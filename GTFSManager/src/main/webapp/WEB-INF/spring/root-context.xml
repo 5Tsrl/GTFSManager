@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<beans xmlns="http://www.springframework.org/schema/beans"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.springframework.org/schema/beans http://www.springframework.org/schema/beans/spring-beans.xsd">
+	
+	<!-- Root Context: defines shared resources visible to all other web components -->
+	<bean name="agencyDAO" class="it.torino._5t.dao.AgencyDAOImpl"></bean>
+	<bean name="routeDAO" class="it.torino._5t.dao.RouteDAOImpl"></bean>
+	<bean name="tripDAO" class="it.torino._5t.dao.TripDAOImpl"></bean>
+	<bean name="calendarDAO" class="it.torino._5t.dao.CalendarDAOImpl"></bean>
+	<bean name="calendarDateDAO" class="it.torino._5t.dao.CalendarDateDAOImpl"></bean>
+	<bean name="frequencyDAO" class="it.torino._5t.dao.FrequencyDAOImpl"></bean>
+	<bean name="fareAttributeDAO" class="it.torino._5t.dao.FareAttributeDAOImpl"></bean>
+	<bean name="fareRuleDAO" class="it.torino._5t.dao.FareRuleDAOImpl"></bean>
+	<bean name="feedInfoDAO" class="it.torino._5t.dao.FeedInfoDAOImpl"></bean>
+	<bean name="shapeDAO" class="it.torino._5t.dao.ShapeDAOImpl"></bean>
+	<bean name="stopDAO" class="it.torino._5t.dao.StopDAOImpl"></bean>
+	<bean name="stopTimeDAO" class="it.torino._5t.dao.StopTimeDAOImpl"></bean>
+	<bean name="transferDAO" class="it.torino._5t.dao.TransferDAOImpl"></bean>
+	<bean name="gtfsDAO" class="it.torino._5t.dao.GTFSDAOImpl"></bean>
+		
+</beans>

@@ -1,0 +1,35 @@
+<?xml version="1.0"?>
+<!DOCTYPE hibernate-configuration PUBLIC
+  "-//Hibernate/Hibernate Configuration DTD//EN"
+  "http://www.hibernate.org/dtd/hibernate-configuration-3.0.dtd">
+<hibernate-configuration>
+  <session-factory>
+    <property name= "hibernate.connection.driver_class">org.postgresql.Driver</property>
+    <property name="hibernate.connection.url">jdbc:postgresql://supremo.5t.torino.it:5432/GTFSManager</property>
+<!--     <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/GTFSManager</property> -->
+    <property name="hibernate.connection.username">postgres</property>
+    <property name="connection.password">postgres</property>
+    <property name="connection.pool_size">10</property>
+	<property name="hibernate.current_session_context_class">thread</property>
+    <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
+	<property name="hibernate.format_sql">true</property> 
+	<property name="hibernate.show_sql">true</property> 
+    <property name="hbm2ddl.auto">validate</property>
+	
+	<mapping class="it.torino._5t.entity.Agency"/>
+	<mapping class="it.torino._5t.entity.Route"/>
+	<mapping class="it.torino._5t.entity.Trip"/>
+	<mapping class="it.torino._5t.entity.Calendar"/>
+	<mapping class="it.torino._5t.entity.CalendarDate"/>
+	<mapping class="it.torino._5t.entity.Frequency"/>
+	<mapping class="it.torino._5t.entity.FareAttribute"/>
+	<mapping class="it.torino._5t.entity.FareRule"/>
+	<mapping class="it.torino._5t.entity.Zone"/>
+	<mapping class="it.torino._5t.entity.Stop"/>
+	<mapping class="it.torino._5t.entity.StopTime"/>
+	<mapping class="it.torino._5t.entity.Transfer"/>
+	<mapping class="it.torino._5t.entity.FeedInfo"/>
+	<mapping class="it.torino._5t.entity.Shape"/>
+	<mapping class="it.torino._5t.entity.GTFS"/>
+  </session-factory>
+</hibernate-configuration>

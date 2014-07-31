@@ -1,0 +1,308 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<class-diagram version="1.1.6" icons="true" automaticImage="JPEG" always-add-relationships="false" 
+  generalizations="true" realizations="true" associations="true" dependencies="false" nesting-relationships="true">  
+  <class id="1" language="java" name="it.torino._5t.entity.Agency" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Agency.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="113" x="66" y="40"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="2" language="java" name="it.torino._5t.entity.Route" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Route.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="104" x="241" y="148"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="3" language="java" name="it.torino._5t.entity.FareAttribute" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/FareAttribute.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="145" x="369" y="39"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="4" language="java" name="it.torino._5t.entity.FareRule" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/FareRule.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="121" x="448" y="152"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="5" language="java" name="it.torino._5t.entity.Zone" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Zone.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="99" x="472" y="329"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="6" language="java" name="it.torino._5t.entity.Trip" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Trip.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="92" x="271" y="276"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="7" language="java" name="it.torino._5t.entity.Calendar" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Calendar.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="122" x="58" y="216"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="8" language="java" name="it.torino._5t.entity.CalendarDate" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/CalendarDate.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="148" x="37" y="347"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="9" language="java" name="it.torino._5t.entity.Frequency" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Frequency.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="130" x="168" y="436"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="10" language="java" name="it.torino._5t.entity.Shape" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Shape.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="107" x="316" y="438"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="11" language="java" name="it.torino._5t.entity.Stop" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Stop.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="97" x="364" y="573"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="12" language="java" name="it.torino._5t.entity.Transfer" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/Transfer.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="119" x="69" y="605"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <class id="13" language="java" name="it.torino._5t.entity.StopTime" project="GTFSManager" 
+    file="/GTFSManager/src/main/java/it/torino/_5t/entity/StopTime.java" binary="false" corner="BOTTOM_RIGHT">    
+    <position height="28" width="125" x="454" y="450"/>    
+    <display autosize="false" stereotype="false" package="false" initial-value="false" signature="true" accessors="true" 
+      visibility="true">      
+      <attributes public="false" package="false" protected="false" private="false" static="false"/>      
+      <operations public="false" package="false" protected="false" private="false" static="true"/>    
+    </display>  
+  </class>  
+  <association id="14">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="15" name="fareAttributes"/>      
+      <multiplicity id="16" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="3" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="17">    
+    <end type="SOURCE" refId="3" navigable="false">      
+      <attribute id="18" name="fareRules"/>      
+      <multiplicity id="19" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="20">    
+    <bendpoint x="602" y="272"/>    
+    <bendpoint x="602" y="182"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="21" name="destinationFareRules">        
+        <position height="18" width="109" x="580" y="162"/>      
+      </attribute>      
+      <multiplicity id="22" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="23">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="24" name="calendarDates"/>      
+      <multiplicity id="25" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="8" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="26">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="27" name="routes"/>      
+      <multiplicity id="28" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="2" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="29">    
+    <bendpoint x="264" y="658"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="30" name="toStopTransfers"/>      
+      <multiplicity id="31" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="32">    
+    <bendpoint x="459" y="633"/>    
+    <bendpoint x="510" y="616"/>    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="33" name="parentStation"/>      
+      <multiplicity id="34" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="35">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="36" name="frequencies"/>      
+      <multiplicity id="37" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="9" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="38">    
+    <end type="SOURCE" refId="7" navigable="false">      
+      <attribute id="39" name="trips"/>      
+      <multiplicity id="40" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="41">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="42" name="trips"/>      
+      <multiplicity id="43" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="6" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="44">    
+    <bendpoint x="629" y="352"/>    
+    <bendpoint x="629" y="524"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="45" name="stops"/>      
+      <multiplicity id="46" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="47">    
+    <bendpoint x="14" y="196"/>    
+    <bendpoint x="28" y="481"/>    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="48" name="stops"/>      
+      <multiplicity id="49" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="11" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="50">    
+    <bendpoint x="408" y="273"/>    
+    <bendpoint x="424" y="214"/>    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="51" name="containsFareRules">        
+        <position height="18" width="98" x="357" y="191"/>      
+      </attribute>      
+      <multiplicity id="52" minimum="0" maximum="2147483647">        
+        <position height="16" width="21" x="463" y="190"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="53">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="54" name="stopTimes"/>      
+      <multiplicity id="55" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="56">    
+    <end type="SOURCE" refId="2" navigable="false">      
+      <attribute id="57" name="fareRules"/>      
+      <multiplicity id="58" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="59">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="60" name="stopTimes"/>      
+      <multiplicity id="61" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="13" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="62">    
+    <end type="SOURCE" refId="11" navigable="false">      
+      <attribute id="63" name="fromStopTransfers"/>      
+      <multiplicity id="64" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="12" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="65">    
+    <end type="SOURCE" refId="6" navigable="false">      
+      <attribute id="66" name="shape"/>      
+      <multiplicity id="67" minimum="0" maximum="1"/>    
+    </end>    
+    <end type="TARGET" refId="10" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="68">    
+    <end type="SOURCE" refId="1" navigable="false">      
+      <attribute id="69" name="calendars"/>      
+      <multiplicity id="70" minimum="0" maximum="2147483647"/>    
+    </end>    
+    <end type="TARGET" refId="7" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <association id="71">    
+    <end type="SOURCE" refId="5" navigable="false">      
+      <attribute id="72" name="originFareRules">        
+        <position height="18" width="83" x="500" y="195"/>      
+      </attribute>      
+      <multiplicity id="73" minimum="0" maximum="2147483647">        
+        <position height="16" width="21" x="487" y="187"/>      
+      </multiplicity>    
+    </end>    
+    <end type="TARGET" refId="4" navigable="true"/>    
+    <display labels="true" multiplicity="true"/>  
+  </association>  
+  <classifier-display autosize="true" stereotype="true" package="true" initial-value="false" signature="true" 
+    accessors="true" visibility="true">    
+    <attributes public="true" package="true" protected="true" private="true" static="true"/>    
+    <operations public="false" package="false" protected="false" private="false" static="true"/>  
+  </classifier-display>  
+  <association-display labels="true" multiplicity="true"/>
+</class-diagram>

@@ -1,0 +1,30 @@
+body {
+	padding-left: 15px;
+	padding-right: 15px;
+	padding-bottom: 15px;
+}
+.login_registration {
+	text-align: center;
+}
+.error {
+	color: red;
+}
+.success {
+	color: green;
+}
+div.riassunto * {
+	margin-top: 15px;
+}
+.colored {
+	width: 100px;
+	height: 20px;
+	border: 1px solid; 
+}
+form {
+	margin-top: 15px;
+}
+#map {
+	width: 850px;
+	height: 600px;
+	border: 1px solid #AAA;
+}
