@@ -13,6 +13,7 @@
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/languages.js' />"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/timezones.js' />"></script>
@@ -22,7 +23,7 @@
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liAgenzie").addClass("active");
     		
-			// se non è stata selezionata nessuna agenzia, i link della navigation bar vengono disattivati
+			// if no agency has been selected, links of the navigation bar are disabled
 			if (!"${agenziaAttiva}") {
 				$("#navigationBar").find("li").each(function () {
 					if ($(this).attr("id") != "liAgenzie" && $(this).attr("id") != "liGestioneGTFS") {
@@ -36,10 +37,10 @@
     });
 	
 	$(document).ready(function() {
-		// form per modificare un'agenzia inizialmente nascosto
+		// edit agency form is initially hidden
 		$("#modificaAgenzia").hide();
 		
-		// la variabile showAlertDuplicateAgency è settata a true da AgencyController se l'id dell'agenzia è già presente
+		// showAlertDuplicateAgency variable is set to true by AgencyController if the agency id is already present
 		if ("${showAlertDuplicateAgency}") {
 			alert("L'id dell'agenzia che hai inserito è già presente");
 		}
@@ -77,6 +78,109 @@
 		$("#listaAgenzie").find("tbody").find("tr").click(function() {
 			var agencyId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaAgenzia?id=" + agencyId;
+		});
+		
+		// Popover
+		$("#creaAgenziaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente un'agenzia." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaAgenziaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo dell'agenzia. Google Maps mostrerà questo nome." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaAgenziaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'agenzia." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaAgenziaForm").find("#phone").popover({ container: 'body', trigger: 'focus', title:"Telefono", content:"Il numero di telefono dell'agenzia. Può contenere segni di punteggiatura per raggruppare le cifre del numero." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaAgenziaForm").find("#fareUrl").popover({ container: 'body', trigger: 'focus', title:"Sito web tariffe", content:"Il sito web che permette a un cliente di acquistare biglietti o altri strumenti tariffari per l'agenzia." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaAgenziaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente un'agenzia." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaAgenziaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo dell'agenzia. Google Maps mostrerà questo nome." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaAgenziaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'agenzia." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaAgenziaForm").find("#phone").popover({ container: 'body', trigger: 'focus', title:"Telefono", content:"Il numero di telefono dell'agenzia. Può contenere segni di punteggiatura per raggruppare le cifre del numero." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaAgenziaForm").find("#fareUrl").popover({ container: 'body', trigger: 'focus', title:"Sito web tariffe", content:"Il sito web che permette a un cliente di acquistare biglietti o altri strumenti tariffari per l'agenzia." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		// Validazione form creazione agenzia
+		$("#creaAgenziaForm").validate({
+			rules: {
+				gtfsId: {
+					required: true
+				},
+				name: {
+					required: true
+				},
+				url: {
+					required: true,
+					url: true
+				},
+				fareUrl: {
+					url: true
+				}
+			},
+			messages: {
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
+				},
+				name: {
+					required: "Il campo nome è obbligatorio"
+				},
+				url: {
+					required: "Il campo url è obbligatorio",
+					url: "Inserire un url corretta"
+				},
+				fareUrl: {
+					url: "Inserire un url corretta"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Validazione form creazione agenzia
+		$("#modificaAgenziaForm").validate({
+			rules: {
+				gtfsId: {
+					required: true
+				},
+				name: {
+					required: true
+				},
+				url: {
+					required: true,
+					url: true
+				},
+				fareUrl: {
+					url: true
+				}
+			},
+			messages: {
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
+				},
+				name: {
+					required: "Il campo nome è obbligatorio"
+				},
+				url: {
+					required: "Il campo url è obbligatorio",
+					url: "Inserire un url corretta"
+				},
+				fareUrl: {
+					url: "Inserire un url corretta"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
 		});
 		
 		// riempe il select delle timezones usando l'array di oggetti in timezones.js
@@ -200,7 +304,7 @@
 			
 			<!-- Div con form per creazione agenzia -->
 			<div id="creaAgenzia">
-				<form:form commandName="agency" method="post" role="form">
+				<form:form id="creaAgenziaForm" commandName="agency" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId">Id</label>
@@ -218,21 +322,21 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="url">Sito web</label>
-				    		<form:input path="url" class="form-control" id="url" type="url" placeholder="Inserisci il sito web" maxlength="255" />
+					    	<form:input path="url" class="form-control" id="url" type="url" placeholder="Inserisci il sito web" maxlength="255" />
 				    		<form:errors path="url" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="timezone">Fuso orario</label>
-							<form:select path="timezone" id="timezones" class="col-lg-12"></form:select>
+							<form:select path="timezone" id="timezones" class="form-control"></form:select>
 							<form:errors path="timezone" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="language">Lingua</label>
-							<form:select path="language" id="languages" class="col-lg-12"></form:select>
+							<form:select path="language" id="languages" class="form-control"></form:select>
 						</div>
 					</div>
 					<div class="row">
@@ -293,7 +397,7 @@
 			
 			<!-- Div con form per modifica agenzia -->
 			<div id="modificaAgenzia">
-				<form:form commandName="agency" method="post" role="form" action="/_5t/modificaAgenzia">
+				<form:form id="modificaAgenziaForm" commandName="agency" method="post" role="form" action="/_5t/modificaAgenzia">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId">Id</label>
@@ -318,14 +422,14 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="timezone">Fuso orario</label>
-							<form:select path="timezone" id="timezonesEdit" class="col-lg-12"></form:select>
+							<form:select path="timezone" id="timezonesEdit" class="form-control"></form:select>
 							<form:errors path="timezone" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="language">Lingua</label>
-							<form:select path="language" id="languagesEdit" class="col-lg-12"></form:select>
+							<form:select path="language" id="languagesEdit" class="form-control"></form:select>
 						</div>
 					</div>
 					<div class="row">
