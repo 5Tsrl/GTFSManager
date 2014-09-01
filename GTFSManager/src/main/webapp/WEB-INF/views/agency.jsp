@@ -10,6 +10,7 @@
 	<title>GTFS Manager - Agenzie</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
@@ -37,21 +38,23 @@
     });
 	
 	$(document).ready(function() {
-		// edit agency form is initially hidden
+		// edit agency form and alerts is initially hidden
 		$("#modificaAgenzia").hide();
+		$(".alert").hide();
 		
 		// showAlertDuplicateAgency variable is set to true by AgencyController if the agency id is already present
 		if ("${showAlertDuplicateAgency}") {
-			alert("L'id dell'agenzia che hai inserito è già presente");
+			$("#agency-already-inserted").show();
 		}
-		// la variabile showForm è settata a true da AgencyController se il form sottomesso per la creazione di un'agenzia contiene degli errori
+	    
+		// showForm variable is set to true from AgencyController if the submitted form for agency creation contains errors
 		if (!"${showCreateForm}") {
 			$("#creaAgenzia").hide();
 		} else {
 			$("#creaAgenzia").show();
 		}
 		
-		// cliccando sul pulsante "Modifica agenzia", il pulsante "Crea agenzia" e il div con il riassunto dell'agenzia attiva devono essere nascosti, mentre il form per modificare l'agenzia deve essere visualizzato
+		// clicking on "Modifica agenzia" button, "Crea agenzia" button and div with active agency summary should be hidden, while the form to modify the agency should be shown
 		$("#modificaAgenziaButton").click(function() {
 			$("#creaAgenziaButton").hide();
 			$("#riassuntoAgenzia").hide();
@@ -63,21 +66,31 @@
 			$("#modificaAgenzia").show();
 		};
 		
-		// cliccando sul pulsante "Elimina", viene mostrata una finestra di dialogo che chiede la conferma dell'eliminazione
+		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaAgenziaButton").click(function() {
-			if (confirm("Vuoi veramente eliminare l'agenzia ${agenziaAttiva.name}?"))
-				window.location.href = "/_5t/eliminaAgenzia";
+			$("#delete-agency").show();
+		});
+		$("#delete-agency-button").click(function() {
+			window.location.href = "/_5t/eliminaAgenzia";
 		});
 		
-		// quando viene selezionata un'agenzia, abilito tutti i link della navigation bar
+		// when an agency is selected, all navigation bar llinks are enabled
 		$(".aSeleziona").click(function() {
 			$("#navigationBar").find("li").find("a").removeClass("disabled");
 		});
 		
-		// cliccando su una riga, l'agenzia corrispondente viene selezionata
+		// clicking on a row, the correspondent agency is selected
 		$("#listaAgenzie").find("tbody").find("tr").click(function() {
 			var agencyId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaAgenzia?id=" + agencyId;
+		});
+		
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().parent().hide();
 		});
 		
 		// Popover
@@ -103,7 +116,7 @@
 		$("#modificaAgenziaForm").find("#fareUrl").popover({ container: 'body', trigger: 'focus', title:"Sito web tariffe", content:"Il sito web che permette a un cliente di acquistare biglietti o altri strumenti tariffari per l'agenzia." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		// Validazione form creazione agenzia
+		// Creation agency form validation
 		$("#creaAgenziaForm").validate({
 			rules: {
 				gtfsId: {
@@ -143,7 +156,7 @@
 			}
 		});
 		
-		// Validazione form creazione agenzia
+		// Edit agency form validation
 		$("#modificaAgenziaForm").validate({
 			rules: {
 				gtfsId: {
@@ -183,7 +196,7 @@
 			}
 		});
 		
-		// riempe il select delle timezones usando l'array di oggetti in timezones.js
+		// fill timezones select using objects array in timezones.js
 		var selTimezones = document.getElementById("timezones");
 		for (var i=0; i<timezones.length; i++) {
 			var opt = document.createElement('option');
@@ -205,7 +218,7 @@
 		    selTimezonesEdit.appendChild(opt);
 		}
 		
-		// riempe il select delle lingue usando l'array di oggetti in languages.js
+		// fill timezones select using objects array in languages.js
 		var selLanguages = document.getElementById("languages");
 		for (var i=0; i<languages.length; i++) {
 			var opt = document.createElement('option');
@@ -227,11 +240,11 @@
 		    selLanguagesEdit.appendChild(opt);
 		}
 		
-		// inizializzazione tabella affinchè le colonne possano essere ordinabili
+		// table initialization to have sortable columns
 		$('.sortable').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Nome")
+	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -250,7 +263,7 @@
 	</ol>
 	
 	<div class="row">
-		<!-- Div con tabella contenente elenco agenzie -->
+		<!-- Div with table containing agencies list -->
 		<div class="col-lg-6">
 			<table id="listaAgenzie" class="table table-striped table-hover sortable">
 				<thead>
@@ -298,11 +311,11 @@
 			</table>
 		</div>
 		
-		<!-- Div con pulsante per creare un'agenzia e riassunto dati agenzia selezionata -->
+		<!-- Div with button to create agency and selected agency summary -->
 		<div class="col-lg-6">
 			<a id="creaAgenziaButton" class="btn btn-primary" href="/_5t/creaAgenzia">Crea un'agenzia</a>
 			
-			<!-- Div con form per creazione agenzia -->
+			<!-- Div with create agency form -->
 			<div id="creaAgenzia">
 				<form:form id="creaAgenziaForm" commandName="agency" method="post" role="form">
 					<div class="row">
@@ -364,7 +377,7 @@
 			
 			<hr>
 			
-			<!-- Div con riassunto agenzia selezionata -->
+			<!-- Div with selected agency summary -->
 			<c:if test="${not empty agenziaAttiva}">
 				<div id="riassuntoAgenzia" class="riassunto">
 					<div class="col-lg-8">
@@ -395,7 +408,7 @@
 				</div>
 			</c:if>
 			
-			<!-- Div con form per modifica agenzia -->
+			<!-- Div with edit agency form -->
 			<div id="modificaAgenzia">
 				<form:form id="modificaAgenziaForm" commandName="agency" method="post" role="form" action="/_5t/modificaAgenzia">
 					<div class="row">
@@ -455,6 +468,18 @@
 				</form:form>
 			</div>
 		</div>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="agency-already-inserted" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <strong>Attenzione!</strong> L'id dell'agenzia che hai inserito è già presente.
+	</div>
+	<div id="delete-agency" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare l'agenzia ${agenziaAttiva.name}?<p>
+	    <button id="delete-agency-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>
 </body>
 </html>

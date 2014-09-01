@@ -28,3 +28,10 @@ form {
 	height: 600px;
 	border: 1px solid #AAA;
 }
+
+.alert {
+	position: absolute;
+	top: 65px;
+	left: 400px;
+	right: 400px;
+}
