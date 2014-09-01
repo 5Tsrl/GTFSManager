@@ -12,9 +12,11 @@
 	<title>GTFS Manager - Corse</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	// load the navigation bar
@@ -25,17 +27,18 @@
     });
 	
 	$(document).ready(function() {
-		// form per modificare una corsa inizialmente nascosto
+		// edit trip form and alerts initially hidden
 		$("#modificaCorsa").hide();
+		$(".alert").hide();
 		
-		// la variabile showForm è settata a true da TripController se il form sottomesso per la creazione di una corsa contiene degli errori
+		// showCreateForm variable is set to true by TripController if the the submitted form to create a trip contains errors
 		if (!"${showCreateForm}") {
 			$("#creaCorsa").hide();
 		} else {
 			$("#creaCorsa").show();
 		}
 		
-		// cliccando sul pulsante "Modifica corsa", il pulsante "Crea corsa" e il div con il riassunto della corsa attiva devono essere nascosti, mentre il form per modificare la corsa deve essere visualizzato
+		// clicking on "Modifica corsa" button, "Crea corsa" button and div with active trip summary should be hidden, while the form to modify the trip should be shown
 		$("#modificaCorsaButton").click(function() {
 			$("#creaCorsaButton").hide();
 			$("#riassuntoCorsa").hide();
@@ -47,23 +50,94 @@
 			$("#modificaCorsa").show();
 		};
 		
-		// cliccando sul pulsante "Elimina", viene mostrata una finestra di dialogo che chiede la conferma dell'eliminazione
+		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaCorsaButton").click(function() {
-			if (confirm("Vuoi veramente eliminare la corsa ${corsaAttiva.tripShortName}?"))
-				window.location.href = "/_5t/eliminaCorsa";
+			$("#delete-trip").show();
+		});
+		$("#delete-trip-button").click(function() {
+			window.location.href = "/_5t/eliminaCorsa";
 		});
 		
-		// cliccando su una riga, la corsa corrispondente viene selezionata
+		// clicking on a row, the correspondent trip is selected
 		$("#listaCorse").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaCorsa?id=" + tripId;
 		});
 		
-		// inizializzazione tabella affinchè le colonne possano essere ordinabili
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
+		});
+		
+		// Popover
+		$("#creaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		// Creation trip form validation
+		$("#creaCorsaForm").validate({
+			rules: {
+				tripShortName: {
+					required: true
+				},
+				serviceId: {
+					required: true
+				}
+			},
+			messages: {
+				tripShortName: {
+					required: "Il campo nome è obbligatorio"
+				},
+				serviceId: {
+					required: "Selezionare un calendario"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Edit trip form validation
+		$("#modificaCorsaForm").validate({
+			rules: {
+				tripShortName: {
+					required: true
+				}
+			},
+			messages: {
+				tripShortName: {
+					required: "Il campo nome è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// table initialization to have sortable columns
 		$('.sortable').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Nome")
+	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -100,7 +174,7 @@
 	%>
 	
 	<div class="row">
-		<!-- Div con tabella contenente elenco corse -->
+		<!-- Div with table containing trip list -->
 		<div class="col-lg-8">
 			<table id="listaCorse" class="table table-striped table-hover sortable">
 				<thead>
@@ -175,16 +249,16 @@
 			</table>
 		</div>
 		
-		<!-- Div con pulsante per creare una corsa e riassunto dati corsa selezionata -->
+		<!-- Div with button to create trip and selected trip summary -->
 		<div class="col-lg-4">
 			<a id="creaCorsaButton" class="btn btn-primary" href="/_5t/creaCorsa">Crea una corsa</a>
 			
-			<!-- Div con form per creazione corsa -->
+			<!-- Div with create trip form -->
 			<div id="creaCorsa">
-				<form:form commandName="trip" method="post" role="form">
+				<form:form id="creaCorsaForm" commandName="trip" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="tripShortName">Nome</label>
+							<label for="tripShortName" class="required">Nome</label>
 				    		<form:input path="tripShortName" class="form-control" id="tripShortName" placeholder="Inserisci il nome" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
@@ -199,7 +273,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="directionId">Direzione</label>
-							<form:select path="directionId">
+							<form:select path="directionId" class="form-control">
 								<form:option value="0" selected="true"><%= direction.get(0) %></form:option>
 								<form:option value="1"><%= direction.get(1) %></form:option>
 							</form:select>
@@ -208,8 +282,8 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="serviceId">Calendario</label>
-							<select name="serviceId" required>
+							<label for="serviceId" class="required">Calendario</label>
+							<select name="serviceId" class="form-control" required>
 								<option value="">Seleziona un calendario</option>
 								<c:forEach var="calendario" items="${listaCalendari}">
 									<option value="${calendario.id}">${calendario.name}</option>
@@ -220,7 +294,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="wheelchairAccessible">Accessibile ai disabili</label>
-							<form:select path="wheelchairAccessible">
+							<form:select path="wheelchairAccessible" class="form-control">
 								<form:option value="0" selected="true"><%= wheelchairAccessible.get(0) %></form:option>
 								<form:option value="1"><%= wheelchairAccessible.get(1) %></form:option>
 								<form:option value="2"><%= wheelchairAccessible.get(2) %></form:option>
@@ -231,7 +305,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="bikesAllowed">Bici permesse</label>
-							<form:select path="bikesAllowed">
+							<form:select path="bikesAllowed" class="form-control">
 								<form:option value="0" selected="true"><%= bikesAllowed.get(0) %></form:option>
 								<form:option value="1"><%= bikesAllowed.get(1) %></form:option>
 								<form:option value="2"><%= bikesAllowed.get(2) %></form:option>
@@ -250,7 +324,7 @@
 			
 			<hr>
 			
-			<!-- Div con riassunto corsa selezionata -->
+			<!-- Div with selected trip summary -->
 			<c:if test="${not empty corsaAttiva}">
 				<div id="riassuntoCorsa" class="riassunto">
 					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
@@ -282,13 +356,13 @@
 				</div>
 			</c:if>
 			
-			<!-- Div con form per modifica corsa -->
+			<!-- Div with edit trip form -->
 			<div id="modificaCorsa">
-				<form:form commandName="trip" method="post" role="form" action="/_5t/modificaCorsa">
+				<form:form id="modificaCorsaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsa">
 					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="tripShortName">Nome</label>
+							<label for="tripShortName" class="required">Nome</label>
 				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaAttiva.tripShortName}" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
@@ -303,7 +377,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="directionId">Direzione</label>
-							<form:select path="directionId">
+							<form:select path="directionId" class="form-control">
 								<%
 								if (trip != null) {
 									for (int i=0; i<direction.size(); i++) {
@@ -325,8 +399,8 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="serviceId">Calendario</label>
-							<select name="serviceId" required>
+							<label for="serviceId" class="required">Calendario</label>
+							<select name="serviceId" class="form-control" required>
 								<option value="">Seleziona un calendario</option>
 								<c:forEach var="calendario" items="${listaCalendari}">
 									<c:choose>
@@ -344,7 +418,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="wheelchairAccessible">Accessibile ai disabili</label>
-							<form:select path="wheelchairAccessible">
+							<form:select path="wheelchairAccessible" class="form-control">
 								<%
 								if (trip != null) {
 									for (int i=0; i<wheelchairAccessible.size(); i++) {
@@ -367,7 +441,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="bikesAllowed">Bici permesse</label>
-							<form:select path="bikesAllowed">
+							<form:select path="bikesAllowed" class="form-control">
 								<%
 								if (trip != null) {
 									for (int i=0; i<bikesAllowed.size(); i++) {
@@ -396,6 +470,14 @@
 				</form:form>
 			</div>
 		</div>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="delete-trip" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare la corsa ${corsaAttiva.tripShortName}?</p>
+	    <button id="delete-trip-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>
 </body>
 </html>

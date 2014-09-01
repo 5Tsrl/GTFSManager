@@ -38,7 +38,7 @@
     });
 	
 	$(document).ready(function() {
-		// edit agency form and alerts is initially hidden
+		// edit agency form and alerts initially hidden
 		$("#modificaAgenzia").hide();
 		$(".alert").hide();
 		
@@ -74,7 +74,7 @@
 			window.location.href = "/_5t/eliminaAgenzia";
 		});
 		
-		// when an agency is selected, all navigation bar llinks are enabled
+		// when an agency is selected, all navigation bar links are enabled
 		$(".aSeleziona").click(function() {
 			$("#navigationBar").find("li").find("a").removeClass("disabled");
 		});
@@ -90,7 +90,7 @@
 			$(this).parent().hide();
 		});
 		$('.annulla').click(function() {
-			$(this).parent().parent().hide();
+			$(this).parent().hide();
 		});
 		
 		// Popover
@@ -263,7 +263,7 @@
 	</ol>
 	
 	<div class="row">
-		<!-- Div with table containing agencies list -->
+		<!-- Div with table containing agency list -->
 		<div class="col-lg-6">
 			<table id="listaAgenzie" class="table table-striped table-hover sortable">
 				<thead>
@@ -320,21 +320,21 @@
 				<form:form id="creaAgenziaForm" commandName="agency" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="gtfsId">Id</label>
+							<label for="gtfsId" class="required">Id</label>
 				    		<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l'id" maxlength="50" />
 				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name">Nome</label>
+							<label for="name" class="required">Nome</label>
 				    		<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="255" />
 				    		<form:errors path="name" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="url">Sito web</label>
+							<label for="url" class="required">Sito web</label>
 					    	<form:input path="url" class="form-control" id="url" type="url" placeholder="Inserisci il sito web" maxlength="255" />
 				    		<form:errors path="url" cssClass="error"></form:errors>
 						</div>
@@ -413,21 +413,21 @@
 				<form:form id="modificaAgenziaForm" commandName="agency" method="post" role="form" action="/_5t/modificaAgenzia">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="gtfsId">Id</label>
+							<label for="gtfsId" class="required">Id</label>
 				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${agenziaAttiva.gtfsId}" maxlength="50" />
 				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name">Nome</label>
+							<label for="name" class="required">Nome</label>
 				    		<form:input path="name" class="form-control" id="name" value="${agenziaAttiva.name}" maxlength="255" />
 				    		<form:errors path="name" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="url">Sito web</label>
+							<label for="url" class="required">Sito web</label>
 				    		<form:input path="url" class="form-control" id="url" type="url" value="${agenziaAttiva.url}" maxlength="255" />
 				    		<form:errors path="url" cssClass="error"></form:errors>
 						</div>
@@ -477,7 +477,7 @@
 	</div>
 	<div id="delete-agency" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
-	    <p>Vuoi veramente eliminare l'agenzia ${agenziaAttiva.name}?<p>
+	    <p>Vuoi veramente eliminare l'agenzia ${agenziaAttiva.name}?</p>
 	    <button id="delete-agency-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>

@@ -11,9 +11,11 @@
 	<title>GTFS Manager - Calendari</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	// load the navigation bar
@@ -24,11 +26,12 @@
     });
 	
 	$(document).ready(function() {
-		// form per modificare un calendario inizialmente nascosto
+		// edit calendar and calendar dates form and alerts initially hidden
 		$("#modificaCalendario").hide();
 		$("#modificaEccezione").hide();
+		$(".alert").hide();
 		
-		// la variabile showForm è settata a true da CalendarController se il form sottomesso per la creazione di un calendario contiene degli errori
+		// showCreateForm variable is set to true by CalendarController if the the submitted form to create a trip contains errors
 		if (!"${showCreateForm}") {
 			$("#creaCalendario").hide();
 		} else {
@@ -41,16 +44,17 @@
 		}
 		
 		// la variabile showAlertWrongCalendarDates è settata a true se la data di inizio inserita nel calendario è successiva alla data di fine 
+		// showAlertWrongCalendarDates variable is set to true if start date is after end date
 		if ("${showAlertWrongCalendarDates}") {
-			alert("La data di inizio non può essere successiva alla data di fine");
+			$("#wrong-calendar-dates").show();
 		}
 		
-		// la variabile showAlertWrongExceptionDate è settata a true se la data inserita nell'eccezione è errata (non nel range del calendario corrispondente) 
+		// showAlertWrongExceptionDate variable is set to true if date of the exception is wrong (not in the corresponding calendar range)
 		if ("${showAlertWrongExceptionDate}") {
-			alert("La data dell'eccezione inserita non è compresa tra le date del calendario corrispondente");
+			$("#wrong-exception-date").show();
 		}
 		
-		// cliccando sul pulsante "Modifica calendario", il pulsante "Crea calendario" e il div con il riassunto del calendario attivo devono essere nascosti, mentre il form per modificare il calendario deve essere visualizzato
+		// clicking on "Modifica calendario" button, "Crea calendario" button and div with active calendar summary should be hidden, while the form to modify the calendar should be shown
 		$("#modificaCalendarioButton").click(function() {
 			$("#creaCalendarioButton").hide();
 			$("#riassuntoCalendario").hide();
@@ -72,35 +76,189 @@
 			$("#modificaEccezione").show();
 		};
 		
-		// cliccando sul pulsante "Elimina", viene mostrata una finestra di dialogo che chiede la conferma dell'eliminazione
+		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaCalendarioButton").click(function() {
 			if ("${calendarioAttivo.trips.size()}" > 0)
-				alert("Non puoi eliminare il calendario.\nDevi prima modificare le corse associate ad esso.")
-			else if (confirm("Vuoi veramente eliminare il calendario ${calendarioAttivo.name}?"))
+				$("#calendar-not-deletable").show();
+			else 
+				$("#delete-calendar").show();
+		});
+		$("#delete-calendar-button").click(function() {
 				window.location.href = "/_5t/eliminaCalendario";
 		});
 		$("#eliminaEccezioneButton").click(function() {
-			if (confirm("Vuoi veramente eliminare l'eccezione ${eccezioneAttiva.date}?"))
-				window.location.href = "/_5t/eliminaEccezione";
+			$("#delete-calendar-date").show();
+		});
+		$("#delete-calendar-date-button").click(function() {
+			window.location.href = "/_5t/eliminaEccezione";
 		});
 		
-		// cliccando su una riga, il calendario corrispondente viene selezionato
+		// clicking on a row, the correspondent calendar is selected
 		$("#listaCalendari").find("tbody").find("tr").click(function() {
 			var serviceId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaCalendario?id=" + serviceId;
 		});
 		
-		// cliccando su una riga, l'eccezione corrispondente viene selezionata
+		// clicking on a row, the correspondent calendar date is selected
 		$("#listaEccezioni").find("tbody").find("tr").click(function() {
 			var calendarDateId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaEccezione?id=" + calendarDateId;
 		});
 		
-		// inizializzazione tabella affinchè le colonne possano essere ordinabili
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
+		});
+		
+		// Popover
+		$("#creaCalendarioForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome del calendario (per uso interno)." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCalendarioForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data di inizio del calendario." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCalendarioForm").find("#endDate").popover({ container: 'body', trigger: 'focus', title:"Data fine", content:"La data di fine del calendario (questa data è iclusa nell'intervallo)." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaCalendarioForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome del calendario (per uso interno)." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCalendarioForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data di inizio del calendario." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCalendarioForm").find("#endDate").popover({ container: 'body', trigger: 'focus', title:"Data fine", content:"La data di fine del calendario (questa data è iclusa nell'intervallo)." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#creaEccezioneForm").find("#date").popover({ container: 'body', trigger: 'focus', title:"Data", content:"La data in cui la disponibilità del servizio è diversa dalla norma." })
+		.blur(function () { $(this).popover('hide'); });
+		$("#creaEccezioneForm").find("#exceptionType").popover({ container: 'body', trigger: 'focus', title:"Data", content:"Indica se il servizio è disponibile nella data specificata." })
+		.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaEccezioneForm").find("#date").popover({ container: 'body', trigger: 'focus', title:"Data", content:"La data in cui la disponibilità del servizio è diversa dalla norma." })
+		.blur(function () { $(this).popover('hide'); });
+		$("#modificaEccezioneForm").find("#exceptionType").popover({ container: 'body', trigger: 'focus', title:"Data", content:"Indica se il servizio è disponibile nella data specificata." })
+		.blur(function () { $(this).popover('hide'); });
+		
+		// Creation calendar form validation
+		$("#creaCalendarioForm").validate({
+			rules: {
+				name: {
+					required: true
+				},
+				startDate: {
+					required: true
+				},
+				endDate: {
+					required: true
+				}
+			},
+			messages: {
+				name: {
+					required: "Il campo nome è obbligatorio"
+				},
+				startDate: {
+					required: "Il campo data inizio è obbligatorio"
+				},
+				endDate: {
+					required: "Il campo data fine è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Edit calendar form validation
+		$("#modificaCalendarioForm").validate({
+			rules: {
+				name: {
+					required: true
+				},
+				startDate: {
+					required: true
+				},
+				endDate: {
+					required: true
+				}
+			},
+			messages: {
+				name: {
+					required: "Il campo nome è obbligatorio"
+				},
+				startDate: {
+					required: "Il campo data inizio è obbligatorio"
+				},
+				endDate: {
+					required: "Il campo data fine è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Creation calendar date form validation
+		$("#creaEccezioneForm").validate({
+			rules: {
+				date: {
+					required: true
+				},
+				exceptionType: {
+					required: true
+				}
+			},
+			messages: {
+				date: {
+					required: "Il campo nome è obbligatorio"
+				},
+				exceptionType: {
+					required: "Il campo tipo di eccezione è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Edit calendar date form validation
+		$("#modificaEccezioneForm").validate({
+			rules: {
+				date: {
+					required: true
+				},
+				exceptionType: {
+					required: true
+				}
+			},
+			messages: {
+				date: {
+					required: "Il campo nome è obbligatorio"
+				},
+				exceptionType: {
+					required: "Il campo tipo di eccezione è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// table initialization to have sortable columns
 		$('#listaCalendari').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Nome")
+	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -110,7 +268,7 @@
 		$('#listaCorse').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Nome")
+	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -120,7 +278,7 @@
 		$('#listaEccezioni').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Data")
+	    	// default sorting on the first column ("Data")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -139,7 +297,7 @@
 	</ol>
 	
 	<div class="row">
-		<!-- Div con tabella contenente elenco calendari -->
+		<!-- Div with table containing calendar list -->
 		<div class="col-lg-6">
 			<table id="listaCalendari" class="table table-striped table-hover sortable">
 				<thead>
@@ -182,30 +340,30 @@
 			</table>
 		</div>
 		
-		<!-- Div con pulsante per creare un calendario e riassunto dati calendario selezionato -->
+		<!-- Div with button to create calendar and selected calendar summary -->
 		<div class="col-lg-6">
 			<a id="creaCalendarioButton" class="btn btn-primary" href="/_5t/creaCalendario">Crea un calendario</a>
 			
-			<!-- Div con form per creazione calendario -->
+			<!-- Div with create calendar form -->
 			<div id="creaCalendario">
-				<form:form commandName="calendar" method="post" role="form">
+				<form:form id="creaCalendarioForm" commandName="calendar" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name">Nome</label>
+							<label for="name" class="required">Nome</label>
 				    		<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="50" />
 				    		<form:errors path="name" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="startDate">Data inizio</label>
+							<label for="startDate" class="required">Data inizio</label>
 				    		<form:input path="startDate" class="form-control" id="startDate" type="date" required="required" />
 				    		<form:errors path="startDate" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="endDate">Data fine</label>
+							<label for="endDate" class="required">Data fine</label>
 				    		<form:input path="endDate" class="form-control" id="endDate" type="date" required="required" />
 				    		<form:errors path="endDate" cssClass="error"></form:errors>
 						</div>
@@ -247,7 +405,7 @@
 			
 			<hr>
 			
-			<!-- Div con riassunto calendario selezionato -->
+			<!-- Div with selected calendar summary -->
 			<c:if test="${not empty calendarioAttivo}">
 				<div id="riassuntoCalendario" class="riassunto">
 					<% Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo"); %>
@@ -277,27 +435,27 @@
 				</div>
 			</c:if>
 			
-			<!-- Div con form per modifica calendario -->
+			<!-- Div with edit calendar form -->
 			<div id="modificaCalendario">
-				<form:form commandName="calendar" method="post" role="form" action="/_5t/modificaCalendario">
+				<form:form id="modificaCalendarioForm" commandName="calendar" method="post" role="form" action="/_5t/modificaCalendario">
 					<% Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name">Nome</label>
+							<label for="name" class="required">Nome</label>
 				    		<form:input path="name" class="form-control" id="name" value="${calendarioAttivo.name}" maxlength="50" />
 				    		<form:errors path="name" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="startDate">Data inizio</label>
+							<label for="startDate" class="required">Data inizio</label>
 				    		<form:input path="startDate" class="form-control" id="startDate" type="date" required="required" value="${calendarioAttivo.startDate}" />
 				    		<form:errors path="startDate" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="endDate">Data fine</label>
+							<label for="endDate" class="required">Data fine</label>
 				    		<form:input path="endDate" class="form-control" id="endDate" type="date" required="required" value="${calendarioAttivo.endDate}" />
 				    		<form:errors path="endDate" cssClass="error"></form:errors>
 						</div>
@@ -343,7 +501,7 @@
 	
 	<div class="row">
 		<c:if test="${not empty calendarioAttivo}">
-			<!-- div con tabella contenente le corse che utilizzano il calendario selezionato -->
+			<!-- div with table containing trips using the selected calendar -->
 			<div class="col-lg-5">
 				<h4>Corse associate al calendario ${calendarioAttivo.name}</h4>
 				<table id="listaCorse" class="table table-striped table-hover sortable">
@@ -371,7 +529,7 @@
 				</table>
 			</div>
 			
-			<!-- div con tabella contenente le eccezioni associate al calendario selezionato -->
+			<!-- div with table containing calendar dates associated to the selected calendar -->
 			<div class="col-lg-4">
 				<h4>Eccezioni associate al calendario ${calendarioAttivo.name}</h4>
 				<table id="listaEccezioni" class="table table-striped table-hover sortable">
@@ -408,24 +566,24 @@
 				</table>
 			</div>
 			
-			<!-- div con tabella contenente le eccezioni associate al calendario selezionato -->
+			<!-- Div with button to create calendar date and selected calendar date summary -->
 			<div class="col-lg-3">
 				<a id="creaEccezioneButton" class="btn btn-primary" href="/_5t/creaEccezione">Crea un'eccezione</a>
 			
-				<!-- Div con form per creazione eccezione -->
+				<!-- Div with create calendar date form -->
 				<div id="creaEccezione">
-					<form:form commandName="calendarDate" method="post" role="form" action="/_5t/creaEccezione">
+					<form:form id="creaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/creaEccezione">
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<label for="date">Data</label>
+								<label for="date" class="required">Data</label>
 					    		<form:input path="date" class="form-control" id="date" type="date" required="required" />
 					    		<form:errors path="date" cssClass="error"></form:errors>
 							</div>
 						</div>
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<label for="exceptionType">Tipo</label>
-					    		<form:select path="exceptionType" required="true">
+								<label for="exceptionType" class="required">Tipo</label>
+					    		<form:select path="exceptionType" class="form-control" required="true">
 					    			<form:option value="">Seleziona il tipo</form:option>
 					    			<form:option value="1">Servizio aggiunto</form:option>
 					    			<form:option value="2">Servizio cancellato</form:option>
@@ -443,7 +601,7 @@
 				
 				<hr>
 			
-				<!-- Div con riassunto calendario selezionato -->
+				<!-- Div with selected calendar date summary -->
 				<c:if test="${not empty eccezioneAttiva}">
 					<div id="riassuntoEccezione" class="riassunto">
 						<div>
@@ -463,20 +621,20 @@
 					</div>
 				</c:if>
 				
-				<!-- Div con form per modifica eccezione -->
+				<!-- Div with edit calendar date form -->
 				<div id="modificaEccezione">
-					<form:form commandName="calendarDate" method="post" role="form" action="/_5t/modificaEccezione">
+					<form:form id="modificaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/modificaEccezione">
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<label for="date">Data</label>
+								<label for="date" class="required">Data</label>
 					    		<form:input path="date" class="form-control" id="date" type="date" required="required" value="${eccezioneAttiva.date}" />
 					    		<form:errors path="date" cssClass="error"></form:errors>
 							</div>
 						</div>
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<label for="exceptionType">Tipo</label>
-					    		<form:select path="exceptionType" required="true">
+								<label for="exceptionType" class="required">Tipo</label>
+					    		<form:select path="exceptionType" class="form-control" required="true">
 					    			<form:option value="">Seleziona il tipo</form:option>
 					    			<c:choose>
 					    				<c:when test="${eccezioneAttiva.exceptionType == 1}">
@@ -501,6 +659,32 @@
 				</div>
 			</div>
 		</c:if>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="delete-calendar" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare il calendario ${calendarioAttivo.name}?</p>
+	    <button id="delete-calendar-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
+	<div id="delete-calendar-date" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare l'eccezione ${eccezioneAttiva.date}?</p>
+	    <button id="delete-calendar-date-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
+	<div id="wrong-calendar-dates" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>La data di inizio non può essere successiva alla data di fine.</p>
+	</div>
+	<div id="wrong-exception-date" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>La data dell'eccezione inserita non è compresa tra le date del calendario corrispondente.</p>
+	</div>
+	<div id="calendar-not-deletable" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>Non puoi eliminare il calendario.<br>Devi prima modificare le corse associate ad esso.</p>
 	</div>
 </body>
 </html>

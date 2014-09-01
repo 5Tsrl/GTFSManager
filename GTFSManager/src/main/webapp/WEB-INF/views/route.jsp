@@ -12,9 +12,11 @@
 	<title>GTFS Manager - Linee</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	// load the navigation bar
@@ -25,17 +27,18 @@
     });
 	
 	$(document).ready(function() {
-		// form per modificare una linea inizialmente nascosto
+		// edit route form and alerts initially hidden
 		$("#modificaLinea").hide();
+		$(".alert").hide();
 		
-		// la variabile showForm è settata a true da RouteController se il form sottomesso per la creazione di una linea contiene degli errori
+		// showCreateForm variable is set to true by RouteController if the the submitted form to create a route contains errors
 		if (!"${showCreateForm}") {
 			$("#creaLinea").hide();
 		} else {
 			$("#creaLinea").show();
 		}
 		
-		// cliccando sul pulsante "Modifica linea", il pulsante "Crea linea" e il div con il riassunto della linea attiva devono essere nascosti, mentre il form per modificare la linea deve essere visualizzato
+		// clicking on "Modifica linea" button, "Crea linea" button and div with active route summary should be hidden, while the form to modify the route should be shown
 		$("#modificaLineaButton").click(function() {
 			$("#creaLineaButton").hide();
 			$("#riassuntoLinea").hide();
@@ -47,23 +50,128 @@
 			$("#modificaLinea").show();
 		};
 		
-		// cliccando sul pulsante "Elimina", viene mostrata una finestra di dialogo che chiede la conferma dell'eliminazione
+		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaLineaButton").click(function() {
-			if (confirm("Vuoi veramente eliminare la linea ${lineaAttiva.shortName}?"))
-				window.location.href = "/_5t/eliminaLinea";
+			$("#delete-route").show();
+		});
+		$("#delete-route-button").click(function() {
+			window.location.href = "/_5t/eliminaLinea";
 		});
 		
-		// cliccando su una riga, la linea corrispondente viene selezionata
+		// clicking on a row, the correspondent route is selected
 		$("#listaLinee").find("tbody").find("tr").click(function() {
 			var routeId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaLinea?id=" + routeId;
 		});
 		
-		// inizializzazione tabella affinchè le colonne possano essere ordinabili
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
+		});
+		
+		// Popover
+		$("#creaLineaForm").find("#shortName").popover({ container: 'body', trigger: 'focus', title:"Linea", content:"Il nome abbreviato della linea. Solitamente è un identificatore breve, astratto, come \"32\", \"100X\" o \"Verde\", che i passeggeri usano per identificare la linea, ma che non dà nessuna informazione su quali luoghi la linea serve." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#longName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo della linea. Questo nome è di solito più descrittivo di quello abbreviato e spesso include la destinazione della linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#description").popover({ container: 'body', trigger: 'focus', title:"Descrizione", content:"La descrizione della linea. Dovrebbero essere inserite informazioni utili, non duplicando semplicemente il nome della linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#type").popover({ container: 'body', trigger: 'focus', title:"Modalità di trasporto", content:"La modalità di trasporto usata sulla linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"La pagina web di una specifica linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#color").popover({ container: 'body', trigger: 'focus', title:"Colore linea", content:"Il colore della linea (quello di default è bianco)." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#textColor").popover({ container: 'body', trigger: 'focus', title:"Colore testo", content:"Il colore del testo avente come sfondo il colore della linea (quello di default è nero)." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaLineaForm").find("#shortName").popover({ container: 'body', trigger: 'focus', title:"Linea", content:"Il nome abbreviato della linea. Solitamente è un identificatore breve, astratto, come \"32\", \"100X\" o \"Verde\", che i passeggeri usano per identificare la linea, ma che non dà nessuna informazione su quali luoghi la linea serve." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#longName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo della linea. Questo nome è di solito più descrittivo di quello abbreviato e spesso include la destinazione della linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#description").popover({ container: 'body', trigger: 'focus', title:"Descrizione", content:"La descrizione della linea. Dovrebbero essere inserite informazioni utili, non duplicando semplicemente il nome della linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#type").popover({ container: 'body', trigger: 'focus', title:"Modalità di trasporto", content:"La modalità di trasporto usata sulla linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"La pagina web di una specifica linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#color").popover({ container: 'body', trigger: 'focus', title:"Colore linea", content:"Il colore della linea (quello di default è bianco)." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#textColor").popover({ container: 'body', trigger: 'focus', title:"Colore testo", content:"Il colore del testo avente come sfondo il colore della linea (quello di default è nero)." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		// Creation route form validation
+		$("#creaLineaForm").validate({
+			rules: {
+				shortName: {
+					required: true
+				},
+				longName: {
+					required: true
+				},
+				url: {
+					url: true
+				}
+			},
+			messages: {
+				shortName: {
+					required: "Il campo linea è obbligatorio"
+				},
+				longName: {
+					required: "Il campo nome è obbligatorio"
+				},
+				url: {
+					url: "Inserire un url corretta"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Edit route form validation
+		$("#modificaLineaForm").validate({
+			rules: {
+				shortName: {
+					required: true
+				},
+				longName: {
+					required: true
+				},
+				url: {
+					url: true
+				}
+			},
+			messages: {
+				shortName: {
+					required: "Il campo linea è obbligatorio"
+				},
+				longName: {
+					required: "Il campo nome è obbligatorio"
+				},
+				url: {
+					url: "Inserire un url corretta"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// table initialization to have sortable columns
 		$('.sortable').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Linea")
+	    	// default sorting on the first column ("Linea")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -95,7 +203,7 @@
 	%>
 	
 	<div class="row">
-		<!-- Div con tabella contenente elenco linee -->
+		<!-- Div with table containing route list -->
 		<div class="col-lg-6">
 			<table id="listaLinee" class="table table-striped table-hover sortable">
 				<thead>
@@ -143,23 +251,23 @@
 			</table>
 		</div>
 		
-		<!-- Div con pulsante per creare una linea e riassunto dati linea selezionata -->
+		<!-- Div with button to create route and selected route summary -->
 		<div class="col-lg-6">
 			<a id="creaLineaButton" class="btn btn-primary" href="/_5t/creaLinea">Crea una linea</a>
 			
-			<!-- Div con form per creazione linea -->
+			<!-- Div with create route form -->
 			<div id="creaLinea">
-				<form:form commandName="route" method="post" role="form">
+				<form:form id="creaLineaForm" commandName="route" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="shortName">Linea</label>
+							<label for="shortName" class="required">Linea</label>
 				    		<form:input path="shortName" class="form-control" id="shortName" placeholder="Inserisci la linea" maxlength="20" />
 				    		<form:errors path="shortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="longName">Nome</label>
+							<label for="longName" class="required">Nome</label>
 				    		<form:input path="longName" class="form-control" id="longName" placeholder="Inserisci il nome" maxlength="50" />
 				    		<form:errors path="longName" cssClass="error"></form:errors>
 						</div>
@@ -174,7 +282,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="type">Modalità di trasporto</label>
-							<form:select path="type">
+							<form:select path="type" class="form-control">
 								<%
 								for (int i=0; i<=7; i++) {
 									if (i == 3) {
@@ -224,7 +332,7 @@
 			
 			<hr>
 			
-			<!-- Div con riassunto linea selezionata -->
+			<!-- Div with selected route summary -->
 			<c:if test="${not empty lineaAttiva}">
 				<div id="riassuntoLinea" class="riassunto">
 					<div class="col-lg-8">
@@ -265,19 +373,19 @@
 				</div>
 			</c:if>
 			
-			<!-- Div con form per modifica linea -->
+			<!-- Div with edit route form -->
 			<div id="modificaLinea">
-				<form:form commandName="route" method="post" role="form" action="/_5t/modificaLinea">
+				<form:form id="modificaLineaForm" commandName="route" method="post" role="form" action="/_5t/modificaLinea">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="shortName">Linea</label>
+							<label for="shortName" class="required">Linea</label>
 				    		<form:input path="shortName" class="form-control" id="shortName" value="${lineaAttiva.shortName}" maxlength="20" />
 				    		<form:errors path="shortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="longName">Nome</label>
+							<label for="longName" class="required">Nome</label>
 				    		<form:input path="longName" class="form-control" id="longName" value="${lineaAttiva.longName}" maxlength="50" />
 				    		<form:errors path="longName" cssClass="error"></form:errors>
 						</div>
@@ -292,7 +400,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="type">Modalità di trasporto</label>
-							<form:select path="type">
+							<form:select path="type" class="form-control">
 								<%
 								Route route = (Route) session.getAttribute("lineaAttiva");
 								if (route != null) {
@@ -343,6 +451,14 @@
 				</form:form>
 			</div>
 		</div>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="delete-route" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare la linea ${lineaAttiva.shortName}?</p>
+	    <button id="delete-route-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>
 </body>
 </html>

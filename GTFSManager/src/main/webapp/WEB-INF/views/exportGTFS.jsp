@@ -10,6 +10,7 @@
 	<title>GTFS Manager - Gestione GTFS</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
@@ -20,7 +21,7 @@
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liGestioneGTFS").addClass("active");
     		
-			// se non è stata selezionata nessuna agenzia, i link della navigation bar vengono disattivati
+    		// if no agency has been selected, links of the navigation bar are disabled
 			if (!"${agenziaAttiva}") {
 				$("#navigationBar").find("li").each(function () {
 					if ($(this).attr("id") != "liAgenzie" && $(this).attr("id") != "liGestioneGTFS") {
@@ -34,7 +35,9 @@
     });
 	
 	$(document).ready(function() {
+		// create GTFS form and alerts initially hidden
 		$("#creaGTFS").hide();
+		$(".alert").hide();
 		
 		$("#creaGTFSButton").click(function() {
 			$("#creaGTFS").show();
@@ -58,15 +61,15 @@
 	    	}
 	    });
 	    
-	 	// se non c'è nessuna riga selezionata nella tabella, il pulsante per eliminare i GTFS è disabilitato
+	    //if no row is selected, button for deleting GTFSs is disabled
 		if (GTFSTable.rows('.selected').data().length == 0) {
 			$('#eliminaGTFSButton').addClass("disabled");
 		}
 	 	
-		// se clicco su una riga nella tabella, viene selezionata
+		// clicking on a row in the table, the row is selected
 		$("#listaGTFS").find("tbody").find("tr").click(function() {
 			$(this).toggleClass('selected');
-			// se il numero di righe selezionate è maggiore di zero il pulsante "Elimina GTFS" è attivo, atrimenti è disabilitato
+			// if the number of selected rows is greater than 0, "Elimina GTFS" button is active, otherwise it is disabled
 			if (GTFSTable.rows('.selected').data().length > 0) {
 				$('#eliminaGTFSButton').removeClass("disabled");
 			} else {
@@ -74,25 +77,29 @@
 			}
 		});
 		
-		// quando clicco sul pulsante "Elimina GTFS", riempio l'array con gli id da eliminare a seconda delle righe selezionate
+		// clicking on "Elimina associazioni" button, the array containing ids to be deleted is filled depending on the selected rows
 		$('#eliminaGTFSButton').click(function(event) {
+			$("#delete-gtfs").show();
+		});
+		$("#delete-gtfs-button").click(function() {
 			var GTFSSelected = GTFSTable.rows('.selected').data().length;
-			if (GTFSSelected == 0) {
-				alert("Non hai selezionato nessun GTFS");
-				event.preventDefault();
-			} else {
-				if (confirm("Vuoi veramente eliminare i GTFS selezionati?")) {
-					var url = "/_5t/eliminaGTFS?id=";
-					$("#listaGTFS").find("tbody").find(".selected").each(function(index) {
-						if (index == GTFSSelected - 1)
-							url += $(this).find(".hidden").html();
-						else
-							url += $(this).find(".hidden").html() + ",";
-					});
-					window.location.href = url;
-				}
-			}
+			var url = "/_5t/eliminaGTFS?id=";
+			$("#listaGTFS").find("tbody").find(".selected").each(function(index) {
+				if (index == GTFSSelected - 1)
+					url += $(this).find(".hidden").html();
+				else
+					url += $(this).find(".hidden").html() + ",";
+			});
+			window.location.href = url;
 	    });
+		
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
+		});
 	});
     </script>
 </head>
@@ -190,5 +197,12 @@
 		</div>
 	</div>
 	
+	<!-- Alerts -->
+	<div id="delete-gtfs" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare i GTFS selezionati?</p>
+	    <button id="delete-gtfs-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
 </body>
 </html>

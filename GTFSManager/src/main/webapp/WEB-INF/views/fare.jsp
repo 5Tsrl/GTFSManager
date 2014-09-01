@@ -9,10 +9,12 @@
 	<title>GTFS Manager - Tariffe</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link href="<c:url value='/resources/css/bootstrap-multiselect.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="<c:url value='/resources/js/bootstrap-multiselect.js' />"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/currencies.js' />"></script>
@@ -25,23 +27,24 @@
     });
     
     $(document).ready(function() {
-		// form per modificare una tariffa inizialmente nascosto
+    	// edit fare form, create fare rule form and alerts initially hidden
 		$("#modificaTariffa").hide();
 		$("#creaRegolaLinea").hide();
+		$(".alert").hide();
 		
-		// la variabile showForm è settata a true da TripController se il form sottomesso per la creazione di una tariffa contiene degli errori
+		// showCreateForm variable is set to true by FareController if the the submitted form to create a fare contains errors
 		if (!"${showCreateForm}") {
 			$("#creaTariffa").hide();
 		} else {
 			$("#creaTariffa").show();
 		}
 		
-		// quando clicco sul pulsante per creare un'associazione con una linea, il rispettivo form viene mostrato
+		// clicking on button to create a route association, the correspondent form is shown
 		$("#creaRegolaLineaButton").click(function() {
 			$("#creaRegolaLinea").show();
 		});
 		
-		// cliccando sul pulsante "Modifica tariffa", il pulsante "Crea tariffa" e il div con il riassunto della tariffa attiva devono essere nascosti, mentre il form per modificare la tariffa deve essere visualizzato
+		// clicking on "Modifica tariffa" button, "Crea tariffa" button and div with active fare summary should be hidden, while the form to modify the fare should be shown
 		$("#modificaTariffaButton").click(function() {
 			$("#creaTariffaButton").hide();
 			$("#riassuntoTariffa").hide();
@@ -53,27 +56,29 @@
 			$("#modificaTariffa").show();
 		};
 		
-		// cliccando sul pulsante "Elimina", viene mostrata una finestra di dialogo che chiede la conferma dell'eliminazione
+		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaTariffaButton").click(function() {
-			if (confirm("Vuoi veramente eliminare la tariffa ${tariffaAttiva.name}?"))
-				window.location.href = "/_5t/eliminaTariffa";
+			$("#delete-fare").show();
+		});
+		$("#delete-fare-button").click(function() {
+			window.location.href = "/_5t/eliminaTariffa";
 		});
 		
-		// cliccando su una riga, la tariffa corrispondente viene selezionata
+		// clicking on a row, the correspondent fare is selected
 		$("#listaTariffe").find("tbody").find("tr").click(function() {
 			var fareAttributeId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaTariffa?id=" + fareAttributeId;
 		});
 		
-		// controllo al submit del form per la creazione di un'associazione con le linee che ne sia stata selezionata almeno una
+		// check at form submit for creation of a route association that at least one route has been selected
 		$("#creaRegolaLinea").find("form").submit(function(event) {
 			if ($(this).find("select :selected").length == 0) {
-				alert("Devi selezionare almeno una linea da associare alla tariffa");
+				$("#no-routes-selected").show();
 				event.preventDefault();
 			}
 		});
 		
-		// riempe il select delle currencies usando l'array di oggetti in currencies.js
+		// fill timezones select using objects array in currencies.js
 		var selCurrencies = document.getElementById("currencies");
 		for (var i=0; i<currencies.length; i++) {
 			var opt = document.createElement('option');
@@ -95,7 +100,7 @@
 		    selCurrenciesEdit.appendChild(opt);
 		}
 		
-		// inizializzazione multiselect
+		// multiselect initialization
 		$('.multiselect').multiselect({
 		       nonSelectedText: 'Nessuna linea selezionata',
 		       includeSelectAllOption: true,
@@ -105,11 +110,82 @@
 		       filterPlaceholder: 'Cerca'
 	     });
 		
-		// inizializzazione tabella affinchè le colonne possano essere ordinabili
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
+		});
+		
+		// Popover
+		$("#creaTariffaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome della tariffa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaTariffaForm").find("#price").popover({ container: 'body', trigger: 'focus', title:"Prezzo", content:"Il prezzo." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaTariffaForm").find("#paymentMethod").popover({ container: 'body', trigger: 'focus', title:"Metodo di pagamento", content:"Il metodo di pagamento indica quando la tariffa deve essere pagata." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaTariffaForm").find("#transfers").popover({ container: 'body', trigger: 'focus', title:"Numero di trasferimenti", content:"Il numero di trasferimenti permessi per questa tariffa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaTariffaForm").find("#transferDuration").popover({ container: 'body', trigger: 'focus', title:"Durata del trasferimento", content:"La durata del trasferimento indica entro quanto tempo il trasferimento scade. Quando è usato con \"Nessun trasferimento permesso\", questo campo indica per quanto tempo un biglietto è valido per una tariffa in cui non sono permessi trasferimenti. A meno che questo campo non sia usato per indicare la validità di un biglietto, dovrebbe essere lasciato vuoto quando nessun trasferimento è permesso." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaTariffaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome della tariffa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaTariffaForm").find("#price").popover({ container: 'body', trigger: 'focus', title:"Prezzo", content:"Il prezzo." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaTariffaForm").find("#paymentMethod").popover({ container: 'body', trigger: 'focus', title:"Metodo di pagamento", content:"Il metodo di pagamento indica quando la tariffa deve essere pagata." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaTariffaForm").find("#transfers").popover({ container: 'body', trigger: 'focus', title:"Numero di trasferimenti", content:"Il numero di trasferimenti permessi per questa tariffa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaTariffaForm").find("#transferDuration").popover({ container: 'body', trigger: 'focus', title:"Durata del trasferimento", content:"La durata del trasferimento indica entro quanto tempo il trasferimento scade. Quando è usato con \"Nessun trasferimento permesso\", questo campo indica per quanto tempo un biglietto è valido per una tariffa in cui non sono permessi trasferimenti. A meno che questo campo non sia usato per indicare la validità di un biglietto, dovrebbe essere lasciato vuoto quando nessun trasferimento è permesso." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		// Creation trip form validation
+		$("#creaTariffaForm").validate({
+			rules: {
+				name: {
+					required: true
+				}
+			},
+			messages: {
+				name: {
+					required: "Il campo nome è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Edit trip form validation
+		$("#modificaTariffaForm").validate({
+			rules: {
+				name: {
+					required: true
+				}
+			},
+			messages: {
+				name: {
+					required: "Il campo nome è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// table initialization to have sortable columns
 		$('#listaTariffe').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Nome")
+	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -119,7 +195,7 @@
 		var listaRegoleTable = $('#listaRegole').DataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Nome")
+	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -127,15 +203,15 @@
 	    	}
 	    });
 		
-		// se non c'è nessuna riga selezionata nella tabella delle associazioni con le linee, il pulsante per eliminare le associazioni è disabilitato
+		// if no row is selected in route association table, delete button for associations is disabled
 		if (listaRegoleTable.rows('.selected').data().length == 0) {
 			$('#eliminaRegolaLineaButton').addClass("disabled");
 		}
 		
-		// se clicco su una riga nella tabella delle associazioni con le linee, la riga viene selezionata
+		// clicking on a row in route association table, the row is selected
 		$("#listaRegole").find("tbody").find("tr").click(function() {
 			$(this).toggleClass('selected');
-			// se il numero di righe selezionate è maggiore di zero il pulsante "Elimina associazioni" è attivo, atrimenti è disabilitato
+			// if the number of selected rows is greater than 0, "Elimina associazioni" button is active, otherwise it is disabled
 			if (listaRegoleTable.rows('.selected').data().length > 0) {
 				$('#eliminaRegolaLineaButton').removeClass("disabled");
 			} else {
@@ -143,33 +219,29 @@
 			}
 		});
 		
-		// quando clicco sul pulsante "Elimina associazioni", riempio l'array con gli id da eliminare a seconda delle righe selezionate
+		// clicking on "Elimina associazioni" button, the array containing ids to be deleted is filled depending on the selected rows
 		$('#eliminaRegolaLineaButton').click(function(event) {
+			$("#delete-fare-rule").show();
+		});
+		$("#delete-fare-rule-button").click(function() {
 			var routeSelected = listaRegoleTable.rows('.selected').data().length;
-			if (routeSelected == 0) {
-				alert("Non hai selezionato nessuna linea");
-				event.preventDefault();
-			} else {
-				if (confirm("Vuoi veramente eliminare le associazioni selezionate?")) {
-					var url = "/_5t/eliminaRegolaLinea?id=";
-					$("#listaRegole").find("tbody").find(".selected").each(function(index) {
-						if (index == routeSelected - 1)
-							url += $(this).find(".hidden").html();
-						else
-							url += $(this).find(".hidden").html() + ",";
-					});
-					window.location.href = url;
-				}
-			}
+			var url = "/_5t/eliminaRegolaLinea?id=";
+			$("#listaRegole").find("tbody").find(".selected").each(function(index) {
+				if (index == routeSelected - 1)
+					url += $(this).find(".hidden").html();
+				else
+					url += $(this).find(".hidden").html() + ",";
+			});
+			window.location.href = url;
 	    });
 		
-		// quando clicco sul pulsante "Seleziona tutte le linee", seleziono tutte le associazioni e abilito il pulsante "Elimina associazioni"
+		// clicking on "Seleziona tutte le linee" button, all the associations are selected and "Elimina associazioni" button is enabled
 		$('#selezionaTutteLeLineeButton').click(function() {
 			$("#listaRegole").find("tbody").find("tr").addClass("selected");
 			$('#eliminaRegolaLineaButton').removeClass("disabled");
 		});
 		
-		// quando clicco sul pulsante "Deseleziona tutte le linee", deseleziono tutte le associazioni e disabilito il pulsante "Elimina associazioni"
+		// clicking on "Deseleziona tutte le linee" button, all the associations are deselected and "Elimina associazioni" button is disabled
 		$('#deselezionaTutteLeLineeButton').click(function() {
 			$("#listaRegole").find("tbody").find("tr").removeClass("selected");
 			$('#eliminaRegolaLineaButton').addClass("disabled");
@@ -186,7 +258,7 @@
 	</ol>
 	
 	<div class="row">
-		<!-- Div con tabella contenente elenco tariffe -->
+		<!-- Div with table containing fare list -->
 		<div class="col-lg-6">
 			<table id="listaTariffe" class="table table-striped table-hover sortable">
 				<thead>
@@ -217,16 +289,16 @@
 			</table>
 		</div>
 		
-		<!-- Div con pulsante per creare una tariffa e riassunto dati tariffa selezionata -->
+		<!-- Div with button to create fare and selected fare summary -->
 		<div class="col-lg-6">
 			<a id="creaTariffaButton" class="btn btn-primary" href="/_5t/creaTariffa">Crea una tariffa</a>
 			
-			<!-- Div con form per creazione tariffa -->
+			<!-- Div with create fare form -->
 			<div id="creaTariffa">
-				<form:form commandName="fareAttribute" method="post" role="form">
+				<form:form id="creaTariffaForm" commandName="fareAttribute" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name">Nome</label>
+							<label for="name" class="required">Nome</label>
 				    		<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="50" />
 				    		<form:errors path="name" cssClass="error"></form:errors>
 						</div>
@@ -241,14 +313,14 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="currencyType">Valuta</label>
-							<form:select path="currencyType" id="currencies"></form:select>
+							<form:select path="currencyType" id="currencies" class="form-control"></form:select>
 							<form:errors path="currencyType" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="paymentMethod">Metodo di pagamento</label>
-							<form:select path="paymentMethod">
+							<form:select path="paymentMethod" class="form-control">
 								<form:option value="0">A bordo</form:option>
 								<form:option value="1" selected="selected">Prima di salire a bordo</form:option>
 							</form:select>
@@ -258,7 +330,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="transfers">Numero di trasferimenti</label>
-							<form:select path="transfers">
+							<form:select path="transfers" class="form-control">
 								<form:option value="0">Nessun trasferimento permesso</form:option>
 								<form:option value="1" selected="selected">1</form:option>
 								<form:option value="2">2</form:option>
@@ -285,7 +357,7 @@
 			
 			<hr>
 			
-			<!-- Div con riassunto tariffa selezionata -->
+			<!-- Div with selected fare summary -->
 			<c:if test="${not empty tariffaAttiva}">
 				<div id="riassuntoTariffa" class="riassunto">
 					<div class="col-lg-8">
@@ -320,12 +392,12 @@
 				</div>
 			</c:if>
 			
-			<!-- Div con form per modifica tariffa -->
+			<!-- Div with edit fare form -->
 			<div id="modificaTariffa">
-				<form:form commandName="fareAttribute" method="post" role="form" action="/_5t/modificaTariffa">
+				<form:form id="modificaTariffaForm" commandName="fareAttribute" method="post" role="form" action="/_5t/modificaTariffa">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name">Nome</label>
+							<label for="name" class="required">Nome</label>
 				    		<form:input path="name" class="form-control" id="name" value="${tariffaAttiva.name}" maxlength="50" />
 				    		<form:errors path="name" cssClass="error"></form:errors>
 						</div>
@@ -419,7 +491,7 @@
 	
 	<div class="row">
 		<c:if test="${not empty tariffaAttiva}">
-			<!-- div con tabella contenente le linee che utilizzano la tariffa selezionata -->
+			<!-- div with table containing routes using the selected fare -->
 			<div class="col-lg-6">
 				<h4>Linee associate alla tariffa ${tariffaAttiva.name}</h4>
 				<table id="listaRegole" class="table sortable">
@@ -453,17 +525,16 @@
 				</table>
 			</div>
 			
-			<!-- Div con pulsante per creare una regola (associazione tariffa-linea) e riassunto dati regola selezionata -->
+			<!-- Div with button to create a fare rule (association fare-route) and selected rule summary -->
 			<div class="col-lg-6">
-<!-- 				<a id="creaRegolaLineaButton" class="btn btn-primary" href="/_5t/creaRegolaLinea">Associa linee</a> -->
 				<button id="creaRegolaLineaButton" class="btn btn-primary">Associa linee</button>
 				
-				<!-- Div con form per creazione tariffa -->
+				<!-- Div with create fare rule form -->
 				<div id="creaRegolaLinea">
 					<form method="post" role="form" action="/_5t/creaRegolaLinea">
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<label for="routeId">Calendario</label>
+								<label for="routeId" class="required">Calendario</label>
 								<select name="routeId" class="multiselect" multiple="multiple">
 									<c:forEach var="linea" items="${listaLinee}">
 										<option value="${linea.id}">${linea.shortName}</option>
@@ -489,6 +560,24 @@
 				</div>
 			</div>
 		</c:if>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="delete-fare" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare la tariffa ${tariifaAttiva.name}?</p>
+	    <button id="delete-fare-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
+	<div id="delete-fare-rule" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare le associazioni selezionate?</p>
+	    <button id="delete-fare-rule-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
+	<div id="no-routes-selected" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>Devi selezionare almeno una linea da associare alla tariffa</p>
 	</div>
 </body>
 </html>

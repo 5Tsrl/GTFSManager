@@ -9,9 +9,11 @@
 	<title>GTFS Manager - Servizi</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	// load the navigation bar
@@ -22,22 +24,23 @@
     });
 	
 	$(document).ready(function() {
-		// form per modificare un servizio inizialmente nascosto
+		// edit frequency form and alerts initially hidden
 		$("#modificaServizio").hide();
+		$(".alert").hide();
 		
-		// la variabile showForm è settata a true da FrequencyController se il form sottomesso per la creazione di un servizio contiene degli errori
+		// showCreateForm variable is set to true by FrequencyController if the the submitted form to create a trip contains errors
 		if (!"${showCreateForm}") {
 			$("#creaServizio").hide();
 		} else {
 			$("#creaServizio").show();
 		}
 		
-		// la variabile showAlertWrongTimes è settata a true se l'ora di inizio inserita nel servizio è successiva all'ora di fine 
+		// showAlertWrongTimes variable is set to true if start time is after end time
 		if ("${showAlertWrongTimes}") {
-			alert("L'ora di inizio non può essere successiva all'ora di fine");
+			$("#wrong-times").show();
 		}
 		
-		// cliccando sul pulsante "Modifica servizio", il pulsante "Crea servizio" e il div con il riassunto del servizio attivo devono essere nascosti, mentre il form per modificare il servizio deve essere visualizzato
+		// clicking on "Modifica servizio" button, "Crea servizio" button and div with active trip summary should be hidden, while the form to modify the trip should be shown
 		$("#modificaServizioButton").click(function() {
 			$("#creaServizioButton").hide();
 			$("#riassuntoServizio").hide();
@@ -49,23 +52,120 @@
 			$("#modificaServizio").show();
 		};
 		
-		// cliccando sul pulsante "Elimina", viene mostrata una finestra di dialogo che chiede la conferma dell'eliminazione
+		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaServizioButton").click(function() {
-			if (confirm("Vuoi veramente eliminare il servizio dalle ${servizioAttivo.startTime} alle ${servizioAttivo.endTime}?"))
-				window.location.href = "/_5t/eliminaServizio";
+			$("#delete-frequency").show();
+		});
+		$("#delete-frequency-button").click(function() {
+			window.location.href = "/_5t/eliminaServizio";
 		});
 		
-		// cliccando su una riga, il servizio corrispondente viene selezionato
+		// clicking on a row, the correspondent frequency is selected
 		$("#listaServizi").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
 			window.location.href = "/_5t/selezionaServizio?id=" + tripId;
 		});
 		
-		// inizializzazione tabella affinchè le colonne possano essere ordinabili
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
+		});
+		
+		// Popover
+		$("#creaServizioForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora inizio", content:"L'ora in cui inizia il servizio con la frequenza specificata." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaServizioForm").find("#end").popover({ container: 'body', trigger: 'focus', title:"Ora fine", content:"L'ora in cui il servizio cambia a una frequenza diversa (o finisce) alla prima fermata nella corsa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaServizioForm").find("#headwaySecs").popover({ container: 'body', trigger: 'focus', title:"Frequenza", content:"Il tempo tra le partenze dalla stessa fermata per questo tipo di corsa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaServizioForm").find("#exactTimes").popover({ container: 'body', trigger: 'focus', title:"Tempi esatti", content:"Determina se le corse basate sulla frequenza debbano essere esattamente schedulate in base alle informazioni specificate." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		$("#modificaServizioForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora inizio", content:"L'ora in cui inizia il servizio con la frequenza specificata." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaServizioForm").find("#end").popover({ container: 'body', trigger: 'focus', title:"Ora fine", content:"L'ora in cui il servizio cambia a una frequenza diversa (o finisce) alla prima fermata nella corsa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaServizioForm").find("#headwaySecs").popover({ container: 'body', trigger: 'focus', title:"Frequenza", content:"Il tempo tra le partenze dalla stessa fermata per questo tipo di corsa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaServizioForm").find("#exactTimes").popover({ container: 'body', trigger: 'focus', title:"Tempi esatti", content:"Determina se le corse basate sulla frequenza debbano essere esattamente schedulate in base alle informazioni specificate." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		// Creation frequency form validation
+		$("#creaServizioForm").validate({
+			rules: {
+				start: {
+					required: true
+				},
+				end: {
+					required: true
+				},
+				headwaySecs: {
+					required: true,
+					min: 1
+				}
+			},
+			messages: {
+				start: {
+					required: "Il campo ora di inizio è obbligatorio"
+				},
+				end: {
+					required: "Il campo ora di fine è obbligatorio"
+				},
+				headwaySecs: {
+					required: "Il campo frequenza è obbligatorio",
+					min: "Inserire una frequenza maggiore o uguale a 1 minuto"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Edit frequency form validation
+		$("#modificaServizioForm").validate({
+			rules: {
+				start: {
+					required: true
+				},
+				end: {
+					required: true
+				},
+				headwaySecs: {
+					required: true,
+					min: 1
+				}
+			},
+			messages: {
+				start: {
+					required: "Il campo ora di inizio è obbligatorio"
+				},
+				end: {
+					required: "Il campo ora di fine è obbligatorio"
+				},
+				headwaySecs: {
+					required: "Il campo frequenza è obbligatorio",
+					min: "Inserire una frequenza maggiore o uguale a 1 minuto"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// table initialization to have sortable columns
 		$('.sortable').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// l'ordinamento di default è sulla prima colonna ("Ora inizio")
+	    	// default sorting on the first column ("Ora inizio")
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
@@ -87,7 +187,7 @@
 	</ol>
 	
 	<div class="row">
-		<!-- Div con tabella contenente elenco servizi -->
+		<!-- Div with table containing frequency list -->
 		<div class="col-lg-6">
 			<table id="listaServizi" class="table table-striped table-hover sortable">
 				<thead>
@@ -120,28 +220,28 @@
 			</table>
 		</div>
 		
-		<!-- Div con pulsante per creare un servizio e riassunto dati servizio selezionata -->
+		<!-- Div with button to create frequency and selected frequency summary -->
 		<div class="col-lg-6">
 			<a id="creaServizioButton" class="btn btn-primary" href="/_5t/creaServizio">Crea un servizio</a>
 			
-			<!-- Div con form per creazione corsa -->
+			<!-- Div with create frequency form -->
 			<div id="creaServizio">
-				<form:form commandName="frequency" method="post" role="form">
+				<form:form id="creaServizioForm" commandName="frequency" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="start">Ora inizio</label>
+							<label for="start" class="required">Ora inizio</label>
 				    		<input name="start" class="form-control" id="start" type="time" required="required" />
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="end">Ora fine</label>
+							<label for="end" class="required">Ora fine</label>
 				    		<input name="end" class="form-control" id="end" type="time" required="required" />
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="headwaySecs">Frequenza (min)</label>
+							<label for="headwaySecs" class="required">Frequenza (min)</label>
 				    		<form:input path="headwaySecs" class="form-control" id="headwaySecs" type="number" min="1" required="required" />
 				    		<form:errors path="headwaySecs" cssClass="error"></form:errors>
 						</div>
@@ -149,7 +249,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="exactTimes">Corsa programmata esattamente</label>
-				    		<form:select path="exactTimes">
+				    		<form:select path="exactTimes" class="form-control">
 								<form:option value="0" selected="true">No</form:option>
 								<form:option value="1">Sì</form:option>
 							</form:select>
@@ -167,7 +267,7 @@
 			
 			<hr>
 			
-			<!-- Div con riassunto corsa selezionata -->
+			<!-- Div with selected frequency summary -->
 			<c:if test="${not empty servizioAttivo}">
 				<div id="riassuntoServizio" class="riassunto">
 					<div class="col-lg-8">
@@ -193,24 +293,24 @@
 				</div>
 			</c:if>
 			
-			<!-- Div con form per modifica servizio -->
+			<!-- Div with edit frequency form -->
 			<div id="modificaServizio">
-				<form:form commandName="frequency" method="post" role="form" action="/_5t/modificaServizio">
+				<form:form id="modificaServizioForm" commandName="frequency" method="post" role="form" action="/_5t/modificaServizio">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="start">Ora inizio</label>
+							<label for="start" class="required">Ora inizio</label>
 				    		<input name="start" class="form-control" id="start" type="time" required="required" value="${servizioAttivo.startTime}" />
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="end">Ora fine</label>
+							<label for="end" class="required">Ora fine</label>
 				    		<input name="end" class="form-control" id="end" type="time" required="required" value="${servizioAttivo.endTime}" />
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="headwaySecs">Frequenza</label>
+							<label for="headwaySecs" class="required">Frequenza</label>
 				    		<form:input path="headwaySecs" class="form-control" id="headwaySecs" type="number" min="1" required="required" value="${servizioAttivo.headwaySecs}" />
 				    		<form:errors path="headwaySecs" cssClass="error"></form:errors>
 						</div>
@@ -218,7 +318,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="exactTimes">Corsa programmata esattamente</label>
-				    		<form:select path="exactTimes">
+				    		<form:select path="exactTimes" class="form-control">
 				    			<c:choose>
 				    				<c:when test="${servizioAttivo.exactTimes == 0}">
 										<form:option value="0" selected="true">No</form:option>
@@ -242,6 +342,18 @@
 				</form:form>
 			</div>
 		</div>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="delete-frequency" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare il servizio dalle ${servizioAttivo.startTime} alle ${servizioAttivo.endTime}?</p>
+	    <button id="delete-frequency-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
+	<div id="wrong-times" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>L'ora di inizio non può essere successiva all'ora di fine.</p>
 	</div>
 </body>
 </html>
