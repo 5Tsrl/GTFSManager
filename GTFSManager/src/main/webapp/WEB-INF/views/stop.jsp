@@ -10,11 +10,13 @@
 	<title>GTFS Manager - Fermate</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
 	<link href="<c:url value='/resources/css/leaflet.label.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.markcluster.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/leaflet.label.js' />"></script>
@@ -57,24 +59,24 @@
 		var lats = {};
 		var lons = {};
 		
-		// per ogni fermata dell'agenzia (listaFermate) creo un marker, con un popup contenente il form per la modifica della fermata
+		// for each stop of the agency (listaFermate) a marker is created, with a popup containing edit stop form
 		<c:forEach var="fermata" items="${listaFermate}">
 			var popupContent = '<form:form id="form${fermata.id}" commandName="stop" method="post" role="form" action="modificaFermata?id=${fermata.id}">' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="lat">Latitudine</label>' +
-											'<form:input path="lat" class="form-control" id="lat" value="${fermata.lat}" />' +
+											'<label for="lat" class="required">Latitudine</label>' +
+											'<form:input path="lat" class="form-control" id="lat" value="${fermata.lat}" required="true" />' +
 											'<form:errors path="lat" cssClass="error"></form:errors>' +
 										'</div>' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="lon">Longitudine</label>' +
-											'<form:input path="lon" class="form-control" id="lon" value="${fermata.lon}" />' +
+											'<label for="lon" class="required">Longitudine</label>' +
+											'<form:input path="lon" class="form-control" id="lon" value="${fermata.lon}" required="true" />' +
 											'<form:errors path="lon" cssClass="error"></form:errors>' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group">' +
-											'<label for="name">Nome</label>' +
+											'<label for="name" class="required">Nome</label>' +
 											'<form:input path="name" class="form-control" id="name" value="${fermata.name}" maxlength="50" required="true" />' +
 											'<form:errors path="name" cssClass="error"></form:errors>' +
 										'</div>' +
@@ -136,7 +138,7 @@
 									'<div class="row">' +
 										'<div class="form-group">' +
 											'<label for="wheelchairBoarding">Accessibile ai disabili</label>' +
-											'<form:select path="wheelchairBoarding">';
+											'<form:select path="wheelchairBoarding" class="form-control">';
 			if ("${fermata.wheelchairBoarding}" == 0) {
 				popupContent += '<form:option value="0" selected="true">Informazione non disponibile</form:option>' +
 								'<form:option value="1">Sì</form:option>' +
@@ -159,21 +161,42 @@
 											'<input class="btn btn-success" type="submit" value="Modifica" />' +
 										'</div>' +
 									'</div>' +
-								'</form:form>' +
-								'<a class="btn btn-danger active" href="/_5t/eliminaFermata?id=${fermata.id}">Elimina</a>';
-			
-			var marker = L.marker(["${fermata.lat}", "${fermata.lon}"], {draggable: true})
-				.bindPopup(popupContent, {minWidth: 300})
-				.bindLabel("${fermata.name}");
+								'</form:form>';
+			var marker;
+			if ("${fn:length(fermata.stopTimes)}" > 0) {
+				// if the stop has some trips associated, it is green and can't be deleted; a list of all trips associated is displayed
+				popupContent +=	'<p>Non puoi eliminare questa fermata, perché le seguenti corse sono associate ad essa:</p><ul>';
+				<c:forEach var="stopTime" items="${fermata.stopTimes}">
+					popupContent +=	'<li>${stopTime.trip.route.shortName} - <a href="/_5t/selezionaCorsa?id=${stopTime.trip.id}">${stopTime.trip.tripShortName}</a></li>';
+				</c:forEach>
+				popupContent +=	'</ul>';
+				
+				var greenIcon = L.icon({
+				    iconUrl: "<c:url value='/resources/images/green-marker.png' />",
+				    iconSize: [25, 41],
+			        iconAnchor: [12, 41],
+			        popupAnchor: [1, -34]
+				});
+				marker = L.marker(["${fermata.lat}", "${fermata.lon}"], {draggable: true, icon: greenIcon})
+					.bindPopup(popupContent, {minWidth: 300})
+					.bindLabel("${fermata.name}");
+			} else {
+				// else it can be deleted, since it has no trips associated
+				popupContent +=	'<a class="btn btn-danger active" href="/_5t/eliminaFermata?id=${fermata.id}">Elimina</a>';
+				
+				marker = L.marker(["${fermata.lat}", "${fermata.lon}"], {draggable: true})
+					.bindPopup(popupContent, {minWidth: 300})
+					.bindLabel("${fermata.name}");
+			}
 			
 			lats["${fermata.id}"] = "${fermata.lat}";
 			lons["${fermata.id}"] = "${fermata.lon}";
-			// se il marker viene draggato, una volta rilasciato deve aprirsi il popup per la modifica della fermata con le coordinate aggiornate
+			// if the marker is dragged, once it is released a popup to edit the stop with the updated coordinates should be opened
 			marker.on("dragend", function() {
 				this.update();
 				console.log(lats);
-				var newPopupContentLat = this.getPopup().getContent().replace('<input id="lat" name="lat" value="' + lats["${fermata.id}"] + '" class="form-control" type="text"', '<input id="lat" name="lat" value="' + this.getLatLng().lat + '" class="form-control" type="text"');
-				var newPopupContentLatLon = newPopupContentLat.replace('<input id="lon" name="lon" value="' + lons["${fermata.id}"] + '" class="form-control" type="text"', '<input id="lon" name="lon" value="' + this.getLatLng().lng + '" class="form-control" type="text"');
+				var newPopupContentLat = this.getPopup().getContent().replace('<input id="lat" name="lat" value="' + lats["${fermata.id}"] + '" class="form-control" required="true" type="text"', '<input id="lat" name="lat" value="' + this.getLatLng().lat + '" class="form-control" required="true" type="text"');
+				var newPopupContentLatLon = newPopupContentLat.replace('<input id="lon" name="lon" value="' + lons["${fermata.id}"] + '" class="form-control" required="true" type="text"', '<input id="lon" name="lon" value="' + this.getLatLng().lng + '" class="form-control" required="true" type="text"');
 				lats["${fermata.id}"] = this.getLatLng().lat;
 				lons["${fermata.id}"] = this.getLatLng().lng;
 				this.bindPopup(newPopupContentLatLon, {minWidth: 300}).openPopup();
@@ -184,26 +207,26 @@
 		
 		map.addLayer(markers);
 		
-		// quando clicco con il tasto destro sulla mappa viene creato un nuovo marker, con un popup contenente un form per la creazione della fermata
+		// right clicking on the map create a new marker, with a popup containing a creation stop form  
 		map.on("contextmenu", function(e) {
 			// add a marker in the given location, attach some popup content to it and open the popup
 			var marker = L.marker(e.latlng, {title: "${fermata.name}"}).addTo(map)
 			    .bindPopup('<form:form id="creaFermataForm" commandName="stop" method="post" role="form">' +
 			    				'<div class="row">' +
 			    					'<div class="form-group col-lg-6">' +
-			    						'<label for="lat">Latitudine</label>' +
-			    						'<form:input path="lat" class="form-control" id="lat" />' +
+			    						'<label for="lat" class="required">Latitudine</label>' +
+			    						'<form:input path="lat" class="form-control" id="lat" required="true" />' +
 			    						'<form:errors path="lat" cssClass="error"></form:errors>' +
 			    					'</div>' +
 			    					'<div class="form-group col-lg-6">' +
-			    						'<label for="lon">Longitudine</label>' +
-			    						'<form:input path="lon" class="form-control" id="lon" />' +
+			    						'<label for="lon" class="required">Longitudine</label>' +
+			    						'<form:input path="lon" class="form-control" id="lon" required="true" />' +
 			    						'<form:errors path="lon" cssClass="error"></form:errors>' +
 			    					'</div>' +
 			    				'</div>' +
 			    				'<div class="row">' +
 			    					'<div class="form-group">' +
-			    						'<label for="name">Nome</label>' +
+			    						'<label for="name" class="required">Nome</label>' +
 			    						'<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="50" required="true" />' +
 			    						'<form:errors path="name" cssClass="error"></form:errors>' +
 			    					'</div>' +
@@ -247,7 +270,7 @@
 			    				'<div class="row">' +
 									'<div class="form-group">' +
 										'<label for="wheelchairBoarding">Accessibile ai disabili</label>' +
-										'<form:select path="wheelchairBoarding">' +
+										'<form:select path="wheelchairBoarding" class="form-control">' +
 											'<form:option value="0" selected="true">Informazione non disponibile</form:option>' +
 											'<form:option value="1">Sì</form:option>' +
 											'<form:option value="2">No</form:option>' +
@@ -266,14 +289,14 @@
 			$("#lat").val(e.latlng.lat);
 			$("#lon").val(e.latlng.lng);
 			
-			// se il popup per la creazione della fermata viene chiuso (e quindi il form non sottomesso), il marker viene eliminato
+			// if the stop creation popup is closed (so the form is not submitted), the marker is deleted
 			marker.on('popupclose', function (e) {
 	            if (!$("creaFermataForm").find("#name").val()) {
 	            	map.removeLayer(marker);
 	            }
 	        });
 			
-			// riempe il select delle timezones usando l'array di oggetti in timezones.js
+			// fill timezones select using objects array in timezones.j
 			var selTimezones = document.getElementById("timezones");
 			for (var i=0; i<timezones.length; i++) {
 				var opt = document.createElement('option');
@@ -284,6 +307,24 @@
 			    }
 			    selTimezones.appendChild(opt);
 			}
+			
+			// Popover
+			$("#creaFermataForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome della fermata o stazione. Usare un nome che le persone possano capire nella lingua locale e turistica." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#code").popover({ container: 'body', trigger: 'focus', title:"Codice", content:"Breve testo o numero che identifica univocamente la fermata per i passeggeri. I codici delle fermate sono spesso usati in sistemi informativi di transito basati sul telefono o stampati sulle paline per rendere più semplice ai passeggeri ottenere il calendario della fermata o informazioni di arrivo in tempo reale per una specifica fermata." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#desc").popover({ container: 'body', trigger: 'focus', title:"Descrizione", content:"La descrizione della fermata. Usare informazioni utili (non duplicare semplicemente il nome della fermata)." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#lat").popover({ container: 'body', trigger: 'focus', title:"Latitudine", content:"La latitudine della fermata o stazione." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#lon").popover({ container: 'body', trigger: 'focus', title:"Longitudine", content:"La longitudine della fermata o stazione." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"La pagine web di una specifica fermata (dovrebbe essere diversa dai campi url dell'agenzia e della linea)." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#locationType").popover({ container: 'body', trigger: 'focus', title:"Tipo", content:"Il tipo indica se si tratta di una fermata o una stazione." })
+				.blur(function () { $(this).popover('hide'); });
+			$("#creaFermataForm").find("#wheelchairBoarding").popover({ container: 'body', trigger: 'focus', title:"Accessibile ai disabili", content:"Indica se la fermata o stazione è accessibile ai disabili." })
+				.blur(function () { $(this).popover('hide'); });
 		});
 	});
     </script>
@@ -303,7 +344,8 @@
 	
 	<h3>Gestione fermate</h3>
 	
-	<p>Cliccare con il tasto destro sulla mappa per creare una nuova fermata o cliccare su un marker per modificarla</p>
+	<p>Cliccare con il tasto destro sulla mappa per creare una nuova fermata o cliccare su un marker per modificarla.<br>
+	Le fermate verdi sono associate ad almeno una corsa e non possono essere eliminate.</p>
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">

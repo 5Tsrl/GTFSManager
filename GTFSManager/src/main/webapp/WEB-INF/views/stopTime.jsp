@@ -10,12 +10,14 @@
 	<title>GTFS Manager - Fermate</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
 	<link href="<c:url value='/resources/css/leaflet.label.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.markcluster.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
 	<link href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css" type="text/css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/leaflet.label.js' />"></script>
@@ -26,24 +28,25 @@
 	<script type="text/javascript" src="<c:url value='/resources/js/leaflet.encoded-polyline.js' />"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/timezones.js' />"></script>
 	<script type="text/javascript">
-	// validazione del form per la modifica di un'associazione di una corsa a una fermata
+	// edit trip-stop association form validation 
 	function validateModificaFermataCorsaForm() {
-		// controllo se ora arrivo > ora partenza
+		// check if arrival time > departure time
 		var arrivalTime = document.forms["modificaFermataCorsaForm"]["arrival"].value;
 		var departureTime = document.forms["modificaFermataCorsaForm"]["departure"].value;
 		if (arrivalTime > departureTime) {
-			alert("L'ora di arrivo non può essere successiva all'ora di partenza");
+			$("#wrong-times").show();
 			return false;
 		}
 		
-		// controllo se numero fermata > del massimo tra tutti i numeri di fermata
+		// check if stop number > max between all stop numbers
 		var stopSequence = document.forms["modificaFermataCorsaForm"]["stopSequence"].value;
 		var stopSequences = [];
 		<c:forEach var="fermataCorsa" items="${listaFermateCorsa}">
 			stopSequences.push("${fermataCorsa.stopSequence}");
 		</c:forEach>
 		if (stopSequence > Math.max.apply(null, stopSequences)) {
-			alert("Il numero della fermata deve essere compreso tra 1 e " + Math.max.apply(null, stopSequences));
+			$("#wrong-stop-sequence-p").text("Il numero della fermata deve essere compreso tra 1 e " + Math.max.apply(null, stopSequences));
+			$("#wrong-stop-sequence").show();
 			return false;
 		}
 		
@@ -111,13 +114,13 @@
 									'<input name="stopId" type="hidden" value="${fermata.id}" />' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="arrival">Ora arrivo</label>' +
+											'<label for="arrival" class="required">Ora arrivo</label>' +
 											'<input type="time" name="arrival" class="form-control" id="arrivalTime" required="true" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="departure">Ora partenza</label>' +
+											'<label for="departure" class="required">Ora partenza</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
 										'</div>' +
 									'</div>' +
@@ -130,7 +133,7 @@
 									'<div class="row">' +
 										'<div class="form-group">' +
 											'<label for="pickupType">Raccolta passeggeri</label>' +
-											'<form:select path="pickupType">' +
+											'<form:select path="pickupType" class="form-control">' +
 												'<form:option value="0" selected="true">Regolarmente programmata</form:option>' +
 												'<form:option value="1">Non disponibile</form:option>' +
 												'<form:option value="2">Organizzabile tramite telefonata all\'agenzia</form:option>' +
@@ -142,7 +145,7 @@
 									'<div class="row">' +
 										'<div class="form-group">' +
 											'<label for="dropOffType">Rilascio passeggeri</label>' +
-											'<form:select path="dropOffType">' +
+											'<form:select path="dropOffType" class="form-control">' +
 												'<form:option value="0" selected="true">Regolarmente programmato</form:option>' +
 												'<form:option value="1">Non disponibile</form:option>' +
 												'<form:option value="2">Organizzabile tramite telefonata all\'agenzia</form:option>' +
@@ -174,20 +177,20 @@
 									'<input name="stopTimeId" type="hidden" value="${fermataCorsa.id}" />' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="stopSequence">Numero fermata</label>' +
+											'<label for="stopSequence" class="required">Numero fermata</label>' +
 											'<form:input type="number" path="stopSequence" class="form-control" id="stopSequence" value="${fermataCorsa.stopSequence}" min="1" />' +
 											'<form:errors path="stopSequence" cssClass="error"></form:errors>' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="arrival">Ora arrivo</label>' +
+											'<label for="arrival" class="required">Ora arrivo</label>' +
 											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.arrivalTime}" required="true" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
-											'<label for="departure">Ora partenza</label>' +
+											'<label for="departure" class="required">Ora partenza</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.departureTime}" required="true" />' +
 										'</div>' +
 									'</div>' +
@@ -200,7 +203,7 @@
 									'<div class="row">' +
 										'<div class="form-group">' +
 											'<label for="pickupType">Raccolta passeggeri</label>' +
-											'<form:select path="pickupType">';
+											'<form:select path="pickupType" class="form-control">';
 			if ("${fermataCorsa.pickupType}" == 0) {
 				popupContent += '<form:option value="0" selected="true">Regolarmente programmata</form:option>' +
 								'<form:option value="1">Non disponibile</form:option>' +
@@ -228,8 +231,8 @@
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group">' +
-											'<label for="dropOffType">Raccolta passeggeri</label>' +
-											'<form:select path="dropOffType">';
+											'<label for="dropOffType">Rilascio passeggeri</label>' +
+											'<form:select path="dropOffType" class="form-control">';
 			if ("${fermataCorsa.dropOffType}" == 0) {
 				popupContent += '<form:option value="0" selected="true">Regolarmente programmato</form:option>' +
 								'<form:option value="1">Non disponibile</form:option>' +
@@ -312,6 +315,9 @@
 	});
 	
 	$(document).ready(function () {
+		// alerts initially hidden
+		$(".alert").hide();
+		
 		// la variabile showAlertWrongTimes è settata a true se l'ora di arrivo inserita nella fermata è successiva all'ora di partenza 
 		if ("${showAlertWrongTimes}") {
 			alert("L'ora di arrivo non può essere successiva all'ora di partenza");
@@ -323,6 +329,14 @@
 				alert("Devi creare uno shape prima di poterlo salvare");
 				e.preventDefault();
 			}
+		});
+		
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
+		});
+		$('.annulla').click(function() {
+			$(this).parent().hide();
 		});
 	});
     </script>
@@ -340,7 +354,8 @@
 	
 	<h3>Assegnazione fermate alla corsa ${corsaAttiva.tripShortName}</h3>
 	
-	<p>Cliccare su una fermata per aggiungerla alla corsa</p>
+	<p>Cliccare su una fermata per aggiungerla alla corsa.<br>
+	Le fermate verdi appartengono alla corsa.</p>
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
@@ -367,6 +382,16 @@
 				</div>
 			</div>
 		</form:form>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="wrong-times" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>L'ora di arrivo non può essere successiva all'ora di partenza.</p>
+	</div>
+	<div id="wrong-stop-sequence" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p id="wrong-stop-sequence-p"></p>
 	</div>
 </body>
 </html>
