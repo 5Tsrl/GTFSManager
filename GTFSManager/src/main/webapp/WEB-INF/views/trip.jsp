@@ -351,6 +351,7 @@
 					</div>
 					<div class="col-lg-12">
 						<a id="modificaCorsaButton" class="btn btn-primary" href="/_5t/modificaCorsa">Modifica</a>
+						<a id="duplicaCorsaButton" class="btn btn-info" href="/_5t/duplicaCorsa">Duplica</a>
 						<button id="eliminaCorsaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>

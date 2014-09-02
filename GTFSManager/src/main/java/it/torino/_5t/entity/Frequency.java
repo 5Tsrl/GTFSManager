@@ -48,12 +48,29 @@ public class Frequency implements Serializable {
 	@Min(0)
 	@Max(1)
 	private Integer exactTimes;
+	
+	public Frequency() {
+	}
+
+	public Frequency(Trip trip, Time startTime, Time endTime, int headwaySecs,
+			Integer exactTimes) {
+		super();
+		this.trip = trip;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.headwaySecs = headwaySecs;
+		this.exactTimes = exactTimes;
+	}
 
 	@Override
 	public int hashCode() {
 		final int prime = 31;
 		int result = 1;
+		result = prime * result + ((endTime == null) ? 0 : endTime.hashCode());
+		result = prime * result + headwaySecs;
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
+		result = prime * result
+				+ ((startTime == null) ? 0 : startTime.hashCode());
 		return result;
 	}
 
@@ -66,10 +83,22 @@ public class Frequency implements Serializable {
 		if (getClass() != obj.getClass())
 			return false;
 		Frequency other = (Frequency) obj;
+		if (endTime == null) {
+			if (other.endTime != null)
+				return false;
+		} else if (!endTime.equals(other.endTime))
+			return false;
+		if (headwaySecs != other.headwaySecs)
+			return false;
 		if (id == null) {
 			if (other.id != null)
 				return false;
 		} else if (!id.equals(other.id))
+			return false;
+		if (startTime == null) {
+			if (other.startTime != null)
+				return false;
+		} else if (!startTime.equals(other.startTime))
 			return false;
 		return true;
 	}

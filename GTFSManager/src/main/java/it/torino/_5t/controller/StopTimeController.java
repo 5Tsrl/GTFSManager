@@ -71,7 +71,7 @@ public class StopTimeController {
 		
 		model.addAttribute("listaFermate", stops);
 		model.addAttribute("listaFermateCorsa", t.getStopTimes());
-		if (!modify) {
+		if (!modify && t.getStopTimes().size() > 0) {
 			model.addAttribute("lat", t.getStopTimes().iterator().next().getStop().getLat());
 			model.addAttribute("lon", t.getStopTimes().iterator().next().getStop().getLon());
 			model.addAttribute("zoom", 14);

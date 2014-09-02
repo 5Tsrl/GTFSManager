@@ -28,6 +28,19 @@
 	<script type="text/javascript" src="<c:url value='/resources/js/leaflet.encoded-polyline.js' />"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/timezones.js' />"></script>
 	<script type="text/javascript">
+	// create trip-stop association form validation 
+	function validateCreaFermataCorsaForm() {
+		// check if arrival time > departure time
+		var arrivalTime = document.forms["creaFermataCorsaForm"]["arrival"].value;
+		var departureTime = document.forms["creaFermataCorsaForm"]["departure"].value;
+		if (arrivalTime > departureTime) {
+			$("#wrong-times").show();
+			return false;
+		}
+		
+		return true;
+	};
+	
 	// edit trip-stop association form validation 
 	function validateModificaFermataCorsaForm() {
 		// check if arrival time > departure time
@@ -109,7 +122,7 @@
 		
 		// per ogni fermata dell'agenzia non associata alla corsa attiva (listaFermate) creo un marker, con un popup contenente il form per l'associazione con la corsa
 		<c:forEach var="fermata" items="${listaFermate}">
-			var popupContent = '<form:form commandName="stopTime" method="post" role="form">' +
+			var popupContent = '<form:form name="creaFermataCorsaForm" commandName="stopTime" method="post" role="form" onsubmit="return validateCreaFermataCorsaForm()">' +
 									"<b>Fermata: </b> ${fermata.name}" +
 									'<input name="stopId" type="hidden" value="${fermata.id}" />' +
 									'<div class="row">' +
@@ -319,14 +332,14 @@
 		$(".alert").hide();
 		
 		// la variabile showAlertWrongTimes è settata a true se l'ora di arrivo inserita nella fermata è successiva all'ora di partenza 
-		if ("${showAlertWrongTimes}") {
+		/*if ("${showAlertWrongTimes}") {
 			alert("L'ora di arrivo non può essere successiva all'ora di partenza");
-		}
+		}*/
 		
 		// non si può salvare uno shape se non è ancora stato creato
 		$("#creaShapeForm").submit(function(e) {
 			if (!$("#encodedPolyline").val()) {
-				alert("Devi creare uno shape prima di poterlo salvare");
+				$("#no-shape-to-save").alert();
 				e.preventDefault();
 			}
 		});
@@ -354,8 +367,8 @@
 	
 	<h3>Assegnazione fermate alla corsa ${corsaAttiva.tripShortName}</h3>
 	
-	<p>Cliccare su una fermata per aggiungerla alla corsa.<br>
-	Le fermate verdi appartengono alla corsa.</p>
+	<p>Cliccare su una fermata per aggiungerla alla corsa. Le fermate verdi appartengono alla corsa.<br>
+	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom. Una volta modificato deve essere salvato cliccando su "Salva shape".</p>
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
@@ -392,6 +405,10 @@
 	<div id="wrong-stop-sequence" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>
 	    <p id="wrong-stop-sequence-p"></p>
+	</div>
+	<div id="no-shape-to-save" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>Devi creare uno shape prima di poterlo salvare.</p>
 	</div>
 </body>
 </html>

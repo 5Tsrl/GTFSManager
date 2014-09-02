@@ -6,10 +6,15 @@ import javax.validation.Valid;
 import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.CalendarDAO;
 import it.torino._5t.dao.RouteDAO;
+import it.torino._5t.dao.ShapeDAO;
 import it.torino._5t.dao.TripDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
+import it.torino._5t.entity.Frequency;
 import it.torino._5t.entity.Route;
+import it.torino._5t.entity.Shape;
+import it.torino._5t.entity.Stop;
+import it.torino._5t.entity.StopTime;
 import it.torino._5t.entity.Trip;
 
 import org.slf4j.Logger;
@@ -36,6 +41,8 @@ public class TripController {
 	private AgencyDAO agencyDAO;
 	@Autowired
 	private CalendarDAO calendarDAO;
+	@Autowired
+	private ShapeDAO shapeDAO;
 	
 	@RequestMapping(value = "/corse", method = RequestMethod.GET)
 	public String showTrips(Model model, HttpSession session) {
@@ -126,6 +133,7 @@ public class TripController {
 		
 		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
 
+		session.removeAttribute("servizioAttivo");
 //		session.setAttribute("lineaAttiva", trip.getRoute());
 		session.setAttribute("corsaAttiva", trip);
 		
@@ -220,7 +228,7 @@ public class TripController {
 		}
 		
 		Trip activetrip = (Trip) session.getAttribute("corsaAttiva");
-		if (trip == null) {
+		if (activetrip == null) {
 			return "redirect:corse";
 		}
 		
@@ -255,6 +263,87 @@ public class TripController {
 		}
 		
 		session.setAttribute("agenziaAttiva", a);
+		
+		return "redirect:corse";
+	}
+	
+	// chiamata al submit del form per la duplicazione di una corsa
+	@RequestMapping(value = "/duplicaCorsa", method = RequestMethod.GET)
+	public String duplicateTrip(Model model, HttpSession session) {
+		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+		if (agency == null) {
+			return "redirect:agenzie";
+		}
+		Agency a = agencyDAO.loadAgency(agency.getId());
+		
+		Route route = (Route) session.getAttribute("lineaAttiva");
+		if (route == null) {
+			return "redirect:linee";
+		}
+		
+		Trip trip = (Trip) session.getAttribute("corsaAttiva");
+		if (trip == null) {
+			return "redirect:corse";
+		}
+		
+		Trip duplicatedTrip = new Trip();
+		duplicatedTrip.setTripHeadsign(trip.getTripHeadsign());
+		duplicatedTrip.setTripShortName(trip.getTripShortName());
+		duplicatedTrip.setDirectionId(trip.getDirectionId());
+		duplicatedTrip.setWheelchairAccessible(trip.getWheelchairAccessible());
+		duplicatedTrip.setBikesAllowed(trip.getBikesAllowed());
+		for (Frequency f: trip.getFrequencies()) {
+			duplicatedTrip.addFrequency(new Frequency(f.getTrip(), f.getStartTime(), f.getEndTime(), f.getHeadwaySecs(), f.getExactTimes()));
+		}
+		// cerco tra le linee dell'agenzia quella attiva
+		for (Route r: a.getRoutes()) {
+			if (r.equals(route)) {
+				// tra le corse della linea quella attiva e le modifico l'associazione
+				for (Trip t: r.getTrips()) {
+					if (t.equals(trip)) {
+						for (StopTime st: t.getStopTimes()) {
+							StopTime stopTime = new StopTime(st.getArrivalTime(), st.getDepartureTime(), st.getStopSequence(), st.getStopHeadsign(), st.getPickupType(), st.getDropOffType(), st.getShapeDistTraveled());
+							for (Stop s: a.getStops()) {
+								if (s.getId().equals(st.getStop().getId())) {
+									s.addStopTime(stopTime);
+									break;
+								}
+							}
+							duplicatedTrip.addStopTime(stopTime);
+						}
+						for (Shape s: a.getShapes()) {
+							if (s.getId().equals(t.getShape().getId())) {
+								Shape shape = new Shape();
+								shape.setEncodedPolyline(s.getEncodedPolyline());
+								shape.addTrip(duplicatedTrip);
+								a.addShape(shape);
+								break;
+							}
+						}
+						break;
+					}
+				}
+				break;
+			}
+		}
+		
+		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
+		for (Route r: a.getRoutes()) {
+			if (r.equals(route)) {
+				r.addTrip(duplicatedTrip);
+				session.setAttribute("lineaAttiva", r);
+				break;
+			}
+		}
+		
+		Calendar calendar = calendarDAO.getCalendar(trip.getCalendar().getId());
+		calendar.addTrip(duplicatedTrip);
+		
+		logger.info("Corsa creata: " + duplicatedTrip.getTripShortName() + ".");
+		
+		session.removeAttribute("servizioAttivo");
+		session.setAttribute("agenziaAttiva", a);
+		session.setAttribute("corsaAttiva", duplicatedTrip);
 		
 		return "redirect:corse";
 	}
