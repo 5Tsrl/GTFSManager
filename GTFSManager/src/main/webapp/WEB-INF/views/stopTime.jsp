@@ -143,8 +143,15 @@
 									'</div>' +
 									'<div class="checkbox">' +
 										'<label>' +
-							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno' +
+							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora partenza e arrivo nello stesso giorno' +
 										'</label>' +
+										'<p class="help-block">Deselezionare solo se l\'ora di arrivo è nel giorno successivo all\'ora di partenza.</p>' + 
+									'</div>' +
+									'<div class="checkbox">' +
+										'<label>' +
+							    			'<form:checkbox path="continueFromPreviousDay" id="continueFromPreviousDay" />Ora partenza e arrivo continuano dal giorno precedente' +
+										'</label>' +
+										'<p class="help-block">Selezionare solo se gli orari di arrivo e partenza continuano dal giorno precedente (una delle precedenti fermate ha orari del giorno precedente es. 23:58, mentre questa ha orari nel giorno successivo es. 00:02).</p>' + 
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
@@ -218,8 +225,22 @@
 									'</div>' +
 									'<div class="checkbox">' +
 										'<label>' +
-							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno' +
+							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora partenza e arrivo nello stesso giorno' +
 										'</label>' +
+										'<p class="help-block">Deselezionare solo se l\'ora di arrivo è nel giorno successivo all\'ora di partenza.</p>' + 
+									'</div>' +
+									'<div class="checkbox">' +
+										'<label>';
+			<c:choose>
+				<c:when test="${not fermataCorsa.continueFromPreviousDay}">
+						popupContent += '<form:checkbox path="continueFromPreviousDay" id="continueFromPreviousDay" />Ora partenza e arrivo continuano dal giorno precedente';
+				</c:when>
+				<c:otherwise>
+						popupContent += '<form:checkbox path="continueFromPreviousDay" id="continueFromPreviousDay" checked="true" />Ora partenza e arrivo continuano dal giorno precedente';
+				</c:otherwise>
+			</c:choose>							
+							popupContent += '</label>' +
+										'<p class="help-block">Selezionare solo se gli orari di arrivo e partenza continuano dal giorno precedente (una delle precedenti fermate ha orari del giorno precedente es. 23:58, mentre questa ha orari nel giorno successivo es. 00:02).</p>' + 
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +

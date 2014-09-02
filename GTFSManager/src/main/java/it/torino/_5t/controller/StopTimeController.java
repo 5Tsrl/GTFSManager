@@ -218,6 +218,7 @@ public class StopTimeController {
 								int precedentStopSequence = st.getStopSequence();
 								st.setArrivalTime(stopTime.getArrivalTime());
 								st.setDepartureTime(stopTime.getDepartureTime());
+								st.setContinueFromPreviousDay(stopTime.isContinueFromPreviousDay());
 								st.setStopSequence(stopTime.getStopSequence());
 								st.setStopHeadsign(stopTime.getStopHeadsign());
 								st.setPickupType(stopTime.getPickupType());

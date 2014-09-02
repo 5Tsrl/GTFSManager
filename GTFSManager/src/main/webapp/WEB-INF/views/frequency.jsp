@@ -268,6 +268,7 @@
 						<label>
 			    			<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno
 						</label>
+						<p class="help-block">Deselezionare solo se l'ora di fine è nel giorno successivo all'ora di inizio.</p>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -342,6 +343,7 @@
 						<label>
 			    			<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno
 						</label>
+						<p class="help-block">Deselezionare solo se l'ora di fine è nel giorno successivo all'ora di inizio.</p>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">

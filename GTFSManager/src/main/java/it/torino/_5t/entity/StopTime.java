@@ -41,6 +41,9 @@ public class StopTime implements Serializable {
 	@Column(name = "departure_time")
 	private Time departureTime;
 	
+	@Column(name = "continue_from_previous_day")
+	private boolean continueFromPreviousDay;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "stop_id")
 	private Stop stop;
@@ -155,6 +158,14 @@ public class StopTime implements Serializable {
 
 	public Time getDepartureTime() {
 		return departureTime;
+	}
+
+	public boolean isContinueFromPreviousDay() {
+		return continueFromPreviousDay;
+	}
+
+	public void setContinueFromPreviousDay(boolean continueFromPreviousDay) {
+		this.continueFromPreviousDay = continueFromPreviousDay;
 	}
 
 	public void setDepartureTime(Time departureTime) {
