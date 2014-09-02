@@ -125,21 +125,6 @@ public class StopTimeController {
 		String[] departureT = departureTime.split(":");
 		Time departure = new Time(Integer.parseInt(departureT[0]), Integer.parseInt(departureT[1]), 0);
 		stopTime.setDepartureTime(departure);
-	
-		if (arrival.after(departure)) {
-			logger.error("Errore nella creazione dell'associazione fermata-corsa (ora arrivo > ora partenza)");
-			agencyDAO.updateAgency(agency);
-			Set<Stop> stops = new HashSet<Stop>(a.getStops());
-			for (StopTime st: trip.getStopTimes()) {
-				stops.remove(st.getStop());
-			}
-			model.addAttribute("listaFermate", stops);
-			model.addAttribute("listaFermateCorsa", trip.getStopTimes());
-			model.addAttribute("stopTime", new StopTime());
-			model.addAttribute("shape", new Shape());
-			model.addAttribute("showAlertWrongTimes", true);
-			return "stopTime";
-		}
 		
 		stopTime.setStopSequence(trip.getStopTimes().size() + 1);
 
@@ -220,21 +205,6 @@ public class StopTimeController {
 		String[] departureT = departureTime.split(":");
 		Time departure = new Time(Integer.parseInt(departureT[0]), Integer.parseInt(departureT[1]), 0);
 		stopTime.setDepartureTime(departure);
-	
-		if (arrival.after(departure)) {
-			logger.error("Errore nella modifica dell'associazione fermata-corsa (ora arrivo > ora partenza)");
-			agencyDAO.updateAgency(agency);
-			Set<Stop> stops = new HashSet<Stop>(a.getStops());
-			for (StopTime st: trip.getStopTimes()) {
-				stops.remove(st.getStop());
-			}
-			model.addAttribute("listaFermate", stops);
-			model.addAttribute("listaFermateCorsa", trip.getStopTimes());
-			model.addAttribute("stopTime", new StopTime());
-			model.addAttribute("shape", new Shape());
-			model.addAttribute("showAlertWrongTimes", true);
-			return "stopTime";
-		}
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {

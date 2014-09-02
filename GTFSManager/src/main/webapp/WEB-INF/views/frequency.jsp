@@ -23,6 +23,36 @@
     	}); 
     });
 	
+	// create frequency form validation 
+	function validateCreaServizioForm() {
+		if (document.forms["creaServizioForm"]["sameDay"].checked) {
+			// if start and end time are in the same day check if start time > end time
+			var arrivalTime = document.forms["creaServizioForm"]["start"].value;
+			var departureTime = document.forms["creaServizioForm"]["end"].value;
+			if (arrivalTime > departureTime) {
+				$("#wrong-times").show();
+				return false;
+			}
+		}
+		
+		return true;
+	};
+	
+	// edit frequency form validation 
+	function validateModificaServizioForm() {
+		if (document.forms["modificaServizioForm"]["sameDay"].checked) {
+			// if start and end time are in the same day check if start time > end time
+			var arrivalTime = document.forms["modificaServizioForm"]["start"].value;
+			var departureTime = document.forms["modificaServizioForm"]["end"].value;
+			if (arrivalTime > departureTime) {
+				$("#wrong-times").show();
+				return false;
+			}
+		}
+		
+		return true;
+	};
+	
 	$(document).ready(function() {
 		// edit frequency form and alerts initially hidden
 		$("#modificaServizio").hide();
@@ -33,11 +63,6 @@
 			$("#creaServizio").hide();
 		} else {
 			$("#creaServizio").show();
-		}
-		
-		// showAlertWrongTimes variable is set to true if start time is after end time
-		if ("${showAlertWrongTimes}") {
-			$("#wrong-times").show();
 		}
 		
 		// clicking on "Modifica servizio" button, "Crea servizio" button and div with active trip summary should be hidden, while the form to modify the trip should be shown
@@ -226,7 +251,7 @@
 			
 			<!-- Div with create frequency form -->
 			<div id="creaServizio">
-				<form:form id="creaServizioForm" commandName="frequency" method="post" role="form">
+				<form:form name="creaServizioForm" id="creaServizioForm" commandName="frequency" method="post" role="form" onsubmit="return validateCreaServizioForm()">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="start" class="required">Ora inizio</label>
@@ -238,6 +263,11 @@
 							<label for="end" class="required">Ora fine</label>
 				    		<input name="end" class="form-control" id="end" type="time" required="required" />
 						</div>
+					</div>
+					<div class="checkbox">
+						<label>
+			    			<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno
+						</label>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -295,7 +325,7 @@
 			
 			<!-- Div with edit frequency form -->
 			<div id="modificaServizio">
-				<form:form id="modificaServizioForm" commandName="frequency" method="post" role="form" action="/_5t/modificaServizio">
+				<form:form name="modificaServizioForm" id="modificaServizioForm" commandName="frequency" method="post" role="form" action="/_5t/modificaServizio" onsubmit="return validateModificaServizioForm()">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="start" class="required">Ora inizio</label>
@@ -307,6 +337,11 @@
 							<label for="end" class="required">Ora fine</label>
 				    		<input name="end" class="form-control" id="end" type="time" required="required" value="${servizioAttivo.endTime}" />
 						</div>
+					</div>
+					<div class="checkbox">
+						<label>
+			    			<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno
+						</label>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -353,7 +388,7 @@
 	</div>
 	<div id="wrong-times" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>
-	    <p>L'ora di inizio non può essere successiva all'ora di fine.</p>
+	    <p>L'ora di inizio non può essere successiva all'ora di fine se sono nello stesso giorno.</p>
 	</div>
 </body>
 </html>

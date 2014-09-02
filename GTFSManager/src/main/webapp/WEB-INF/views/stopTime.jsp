@@ -30,12 +30,14 @@
 	<script type="text/javascript">
 	// create trip-stop association form validation 
 	function validateCreaFermataCorsaForm() {
-		// check if arrival time > departure time
-		var arrivalTime = document.forms["creaFermataCorsaForm"]["arrival"].value;
-		var departureTime = document.forms["creaFermataCorsaForm"]["departure"].value;
-		if (arrivalTime > departureTime) {
-			$("#wrong-times").show();
-			return false;
+		if (document.forms["creaFermataCorsaForm"]["sameDay"].checked) {
+			// if arrival and departure time are in the same day check if arrival time > departure time
+			var arrivalTime = document.forms["creaFermataCorsaForm"]["arrival"].value;
+			var departureTime = document.forms["creaFermataCorsaForm"]["departure"].value;
+			if (arrivalTime > departureTime) {
+				$("#wrong-times").show();
+				return false;
+			}
 		}
 		
 		return true;
@@ -43,12 +45,14 @@
 	
 	// edit trip-stop association form validation 
 	function validateModificaFermataCorsaForm() {
-		// check if arrival time > departure time
-		var arrivalTime = document.forms["modificaFermataCorsaForm"]["arrival"].value;
-		var departureTime = document.forms["modificaFermataCorsaForm"]["departure"].value;
-		if (arrivalTime > departureTime) {
-			$("#wrong-times").show();
-			return false;
+		if (document.forms["modificaFermataCorsaForm"]["sameDay"].checked) {
+			// if arrival and departure time are in the same day check if arrival time > departure time
+			var arrivalTime = document.forms["modificaFermataCorsaForm"]["arrival"].value;
+			var departureTime = document.forms["modificaFermataCorsaForm"]["departure"].value;
+			if (arrivalTime > departureTime) {
+				$("#wrong-times").show();
+				return false;
+			}
 		}
 		
 		// check if stop number > max between all stop numbers
@@ -137,6 +141,11 @@
 											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
 										'</div>' +
 									'</div>' +
+									'<div class="checkbox">' +
+										'<label>' +
+							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno' +
+										'</label>' +
+									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="stopHeadsign">Display</label>' +
@@ -206,6 +215,11 @@
 											'<label for="departure" class="required">Ora partenza</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.departureTime}" required="true" />' +
 										'</div>' +
+									'</div>' +
+									'<div class="checkbox">' +
+										'<label>' +
+							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora inizio e fine nello stesso giorno' +
+										'</label>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
@@ -400,7 +414,7 @@
 	<!-- Alerts -->
 	<div id="wrong-times" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>
-	    <p>L'ora di arrivo non può essere successiva all'ora di partenza.</p>
+	    <p>L'ora di arrivo non può essere successiva all'ora di partenza se sono nello stesso giorno.</p>
 	</div>
 	<div id="wrong-stop-sequence" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>

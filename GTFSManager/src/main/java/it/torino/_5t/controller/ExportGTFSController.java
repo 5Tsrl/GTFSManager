@@ -401,7 +401,15 @@ public class ExportGTFSController {
 		for (Frequency f: frequencyDAO.getAllFrequencies()) {
 			row += f.getTrip().getId() + ",";
 			row += formatTime(f.getStartTime()) + ",";
-			row += formatTime(f.getEndTime()) + ",";
+			String endTime = formatTime(f.getEndTime());
+			if (f.getStartTime().after(f.getEndTime())) {
+				// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
+				String[] end = endTime.split(":");
+				int hh = Integer.parseInt(end[0]) + 24;
+				row += hh + ":" + end[1] + ":" + end[2] + ",";
+			} else {
+				row += endTime + ",";
+			}
 			row += f.getHeadwaySecs() * 60 + ",";
 			row += f.getExactTimes() + "\n";
 		}
@@ -468,7 +476,15 @@ public class ExportGTFSController {
 		for (StopTime st: stopTimeDAO.getAllStopTimes()) {
 			row += st.getTrip().getId() + ",";
 			row += formatTime(st.getArrivalTime()) + ",";
-			row += formatTime(st.getDepartureTime()) + ",";
+			String departureTime = formatTime(st.getDepartureTime());
+			if (st.getArrivalTime().after(st.getDepartureTime())) {
+				// if arrival time > departure time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
+				String[] departure = departureTime.split(":");
+				int hh = Integer.parseInt(departure[0]) + 24;
+				row += hh + ":" + departure[1] + ":" + departure[2] + ",";
+			} else {
+				row += departureTime + ",";
+			}
 			row += st.getStop().getId() + ",";
 			row += st.getStopSequence() + ",";
 			row += st.getStopHeadsign() + ",";

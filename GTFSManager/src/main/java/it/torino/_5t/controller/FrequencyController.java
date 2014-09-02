@@ -106,15 +106,6 @@ public class FrequencyController {
 		Time end = new Time(Integer.parseInt(endT[0]), Integer.parseInt(endT[1]), 0);
 		frequency.setEndTime(end);
 		
-		if (start.after(end)) {
-			logger.error("Errore nella creazione del servizio (ora inizio > ora fine)");
-			tripDAO.updateTrip(trip);
-			model.addAttribute("listaServizi", trip.getFrequencies());
-			model.addAttribute("showCreateForm", true);
-			model.addAttribute("showAlertWrongTimes", true);
-			return "frequency";
-		}
-		
 		// cerco tra le linee dell'agenzia quella attiva, la corsa attiva della linea selezionata e le aggiungo il servizio
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
@@ -253,15 +244,6 @@ public class FrequencyController {
 		String[] endT = endTime.split(":");
 		Time end = new Time(Integer.parseInt(endT[0]), Integer.parseInt(endT[1]), 0);
 		frequency.setEndTime(end);
-		
-		if (start.after(end)) {
-			logger.error("Errore nella creazione del servizio (ora inizio > ora fine)");
-			tripDAO.updateTrip(trip);
-			model.addAttribute("listaServizi", trip.getFrequencies());
-			model.addAttribute("showEditForm", true);
-			model.addAttribute("showAlertWrongTimes", true);
-			return "frequency";
-		}
 		
 		Frequency activeFrequency = (Frequency) session.getAttribute("servizioAttivo");
 		if (activeFrequency == null) {
