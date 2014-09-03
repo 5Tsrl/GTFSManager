@@ -14,6 +14,7 @@
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	// load the navigation bar
@@ -41,10 +42,6 @@
 		
 		$("#creaGTFSButton").click(function() {
 			$("#creaGTFS").show();
-		});
-		
-		$("form").submit(function() {
-			$("#progressbarModal").modal("show");
 		});
 		
 	    var GTFSTable = $('.sortable').DataTable({
@@ -100,6 +97,67 @@
 		$('.annulla').click(function() {
 			$(this).parent().hide();
 		});
+		
+		// Popover
+		$("#creaGTFSForm").find("#publisherName").popover({ container: 'body', trigger: 'focus', title:"Pubblicatore", content:"Il nome completo dell'organizzazione che pubblica il feed." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaGTFSForm").find("#publisherUrl").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'organizzazione che pubblica il feed." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaGTFSForm").find("#language").popover({ container: 'body', trigger: 'focus', title:"Lingua", content:"Il codice IETF BCP 47 della lingua usata in questo feed." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaGTFSForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data a partire da cui il feed è valido." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaGTFSForm").find("#endDate").popover({ container: 'body', trigger: 'focus', title:"Data fine", content:"La data fino a cui il feed è valido." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaGTFSForm").find("#version").popover({ container: 'body', trigger: 'focus', title:"Versione", content:"La versione del feed." })
+			.blur(function () { $(this).popover('hide'); });
+		
+		// Creation feed form validation
+		$("#creaGTFSForm").validate({
+			rules: {
+				publisherName: {
+					required: true
+				},
+				publisherUrl: {
+					required: true
+				},
+				language: {
+					required: true
+				}
+			},
+			messages: {
+				publisherName: {
+					required: "Il campo nome pubblicatore è obbligatorio"
+				},
+				publisherUrl: {
+					required: "Il campo sito web pubblicatore è obbligatorio"
+				},
+				language: {
+					required: "Il campo lingua pubblicatore è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			},
+			submitHandler: function(form) {
+				var startDate = form.elements["startDate"].value;
+				var endDate = form.elements["endDate"].value;
+				if (startDate != "" && endDate != "" && startDate > endDate) {
+					$("#wrong-dates").show();
+					return false;
+				} else {
+					if (startDate == "")
+						form.elements["startDate"].value = "1000-01-01";
+					if (endDate == "")
+						form.elements["endDate"].value = "1000-01-01";
+					$("#progressbarModal").modal("show");
+					form.submit();
+				}
+			}
+		});
 	});
     </script>
 </head>
@@ -116,6 +174,9 @@
 			<thead>
 				<tr>
 					<th>GTFS</th>
+					<th>Versione</th>
+					<th>Da</th>
+					<th>A</th>
 					<th>Descrizione</th>
 					<th class="hidden"></th>
 				</tr>
@@ -134,6 +195,9 @@
 					<tr>
 <%-- 						<td><a href="/_5t/scaricaGTFS?file=<%= list[i] %>"><%= list[i] %></a></td> --%>
 						<td><a href="/_5t/scaricaGTFS?id=${gtfs.id}">${gtfs.name}</a></td>
+						<td>${gtfs.version}</td>
+						<td>${gtfs.startDate}</td>
+						<td>${gtfs.endDate}</td>
 						<td>${gtfs.description}</td>
 						<td class="hidden">${gtfs.id}</td>
 					</tr>
@@ -153,7 +217,42 @@
 		</div>
 		
 		<div id="creaGTFS">
-			<form:form commandName="gtfs" method="post" role="form" action="/_5t/creaGTFS">
+			<form:form id="creaGTFSForm" commandName="feedInfo" method="post" role="form" action="/_5t/creaGTFS">
+				<div class="row">
+					<div class="form-group col-lg-8">
+						<label for="publisherName" class="required">Pubblicato da</label>
+			    		<form:input path="publisherName" class="form-control" id="publisherName" placeholder="Inserire il nome del pubblicatore" required="true" maxlength="50" />
+			    		<form:errors path="publisherName" cssClass="error"></form:errors>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-8">
+						<label for="publisherUrl" class="required">Sito web</label>
+			    		<form:input path="publisherUrl" class="form-control" id="publisherUrl" placeholder="Inserire l'url del pubblicatore" required="true" maxlength="255" />
+			    		<form:errors path="publisherUrl" cssClass="error"></form:errors>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-8">
+						<label for="language" class="required">Lingua</label>
+			    		<form:input path="language" class="form-control" id="language" placeholder="Inserire la lingua" required="true" maxlength="20" />
+			    		<form:errors path="language" cssClass="error"></form:errors>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-8">
+						<label for="startDate">Data inizio</label>
+			    		<form:input path="startDate" class="form-control" id="startDate" type="date" />
+			    		<form:errors path="startDate" cssClass="error"></form:errors>
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-8">
+						<label for="endDate">Data fine</label>
+			    		<form:input path="endDate" class="form-control" id="endDate" type="date" />
+			    		<form:errors path="endDate" cssClass="error"></form:errors>
+					</div>
+				</div>
 				<div class="row">
 					<div class="form-group col-lg-8">
 						<label for="name">Nome</label>
@@ -161,6 +260,13 @@
 						<fmt:formatDate pattern="yyyy-MM-dd HH.mm.ss" value="${now}" var="formattedNow" />
 			    		<input class="form-control" id="name" value="${formattedNow}" disabled="true" />
 			    		<form:hidden path="name" value="${formattedNow}" />
+					</div>
+				</div>
+				<div class="row">
+					<div class="form-group col-lg-8">
+						<label for="version">Versione</label>
+			    		<form:input path="version" class="form-control" id="version" placeholder="Inserire la versione del feed" maxlength="50" />
+			    		<form:errors path="version" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
@@ -198,6 +304,10 @@
 	</div>
 	
 	<!-- Alerts -->
+	<div id="wrong-dates" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p>La data di inizio non può essere successiva alla data di fine.</p>
+	</div>
 	<div id="delete-gtfs" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
 	    <p>Vuoi veramente eliminare i GTFS selezionati?</p>

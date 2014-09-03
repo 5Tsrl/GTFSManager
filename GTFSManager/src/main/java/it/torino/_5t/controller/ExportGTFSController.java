@@ -7,7 +7,6 @@ import it.torino._5t.dao.FareAttributeDAO;
 import it.torino._5t.dao.FareRuleDAO;
 import it.torino._5t.dao.FeedInfoDAO;
 import it.torino._5t.dao.FrequencyDAO;
-import it.torino._5t.dao.GTFSDAO;
 import it.torino._5t.dao.RouteDAO;
 import it.torino._5t.dao.ShapeDAO;
 import it.torino._5t.dao.StopDAO;
@@ -21,7 +20,6 @@ import it.torino._5t.entity.FareAttribute;
 import it.torino._5t.entity.FareRule;
 import it.torino._5t.entity.FeedInfo;
 import it.torino._5t.entity.Frequency;
-import it.torino._5t.entity.GTFS;
 import it.torino._5t.entity.Route;
 import it.torino._5t.entity.Shape;
 import it.torino._5t.entity.Stop;
@@ -153,24 +151,24 @@ public class ExportGTFSController {
 	private TransferDAO transferDAO;
 	@Autowired
 	private TripDAO tripDAO;
-	@Autowired
-	private GTFSDAO gtfsDAO;
+	
+	private FeedInfo currentFeedInfo;
 
 	@RequestMapping(value = "/esportaGTFS", method = RequestMethod.GET)
 	public String showExportGTFS(Model model, HttpSession session) {
 		logger.info("Visualizzazione pagina per esportazione GTFS.");
 		
-		model.addAttribute("listaGTFS", gtfsDAO.getAllGTFSs());
-		model.addAttribute("gtfs", new GTFS());
+		model.addAttribute("listaGTFS", feedInfoDAO.getAllFeedInfos());
+		model.addAttribute("feedInfo", new FeedInfo());
 		
 		return "exportGTFS";
 	}
 	
 	@RequestMapping(value = "/scaricaGTFS", method = RequestMethod.GET)
 	public String downloadGTFS(Model model, @RequestParam("id") Integer id, HttpSession session, HttpServletResponse response) {
-		GTFS gtfs = gtfsDAO.getGTFS(id);
+		FeedInfo feedInfo = feedInfoDAO.getFeedInfo(id);
 		
-		String filename = gtfs.getName() + ".zip";
+		String filename = feedInfo.getName() + ".zip";
 		
 		logger.info("Download " + filename);
 		
@@ -202,34 +200,42 @@ public class ExportGTFSController {
 	@RequestMapping(value = "/eliminaGTFS", method = RequestMethod.GET)
 	public String deleteGTFS(Model model, @RequestParam("id") Integer[] gtfsId, HttpSession session) {
 		for (int i=0; i<gtfsId.length; i++) {
-			GTFS gtfs = gtfsDAO.getGTFS(gtfsId[i]);
-			gtfsDAO.deleteGTFS(gtfs);
-			File f = new File(GTFS_HISTORY_DIR_NAME + gtfs.getName() + ".zip");
+			FeedInfo feedInfo = feedInfoDAO.getFeedInfo(gtfsId[i]);
+			feedInfoDAO.deleteFeedInfo(feedInfo);
+			File f = new File(GTFS_HISTORY_DIR_NAME + feedInfo.getName() + ".zip");
 			f.delete();
-			logger.info(gtfs.getName() + " eliminato.");
+			logger.info(feedInfo.getName() + " eliminato.");
 		}
 		
 		return "redirect:esportaGTFS";
 	}
 	
 	@RequestMapping(value = "/creaGTFS", method = RequestMethod.POST)
-	public String createGTFS(@ModelAttribute GTFS gtfs, BindingResult bindingResult, Model model, HttpSession session) {
+	public String createGTFS(@ModelAttribute FeedInfo feedInfo, BindingResult bindingResult, Model model, HttpSession session) {
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione del GTFS");
-			model.addAttribute("listaGTFS", gtfsDAO.getAllGTFSs());
-			model.addAttribute("gtfs", new GTFS());
+			logger.error(bindingResult.getAllErrors().toString());
+			model.addAttribute("listaGTFS", feedInfoDAO.getAllFeedInfos());
+			model.addAttribute("feedInfo", new FeedInfo());
 			return "exportGTFS";
 		}
+		
+		if (feedInfo.getStartDate().toString().equals("1000-01-01"))
+			feedInfo.setStartDate(null);
+		if (feedInfo.getEndDate().toString().equals("1000-01-01"))
+			feedInfo.setEndDate(null);
+		
+		currentFeedInfo = feedInfo;
 		
 		logger.info("Inizio creazione GTFS.");
 		
 		try {
-			zipName = gtfs.getName();
+			zipName = feedInfo.getName();
 			initializeOutputStreams();
 			fillOutputStreams();
 			closeOutputStreams();
 			createZipFile();
-			gtfsDAO.addGTFS(gtfs);
+			feedInfoDAO.addFeedInfo(feedInfo);
 		} catch (IOException e) {
 			logger.error("Errore nella creazione del file " + zipName);
 			e.printStackTrace();
@@ -384,14 +390,12 @@ public class ExportGTFSController {
 	
 	private void fillFeedInfo() throws IOException {
 		String row = new String();
-		for (FeedInfo fi: feedInfoDAO.getAllFeedInfos()) {
-			row += fi.getPublisherName() + ",";
-			row += fi.getPublisherUrl() + ",";
-			row += fi.getLanguage() + ",";
-			row += formatDate(fi.getStartDate()) + ",";
-			row += formatDate(fi.getEndDate()) + ",";
-			row += fi.getVersion() + "\n";
-		}
+		row += currentFeedInfo.getPublisherName() + ",";
+		row += currentFeedInfo.getPublisherUrl() + ",";
+		row += currentFeedInfo.getLanguage() + ",";
+		row += (currentFeedInfo.getStartDate() != null ? formatDate(currentFeedInfo.getStartDate()) : "") + ",";
+		row += (currentFeedInfo.getEndDate() != null ? formatDate(currentFeedInfo.getEndDate()) : "") + ",";
+		row += currentFeedInfo.getVersion() + "\n";
 		feedInfoOutput.write(row.getBytes());
 		logger.info("feed_info.txt completato.");
 	}

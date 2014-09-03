@@ -48,7 +48,6 @@
 			$("#creaEccezione").show();
 		}
 		
-		// la variabile showAlertWrongCalendarDates è settata a true se la data di inizio inserita nel calendario è successiva alla data di fine 
 		// showAlertWrongCalendarDates variable is set to true if start date is after end date
 		if ("${showAlertWrongCalendarDates}") {
 			$("#wrong-calendar-dates").show();

@@ -50,6 +50,14 @@ public class FeedInfo implements Serializable {
 	@Column(name = "feed_version")
 	@Size(max = 20)
 	private String version;
+	
+	@Column(name = "feed_name")
+	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
+	private String name;
+	
+	@Column(name = "feed_description")
+	@Size(max = 255)
+	private String description;
 
 	@Override
 	public int hashCode() {
@@ -130,5 +138,21 @@ public class FeedInfo implements Serializable {
 
 	public void setVersion(String version) {
 		this.version = version;
+	}
+
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
+
+	public String getDescription() {
+		return description;
+	}
+
+	public void setDescription(String description) {
+		this.description = description;
 	}
 }
