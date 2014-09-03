@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
 import it.torino._5t.persistence.HibernateUtil;
 
@@ -53,6 +54,14 @@ public class CalendarDAOImpl implements CalendarDAO {
 	public Calendar loadCalendar(Integer id) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		return (Calendar) session.load(Calendar.class, id);
+	}
+
+	@Override
+	public List<Calendar> getCalendarsFromAgency(Agency agency) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Query query = session.createQuery("from Calendar where agency = :agency");
+		query.setEntity("agency", agency);
+		return query.list();
 	}
 
 }

@@ -341,7 +341,7 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="timezone">Fuso orario</label>
+							<label for="timezone" class="required">Fuso orario</label>
 							<form:select path="timezone" id="timezones" class="form-control"></form:select>
 							<form:errors path="timezone" cssClass="error"></form:errors>
 						</div>
@@ -434,7 +434,7 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="timezone">Fuso orario</label>
+							<label for="timezone" class="required">Fuso orario</label>
 							<form:select path="timezone" id="timezonesEdit" class="form-control"></form:select>
 							<form:errors path="timezone" cssClass="error"></form:errors>
 						</div>

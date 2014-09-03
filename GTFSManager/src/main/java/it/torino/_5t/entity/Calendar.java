@@ -37,9 +37,9 @@ public class Calendar implements Serializable{
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
 	
-	@Column(name = "name")
-	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
-	private String name;
+	@Column(name = "calendar_gtfs_id")
+	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
+	private String gtfsId;
 	
 	@Column(name = "monday")
 	private boolean monday = true;
@@ -115,12 +115,12 @@ public class Calendar implements Serializable{
 		this.agency = agency;
 	}
 
-	public String getName() {
-		return name;
+	public String getGtfsId() {
+		return gtfsId;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setGtfsId(String gtfsId) {
+		this.gtfsId = gtfsId;
 	}
 
 	public boolean isMonday() {

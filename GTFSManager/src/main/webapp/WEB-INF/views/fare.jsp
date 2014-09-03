@@ -146,11 +146,21 @@
 			rules: {
 				name: {
 					required: true
+				},
+				price: {
+					required: true,
+					number: true,
+					min: 0
 				}
 			},
 			messages: {
 				name: {
 					required: "Il campo nome è obbligatorio"
+				},
+				price: {
+					required: "Il campo prezzo è obbligatorio",
+					number: "Inserire un numero",
+					min: "Il prezzo deve essere maggiore di 0"
 				}
 			},
 			highlight: function(label) {
@@ -166,11 +176,21 @@
 			rules: {
 				name: {
 					required: true
+				},
+				price: {
+					required: true,
+					number: true,
+					min: 0
 				}
 			},
 			messages: {
 				name: {
 					required: "Il campo nome è obbligatorio"
+				},
+				price: {
+					required: "Il campo prezzo è obbligatorio",
+					number: "Inserire un numero",
+					min: "Il prezzo deve essere maggiore di 0"
 				}
 			},
 			highlight: function(label) {
@@ -305,21 +325,21 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="price">Prezzo</label>
+							<label for="price" class="required">Prezzo</label>
 				    		<form:input path="price" class="form-control" id="price" type="number" step="0.01" min="0" />
 				    		<form:errors path="price" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="currencyType">Valuta</label>
+							<label for="currencyType" class="required">Valuta</label>
 							<form:select path="currencyType" id="currencies" class="form-control"></form:select>
 							<form:errors path="currencyType" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="paymentMethod">Metodo di pagamento</label>
+							<label for="paymentMethod" class="required">Metodo di pagamento</label>
 							<form:select path="paymentMethod" class="form-control">
 								<form:option value="0">A bordo</form:option>
 								<form:option value="1" selected="selected">Prima di salire a bordo</form:option>
@@ -329,7 +349,7 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="transfers">Numero di trasferimenti</label>
+							<label for="transfers" class="required">Numero di trasferimenti</label>
 							<form:select path="transfers" class="form-control">
 								<form:option value="0">Nessun trasferimento permesso</form:option>
 								<form:option value="1" selected="selected">1</form:option>
@@ -404,22 +424,22 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="price">Prezzo</label>
+							<label for="price" class="required">Prezzo</label>
 				    		<form:input path="price" class="form-control" id="price" type="number" step="0.01" min="0" value="${tariffaAttiva.price}" />
 				    		<form:errors path="price" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="currencyType">Valuta</label>
-							<form:select path="currencyType" id="currenciesEdit"></form:select>
+							<label for="currencyType" class="required">Valuta</label>
+							<form:select path="currencyType" id="currenciesEdit" class="form-control"></form:select>
 							<form:errors path="currencyType" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="paymentMethod">Metodo di pagamento</label>
-							<form:select path="paymentMethod">
+							<label for="paymentMethod" class="required">Metodo di pagamento</label>
+							<form:select path="paymentMethod" class="form-control">
 								<c:choose>
 									<c:when test="${tariffaAttiva.paymentMethod == 0}">
 										<form:option value="0" selected="selected">A bordo</form:option>
@@ -436,8 +456,8 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="transfers">Numero di trasferimenti</label>
-							<form:select path="transfers">
+							<label for="transfers" class="required">Numero di trasferimenti</label>
+							<form:select path="transfers" class="form-control">
 								<c:choose>
 									<c:when test="${tariffaAttiva.transfers == 0}">
 										<form:option value="0" selected="selected">Nessun trasferimento permesso</form:option>

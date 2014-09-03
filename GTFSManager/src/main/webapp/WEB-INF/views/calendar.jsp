@@ -31,6 +31,11 @@
 		$("#modificaEccezione").hide();
 		$(".alert").hide();
 		
+		// showAlertDuplicateCalendar variable is set to true by CalendarController if the calendar id is already present
+		if ("${showAlertDuplicateCalendar}") {
+			$("#calendar-already-inserted").show();
+		}
+		
 		// showCreateForm variable is set to true by CalendarController if the the submitted form to create a trip contains errors
 		if (!"${showCreateForm}") {
 			$("#creaCalendario").hide();
@@ -114,14 +119,14 @@
 		});
 		
 		// Popover
-		$("#creaCalendarioForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome del calendario (per uso interno)." })
+		$("#creaCalendarioForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamnete un set di date in cui il servizio è disponibile per una o più linee." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaCalendarioForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data di inizio del calendario." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaCalendarioForm").find("#endDate").popover({ container: 'body', trigger: 'focus', title:"Data fine", content:"La data di fine del calendario (questa data è iclusa nell'intervallo)." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaCalendarioForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome del calendario (per uso interno)." })
+		$("#modificaCalendarioForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamnete un set di date in cui il servizio è disponibile per una o più linee." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaCalendarioForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data di inizio del calendario." })
 			.blur(function () { $(this).popover('hide'); });
@@ -141,7 +146,7 @@
 		// Creation calendar form validation
 		$("#creaCalendarioForm").validate({
 			rules: {
-				name: {
+				gtfsId: {
 					required: true
 				},
 				startDate: {
@@ -152,8 +157,8 @@
 				}
 			},
 			messages: {
-				name: {
-					required: "Il campo nome è obbligatorio"
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
 				},
 				startDate: {
 					required: "Il campo data inizio è obbligatorio"
@@ -173,7 +178,7 @@
 		// Edit calendar form validation
 		$("#modificaCalendarioForm").validate({
 			rules: {
-				name: {
+				gtfsId: {
 					required: true
 				},
 				startDate: {
@@ -184,8 +189,8 @@
 				}
 			},
 			messages: {
-				name: {
-					required: "Il campo nome è obbligatorio"
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
 				},
 				startDate: {
 					required: "Il campo data inizio è obbligatorio"
@@ -302,7 +307,7 @@
 			<table id="listaCalendari" class="table table-striped table-hover sortable">
 				<thead>
 					<tr>
-						<th>Nome</th>
+						<th>Id</th>
 						<th>Data inizio</th>
 						<th>Data fine</th>
 						<th>Giorni</th>
@@ -321,7 +326,7 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
-							<td>${calendario.name}</td>
+							<td>${calendario.gtfsId}</td>
 							<td><fmt:formatDate pattern="dd/MM/yyyy" value="${calendario.startDate}" /></td>
 							<td><fmt:formatDate pattern="dd/MM/yyyy" value="${calendario.endDate}" /></td>
 							<td>
@@ -349,9 +354,9 @@
 				<form:form id="creaCalendarioForm" commandName="calendar" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name" class="required">Nome</label>
-				    		<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="50" />
-				    		<form:errors path="name" cssClass="error"></form:errors>
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l'id" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
@@ -410,7 +415,7 @@
 				<div id="riassuntoCalendario" class="riassunto">
 					<% Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo"); %>
 					<div class="col-lg-8">
-						<b>Nome:</b> ${calendarioAttivo.name}
+						<b>Id:</b> ${calendarioAttivo.gtfsId}
 					</div>
 					<div class="col-lg-8">
 						<b>Data inizio:</b> <fmt:formatDate pattern="dd/MM/yyyy" value="${calendarioAttivo.startDate}" />
@@ -441,9 +446,9 @@
 					<% Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name" class="required">Nome</label>
-				    		<form:input path="name" class="form-control" id="name" value="${calendarioAttivo.name}" maxlength="50" />
-				    		<form:errors path="name" cssClass="error"></form:errors>
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${calendarioAttivo.gtfsId}" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
@@ -503,7 +508,7 @@
 		<c:if test="${not empty calendarioAttivo}">
 			<!-- div with table containing trips using the selected calendar -->
 			<div class="col-lg-5">
-				<h4>Corse associate al calendario ${calendarioAttivo.name}</h4>
+				<h4>Corse associate al calendario ${calendarioAttivo.gtfsId}</h4>
 				<table id="listaCorse" class="table table-striped table-hover sortable">
 					<thead>
 						<tr>
@@ -531,7 +536,7 @@
 			
 			<!-- div with table containing calendar dates associated to the selected calendar -->
 			<div class="col-lg-4">
-				<h4>Eccezioni associate al calendario ${calendarioAttivo.name}</h4>
+				<h4>Eccezioni associate al calendario ${calendarioAttivo.gtfsId}</h4>
 				<table id="listaEccezioni" class="table table-striped table-hover sortable">
 					<thead>
 						<tr>
@@ -662,9 +667,13 @@
 	</div>
 	
 	<!-- Alerts -->
+	<div id="calendar-already-inserted" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <strong>Attenzione!</strong> L'id del calendario che hai inserito è già presente.
+	</div>
 	<div id="delete-calendar" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
-	    <p>Vuoi veramente eliminare il calendario ${calendarioAttivo.name}?</p>
+	    <p>Vuoi veramente eliminare il calendario ${calendarioAttivo.gtfsId}?</p>
 	    <button id="delete-calendar-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>

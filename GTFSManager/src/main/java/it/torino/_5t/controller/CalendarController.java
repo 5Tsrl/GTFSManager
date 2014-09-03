@@ -100,9 +100,28 @@ public class CalendarController {
 			return "calendar";
 		}
 		
+		for (Calendar c: calendarDAO.getCalendarsFromAgency(a)) {
+			if (c.getGtfsId().equals(calendar.getGtfsId())) {
+				logger.error("L'id del calendario è già presente");
+				model.addAttribute("listaCalendari", a.getCalendars());
+				model.addAttribute("showCreateForm", true);
+				model.addAttribute("showAlertDuplicateCalendar", true);
+				model.addAttribute("calendarDate", new CalendarDate());
+				Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
+				if (cal != null) {
+					//calendarDAO.updateCalendar(cal);
+					model.addAttribute("listaCorse", cal.getTrips());
+					model.addAttribute("listaEccezioni", cal.getCalendarDates());
+				}
+				if (calendar.getStartDate().after(calendar.getEndDate()))
+					model.addAttribute("showAlertWrongCalendarDates", true);
+				return "calendar";
+			}
+		}
+		
 		a.addCalendar(calendar);
 		
-		logger.info("Calendario creato: " + calendar.getName() + ".");
+		logger.info("Calendario creato: " + calendar.getGtfsId() + ".");
 		
 		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("calendarioAttivo", calendar);
@@ -115,7 +134,7 @@ public class CalendarController {
 	public String selectCalendar(@RequestParam("id") Integer calendarId, Model model, HttpSession session) {
 		Calendar calendar = calendarDAO.getCalendar(calendarId);
 		
-		logger.info("Calendario selezionato: " + calendar.getName() + ".");
+		logger.info("Calendario selezionato: " + calendar.getGtfsId() + ".");
 		
 		session.removeAttribute("eccezioneAttiva");
 		session.setAttribute("calendarioAttivo", calendar);
@@ -145,7 +164,7 @@ public class CalendarController {
 		
 		a.getCalendars().remove(c);
 		
-		logger.info("Calendario eliminato: " + calendar.getName() + ".");
+		logger.info("Calendario eliminato: " + calendar.getGtfsId() + ".");
 		
 		session.removeAttribute("calendarioAttivo");
 		session.removeAttribute("eccezioneAttiva");
@@ -194,6 +213,25 @@ public class CalendarController {
 			return "calendar";
 		}
 		
+		for (Calendar c: calendarDAO.getCalendarsFromAgency(a)) {
+			if (c.getGtfsId().equals(calendar.getGtfsId())) {
+				logger.error("L'id del calendario è già presente");
+				model.addAttribute("listaCalendari", a.getCalendars());
+				model.addAttribute("showCreateForm", true);
+				model.addAttribute("showAlertDuplicateCalendar", true);
+				model.addAttribute("calendarDate", new CalendarDate());
+				Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
+				if (cal != null) {
+					//calendarDAO.updateCalendar(cal);
+					model.addAttribute("listaCorse", cal.getTrips());
+					model.addAttribute("listaEccezioni", cal.getCalendarDates());
+				}
+				if (calendar.getStartDate().after(calendar.getEndDate()))
+					model.addAttribute("showAlertWrongCalendarDates", true);
+				return "calendar";
+			}
+		}
+		
 		Calendar activeCalendar = (Calendar) session.getAttribute("calendarioAttivo");
 		if (activeCalendar == null) {
 			return "redirect:calendari";
@@ -202,7 +240,7 @@ public class CalendarController {
 		// cerco il calendario attivo tra quelli dell'agenzia e lo aggiorno
 		for (Calendar c: a.getCalendars()) {
 			if (c.equals(activeCalendar)) {
-				c.setName(calendar.getName());
+				c.setGtfsId(calendar.getGtfsId());
 				c.setStartDate(calendar.getStartDate());
 				c.setEndDate(calendar.getEndDate());
 				c.setMonday(calendar.isMonday());
@@ -212,7 +250,7 @@ public class CalendarController {
 				c.setFriday(calendar.isFriday());
 				c.setSaturday(calendar.isSaturday());
 				c.setSunday(calendar.isSunday());
-				logger.info("Calendario modificato: " + c.getName() + ".");
+				logger.info("Calendario modificato: " + c.getGtfsId() + ".");
 				session.setAttribute("calendarioAttivo", c);
 				break;
 			}

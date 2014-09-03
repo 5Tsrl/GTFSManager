@@ -329,7 +329,7 @@ public class ExportGTFSController {
 	private void fillCalendar() throws IOException {
 		String row = new String();
 		for (Calendar c: calendarDAO.getAllCalendars()) {
-			row += c.getId() + ",";
+			row += c.getGtfsId() + ",";
 			row += formatBoolean(c.isMonday()) + ",";
 			row += formatBoolean(c.isTuesday()) + ",";
 			row += formatBoolean(c.isWednesday()) + ",";
@@ -347,7 +347,7 @@ public class ExportGTFSController {
 	private void fillCalendarDates() throws IOException {
 		String row = new String();
 		for (CalendarDate cd: calendarDateDAO.getAllCalendarDates()) {
-			row += cd.getCalendar().getId() + ",";
+			row += cd.getCalendar().getGtfsId() + ",";
 			row += formatDate(cd.getDate()) + ",";
 			row += cd.getExceptionType() + "\n";
 		}
@@ -520,7 +520,7 @@ public class ExportGTFSController {
 		String row = new String();
 		for (Trip t: tripDAO.getAllTrips()) {
 			row += t.getRoute().getId() + ",";
-			row += t.getCalendar().getId() + ",";
+			row += t.getCalendar().getGtfsId() + ",";
 			row += t.getId() + ",";
 			row += t.getTripHeadsign() + ",";
 			row += t.getTripShortName() + ",";
