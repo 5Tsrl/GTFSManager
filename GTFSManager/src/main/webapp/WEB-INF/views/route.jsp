@@ -31,6 +31,11 @@
 		$("#modificaLinea").hide();
 		$(".alert").hide();
 		
+		// showAlertDuplicateRoute variable is set to true by RouteController if the route id is already present
+		if ("${showAlertDuplicateRoute}") {
+			$("#route-already-inserted").show();
+		}
+		
 		// showCreateForm variable is set to true by RouteController if the the submitted form to create a route contains errors
 		if (!"${showCreateForm}") {
 			$("#creaLinea").hide();
@@ -73,9 +78,11 @@
 		});
 		
 		// Popover
-		$("#creaLineaForm").find("#shortName").popover({ container: 'body', trigger: 'focus', title:"Linea", content:"Il nome abbreviato della linea. Solitamente è un identificatore breve, astratto, come \"32\", \"100X\" o \"Verde\", che i passeggeri usano per identificare la linea, ma che non dà nessuna informazione su quali luoghi la linea serve." })
+		$("#creaLineaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una linea." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaLineaForm").find("#longName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo della linea. Questo nome è di solito più descrittivo di quello abbreviato e spesso include la destinazione della linea." })
+		$("#creaLineaForm").find("#shortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome abbreviato della linea. Solitamente è un identificatore breve, astratto, come \"32\", \"100X\" o \"Verde\", che i passeggeri usano per identificare la linea, ma che non dà nessuna informazione su quali luoghi la linea serve." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaLineaForm").find("#longName").popover({ container: 'body', trigger: 'focus', title:"Nome completo", content:"Il nome completo della linea. Questo nome è di solito più descrittivo di quello abbreviato e spesso include la destinazione della linea." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaLineaForm").find("#description").popover({ container: 'body', trigger: 'focus', title:"Descrizione", content:"La descrizione della linea. Dovrebbero essere inserite informazioni utili, non duplicando semplicemente il nome della linea." })
 			.blur(function () { $(this).popover('hide'); });
@@ -88,9 +95,11 @@
 		$("#creaLineaForm").find("#textColor").popover({ container: 'body', trigger: 'focus', title:"Colore testo", content:"Il colore del testo avente come sfondo il colore della linea (quello di default è nero)." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaLineaForm").find("#shortName").popover({ container: 'body', trigger: 'focus', title:"Linea", content:"Il nome abbreviato della linea. Solitamente è un identificatore breve, astratto, come \"32\", \"100X\" o \"Verde\", che i passeggeri usano per identificare la linea, ma che non dà nessuna informazione su quali luoghi la linea serve." })
+		$("#modificaLineaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una linea." })
+		.blur(function () { $(this).popover('hide'); });
+		$("#modificaLineaForm").find("#shortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome abbreviato della linea. Solitamente è un identificatore breve, astratto, come \"32\", \"100X\" o \"Verde\", che i passeggeri usano per identificare la linea, ma che non dà nessuna informazione su quali luoghi la linea serve." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaLineaForm").find("#longName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo della linea. Questo nome è di solito più descrittivo di quello abbreviato e spesso include la destinazione della linea." })
+		$("#modificaLineaForm").find("#longName").popover({ container: 'body', trigger: 'focus', title:"Nome completo", content:"Il nome completo della linea. Questo nome è di solito più descrittivo di quello abbreviato e spesso include la destinazione della linea." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaLineaForm").find("#description").popover({ container: 'body', trigger: 'focus', title:"Descrizione", content:"La descrizione della linea. Dovrebbero essere inserite informazioni utili, non duplicando semplicemente il nome della linea." })
 			.blur(function () { $(this).popover('hide'); });
@@ -106,6 +115,9 @@
 		// Creation route form validation
 		$("#creaLineaForm").validate({
 			rules: {
+				gtfsId: {
+					required: true
+				},
 				shortName: {
 					required: true
 				},
@@ -117,11 +129,14 @@
 				}
 			},
 			messages: {
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
+				},
 				shortName: {
-					required: "Il campo linea è obbligatorio"
+					required: "Il campo nome abbreviato è obbligatorio"
 				},
 				longName: {
-					required: "Il campo nome è obbligatorio"
+					required: "Il campo nome completo è obbligatorio"
 				},
 				url: {
 					url: "Inserire un url corretta"
@@ -138,6 +153,9 @@
 		// Edit route form validation
 		$("#modificaLineaForm").validate({
 			rules: {
+				gtfsId: {
+					required: true
+				},
 				shortName: {
 					required: true
 				},
@@ -149,11 +167,14 @@
 				}
 			},
 			messages: {
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
+				},
 				shortName: {
-					required: "Il campo linea è obbligatorio"
+					required: "Il campo nome abbreviato è obbligatorio"
 				},
 				longName: {
-					required: "Il campo nome è obbligatorio"
+					required: "Il campo nome completo è obbligatorio"
 				},
 				url: {
 					url: "Inserire un url corretta"
@@ -208,8 +229,9 @@
 			<table id="listaLinee" class="table table-striped table-hover sortable">
 				<thead>
 					<tr>
-						<th>Linea</th>
-						<th>Nome</th>
+						<th>Id</th>
+						<th>Nome abbreviato</th>
+						<th>Nome completo</th>
 						<th>Corse</th>
 						<th class="hidden"></th>
 					</tr>
@@ -226,6 +248,7 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
+							<td>${linea.gtfsId}</td>
 							<td>${linea.shortName}</td>
 							<td>${linea.longName}</td>
 							<td>
@@ -260,15 +283,22 @@
 				<form:form id="creaLineaForm" commandName="route" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="shortName" class="required">Linea</label>
-				    		<form:input path="shortName" class="form-control" id="shortName" placeholder="Inserisci la linea" maxlength="20" />
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l'id" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="shortName" class="required">Nome abbreviato</label>
+				    		<form:input path="shortName" class="form-control" id="shortName" placeholder="Inserisci il nome abbreviato" maxlength="50" />
 				    		<form:errors path="shortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="longName" class="required">Nome</label>
-				    		<form:input path="longName" class="form-control" id="longName" placeholder="Inserisci il nome" maxlength="50" />
+							<label for="longName" class="required">Nome completo</label>
+				    		<form:input path="longName" class="form-control" id="longName" placeholder="Inserisci il nome completo" maxlength="255" />
 				    		<form:errors path="longName" cssClass="error"></form:errors>
 						</div>
 					</div>
@@ -336,10 +366,13 @@
 			<c:if test="${not empty lineaAttiva}">
 				<div id="riassuntoLinea" class="riassunto">
 					<div class="col-lg-8">
-						<b>Linea:</b> ${lineaAttiva.shortName}
+						<b>Id:</b> ${lineaAttiva.gtfsId}
 					</div>
 					<div class="col-lg-8">
-						<b>Nome:</b> ${lineaAttiva.longName}
+						<b>Nome abbreviato:</b> ${lineaAttiva.shortName}
+					</div>
+					<div class="col-lg-8">
+						<b>Nome completo:</b> ${lineaAttiva.longName}
 					</div>
 					<div class="col-lg-8">
 						<b>Descrizione:</b> ${lineaAttiva.description}
@@ -363,7 +396,7 @@
 					<div class="col-lg-8">
 						<b>Tariffe:</b>
 						<c:forEach var="tariffa" items="${listaTariffe}" varStatus="i">
-							<a href="/_5t/selezionaTariffa?id=${tariffa.fareAttribute.id}">${tariffa.fareAttribute.name}</a><c:if test="${!i.last}">,</c:if>
+							<a href="/_5t/selezionaTariffa?id=${tariffa.fareAttribute.id}">${tariffa.fareAttribute.gtfsId}</a><c:if test="${!i.last}">,</c:if>
 						</c:forEach>
 					</div>
 					<div class="col-lg-12">
@@ -378,15 +411,22 @@
 				<form:form id="modificaLineaForm" commandName="route" method="post" role="form" action="/_5t/modificaLinea">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="shortName" class="required">Linea</label>
-				    		<form:input path="shortName" class="form-control" id="shortName" value="${lineaAttiva.shortName}" maxlength="20" />
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${lineaAttiva.gtfsId}" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="shortName" class="required">Nome abbreviato</label>
+				    		<form:input path="shortName" class="form-control" id="shortName" value="${lineaAttiva.shortName}" maxlength="50" />
 				    		<form:errors path="shortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="longName" class="required">Nome</label>
-				    		<form:input path="longName" class="form-control" id="longName" value="${lineaAttiva.longName}" maxlength="50" />
+							<label for="longName" class="required">Nome completo</label>
+				    		<form:input path="longName" class="form-control" id="longName" value="${lineaAttiva.longName}" maxlength="255" />
 				    		<form:errors path="longName" cssClass="error"></form:errors>
 						</div>
 					</div>
@@ -454,6 +494,10 @@
 	</div>
 	
 	<!-- Alerts -->
+	<div id="route-already-inserted" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <strong>Attenzione!</strong> L'id della linea che hai inserito è già presente.
+	</div>
 	<div id="delete-route" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
 	    <p>Vuoi veramente eliminare la linea ${lineaAttiva.shortName}?</p>

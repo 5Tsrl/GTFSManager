@@ -95,6 +95,7 @@ public class TripController {
 			logger.error("Errore nella creazione della corsa");
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaCorse", route.getTrips());
+			model.addAttribute("listaCalendari", agency.getCalendars());
 			model.addAttribute("showCreateForm", true);
 			return "trip";
 		}
@@ -102,6 +103,16 @@ public class TripController {
 		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
+				for (Trip t: tripDAO.getTripsFromRoute(r)) {
+					if (t.getGtfsId().equals(trip.getGtfsId())) {
+						logger.error("L'id della corsa è già presente");
+						model.addAttribute("listaCorse", r.getTrips());
+						model.addAttribute("listaCalendari", a.getCalendars());
+						model.addAttribute("showCreateForm", true);
+						model.addAttribute("showAlertDuplicateTrip", true);
+						return "trip";
+					}
+				}
 				r.addTrip(trip);
 				session.setAttribute("lineaAttiva", r);
 				break;
@@ -223,6 +234,7 @@ public class TripController {
 			logger.error("Errore nella modifica della corsa");
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaCorse", route.getTrips());
+			model.addAttribute("listaCalendari", agency.getCalendars());
 			model.addAttribute("showEditForm", true);
 			return "trip";
 		}
@@ -237,8 +249,19 @@ public class TripController {
 		// cerco tra le linee dell'agenzia quella attiva, tra le corse della linea selezionata quella attiva e la aggiorno
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
+				for (Trip t: tripDAO.getTripsFromRoute(r)) {
+					if (!activetrip.getGtfsId().equals(trip.getGtfsId()) && t.getGtfsId().equals(trip.getGtfsId())) {
+						logger.error("L'id della corsa è già presente");
+						model.addAttribute("listaCorse", r.getTrips());
+						model.addAttribute("listaCalendari", a.getCalendars());
+						model.addAttribute("showEditForm", true);
+						model.addAttribute("showAlertDuplicateTrip", true);
+						return "trip";
+					}
+				}
 				for (Trip t: r.getTrips()) {
 					if (t.equals(activetrip)) {
+						t.setGtfsId(trip.getGtfsId());
 						t.setTripHeadsign(trip.getTripHeadsign());
 						t.setTripShortName(trip.getTripShortName());
 						t.setDirectionId(trip.getDirectionId());
@@ -268,8 +291,8 @@ public class TripController {
 	}
 	
 	// chiamata al submit del form per la duplicazione di una corsa
-	@RequestMapping(value = "/duplicaCorsa", method = RequestMethod.GET)
-	public String duplicateTrip(Model model, HttpSession session) {
+	@RequestMapping(value = "/duplicaCorsa", method = RequestMethod.POST)
+	public String duplicateTrip(@RequestParam("newGtfsId") String newGtfsId, Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -286,7 +309,16 @@ public class TripController {
 			return "redirect:corse";
 		}
 		
+		if (newGtfsId == null) {
+			logger.error("Nessun id inserito per la corsa duplicata");
+			model.addAttribute("listaCorse", route.getTrips());
+			model.addAttribute("listaCalendari", a.getCalendars());
+			model.addAttribute("showCreateForm", true);
+			return "trip";
+		}
+		
 		Trip duplicatedTrip = new Trip();
+		duplicatedTrip.setGtfsId(newGtfsId);
 		duplicatedTrip.setTripHeadsign(trip.getTripHeadsign());
 		duplicatedTrip.setTripShortName(trip.getTripShortName());
 		duplicatedTrip.setDirectionId(trip.getDirectionId());
@@ -298,6 +330,16 @@ public class TripController {
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
+				for (Trip t: tripDAO.getTripsFromRoute(r)) {
+					if (t.getGtfsId().equals(newGtfsId)) {
+						logger.error("L'id della corsa è già presente");
+						model.addAttribute("listaCorse", r.getTrips());
+						model.addAttribute("listaCalendari", a.getCalendars());
+						model.addAttribute("showAlertDuplicateTrip", true);
+						model.addAttribute("trip", new Trip());
+						return "trip";
+					}
+				}
 				// tra le corse della linea quella attiva e le modifico l'associazione
 				for (Trip t: r.getTrips()) {
 					if (t.equals(trip)) {
@@ -311,13 +353,15 @@ public class TripController {
 							}
 							duplicatedTrip.addStopTime(stopTime);
 						}
-						for (Shape s: a.getShapes()) {
-							if (s.getId().equals(t.getShape().getId())) {
-								Shape shape = new Shape();
-								shape.setEncodedPolyline(s.getEncodedPolyline());
-								shape.addTrip(duplicatedTrip);
-								a.addShape(shape);
-								break;
+						if (t.getShape() != null) {
+							for (Shape s: a.getShapes()) {
+								if (s.getId().equals(t.getShape().getId())) {
+									Shape shape = new Shape();
+									shape.setEncodedPolyline(s.getEncodedPolyline());
+									shape.addTrip(duplicatedTrip);
+									a.addShape(shape);
+									break;
+								}
 							}
 						}
 						break;

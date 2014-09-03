@@ -81,6 +81,16 @@ public class RouteController {
 			return "route";
 		}
 		
+		for (Route r: routeDAO.getRoutesFromAgency(a)) {
+			if (r.getGtfsId().equals(route.getGtfsId())) {
+				logger.error("L'id della linea è già presente");
+				model.addAttribute("listaLinee", agency.getRoutes());
+				model.addAttribute("showCreateForm", true);
+				model.addAttribute("showAlertDuplicateRoute", true);
+				return "route";
+			}
+		}
+		
 		a.addRoute(route);
 		
 		logger.info("Linea creata: " + route.getShortName() + ".");
@@ -168,9 +178,20 @@ public class RouteController {
 			return "redirect:linee";
 		}
 		
+		for (Route r: routeDAO.getRoutesFromAgency(a)) {
+			if (!activeRoute.getGtfsId().equals(route.getGtfsId()) && r.getGtfsId().equals(route.getGtfsId())) {
+				logger.error("L'id della linea è già presente");
+				model.addAttribute("listaLinee", agency.getRoutes());
+				model.addAttribute("showEditForm", true);
+				model.addAttribute("showAlertDuplicateRoute", true);
+				return "route";
+			}
+		}
+		
 		// cerco la linea attiva tra quelle dell'agenzia e la aggiorno
 		for (Route r: a.getRoutes()) {
 			if (r.equals(activeRoute)) {
+				r.setGtfsId(route.getGtfsId());
 				r.setShortName(route.getShortName());
 				r.setLongName(route.getLongName());
 				r.setDescription(route.getDescription());

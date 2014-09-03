@@ -36,16 +36,20 @@ public class Route implements Serializable {
 	@Column(name = "route_id")
 	private Integer id;
 	
+	@Column(name = "route_gtfs_id")
+	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
+	private String gtfsId;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
 	
 	@Column(name = "route_short_name")
-	@Size(min = 1, max = 20, message = "Il campo \"nome abbreviato\" non può essere vuoto")
+	@Size(min = 1, max = 50, message = "Il campo \"nome abbreviato\" non può essere vuoto")
 	private String shortName;
 	
 	@Column(name = "route_long_name")
-	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
+	@Size(min = 1, max = 255, message = "Il campo \"nome completo\" non può essere vuoto")
 	private String longName;
 	
 	@Column(name = "route_desc")
@@ -107,6 +111,14 @@ public class Route implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getGtfsId() {
+		return gtfsId;
+	}
+
+	public void setGtfsId(String gtfsId) {
+		this.gtfsId = gtfsId;
 	}
 
 	public Agency getAgency() {

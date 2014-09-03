@@ -31,6 +31,11 @@
 		$("#modificaCorsa").hide();
 		$(".alert").hide();
 		
+		// showAlertDuplicateTrip variable is set to true by TripController if the trip id is already present
+		if ("${showAlertDuplicateTrip}") {
+			$("#trip-already-inserted").show();
+		}
+		
 		// showCreateForm variable is set to true by TripController if the the submitted form to create a trip contains errors
 		if (!"${showCreateForm}") {
 			$("#creaCorsa").hide();
@@ -73,14 +78,18 @@
 		});
 		
 		// Popover
-		$("#creaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+		$("#creaCorsaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaCorsaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaCorsaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+		$("#modificaCorsaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
+		.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaCorsaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
 			.blur(function () { $(this).popover('hide'); });
@@ -90,6 +99,9 @@
 		// Creation trip form validation
 		$("#creaCorsaForm").validate({
 			rules: {
+				gtfsId: {
+					required: true
+				},
 				tripShortName: {
 					required: true
 				},
@@ -98,8 +110,11 @@
 				}
 			},
 			messages: {
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
+				},
 				tripShortName: {
-					required: "Il campo nome è obbligatorio"
+					required: "Il campo nome abbreviato è obbligatorio"
 				},
 				serviceId: {
 					required: "Selezionare un calendario"
@@ -116,13 +131,45 @@
 		// Edit trip form validation
 		$("#modificaCorsaForm").validate({
 			rules: {
+				gtfsId: {
+					required: true
+				},
 				tripShortName: {
+					required: true
+				},
+				serviceId: {
 					required: true
 				}
 			},
 			messages: {
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
+				},
 				tripShortName: {
-					required: "Il campo nome è obbligatorio"
+					required: "Il campo nome abbreviato è obbligatorio"
+				},
+				serviceId: {
+					required: "Selezionare un calendario"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
+		
+		// Duplicate trip form validation
+		$("#duplicaCorsaForm").validate({
+			rules: {
+				newGtfsId: {
+					required: true
+				}
+			},
+			messages: {
+				newGtfsId: {
+					required: "Il campo id è obbligatorio"
 				}
 			},
 			highlight: function(label) {
@@ -179,7 +226,8 @@
 			<table id="listaCorse" class="table table-striped table-hover sortable">
 				<thead>
 					<tr>
-						<th>Nome</th>
+						<th>Id</th>
+						<th>Nome abbreviato</th>
 						<th>Direzione</th>
 						<th>Calendario</th>
 						<th>Servizi</th>
@@ -199,6 +247,7 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
+							<td>${corsa.gtfsId}</td>
 							<td>${corsa.tripShortName}</td>
 							<td>
 								<c:choose>
@@ -206,7 +255,7 @@
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${corsa.calendar.id}">${corsa.calendar.name}</a></td>
+							<td><a href="/_5t/selezionaCalendario?id=${corsa.calendar.id}">${corsa.calendar.gtfsId}</a></td>
 							<td>
 								${fn:length(corsa.frequencies)}
 								<c:choose>
@@ -258,8 +307,15 @@
 				<form:form id="creaCorsaForm" commandName="trip" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="tripShortName" class="required">Nome</label>
-				    		<form:input path="tripShortName" class="form-control" id="tripShortName" placeholder="Inserisci il nome" maxlength="50" />
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l'id" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="tripShortName" class="required">Nome abbreviato</label>
+				    		<form:input path="tripShortName" class="form-control" id="tripShortName" placeholder="Inserisci il nome abbreviato" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
 					</div>
@@ -286,7 +342,7 @@
 							<select name="serviceId" class="form-control" required>
 								<option value="">Seleziona un calendario</option>
 								<c:forEach var="calendario" items="${listaCalendari}">
-									<option value="${calendario.id}">${calendario.name}</option>
+									<option value="${calendario.id}">${calendario.gtfsId}</option>
 								</c:forEach>
 							</select>
 						</div>
@@ -329,6 +385,9 @@
 				<div id="riassuntoCorsa" class="riassunto">
 					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
 					<div class="col-lg-8">
+						<b>Id:</b> ${corsaAttiva.gtfsId}
+					</div>
+					<div class="col-lg-8">
 						<b>Nome:</b> ${corsaAttiva.tripShortName}
 					</div>
 					<div class="col-lg-8">
@@ -339,7 +398,7 @@
 						<% out.write(direction.get(trip.getDirectionId())); %>
 					</div>
 					<div class="col-lg-8">
-						<b>Calendario:</b> ${corsaAttiva.calendar.name}
+						<b>Calendario:</b> ${corsaAttiva.calendar.gtfsId}
 					</div>
 					<div class="col-lg-8">
 						<b>Accessibile ai disabili:</b>
@@ -351,8 +410,16 @@
 					</div>
 					<div class="col-lg-12">
 						<a id="modificaCorsaButton" class="btn btn-primary" href="/_5t/modificaCorsa">Modifica</a>
-						<a id="duplicaCorsaButton" class="btn btn-info" href="/_5t/duplicaCorsa">Duplica</a>
 						<button id="eliminaCorsaButton" type="button" class="btn btn-danger">Elimina</button>
+					</div>
+					<div class="col-lg-12">
+						<form id="duplicaCorsaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsa">
+							<div class="form-group">
+								<label for="newGtfsId" class="required">Duplica con id</label>
+					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" />
+							</div>
+							<input class="btn btn-info" type="submit" value="Duplica" />
+						</form>
 					</div>
 				</div>
 			</c:if>
@@ -363,7 +430,14 @@
 					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="tripShortName" class="required">Nome</label>
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${corsaAttiva.gtfsId}" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="tripShortName" class="required">Nome abbreviato</label>
 				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaAttiva.tripShortName}" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
@@ -406,10 +480,10 @@
 								<c:forEach var="calendario" items="${listaCalendari}">
 									<c:choose>
 										<c:when test="${corsaAttiva.calendar.id == calendario.id}">
-											<option value="${calendario.id}" selected>${calendario.name}</option>
+											<option value="${calendario.id}" selected>${calendario.gtfsId}</option>
 										</c:when>
 										<c:otherwise>
-											<option value="${calendario.id}">${calendario.name}</option>
+											<option value="${calendario.id}">${calendario.gtfsId}</option>
 										</c:otherwise>
 									</c:choose>
 								</c:forEach>
@@ -474,6 +548,10 @@
 	</div>
 	
 	<!-- Alerts -->
+	<div id="trip-already-inserted" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <strong>Attenzione!</strong> L'id della corsa che hai inserito è già presente.
+	</div>
 	<div id="delete-trip" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
 	    <p>Vuoi veramente eliminare la corsa ${corsaAttiva.tripShortName}?</p>

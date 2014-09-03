@@ -34,6 +34,10 @@ public class Trip implements Serializable{
 	@Column(name = "trip_id")
 	private Integer id;
 	
+	@Column(name = "trip_gtfs_id")
+	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
+	private String gtfsId;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "route_id")
 	private Route route;
@@ -47,7 +51,7 @@ public class Trip implements Serializable{
 	private String tripHeadsign;
 	
 	@Column(name = "trip_short_name")
-	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
+	@Size(max = 50)
 	private String tripShortName;
 	
 	@Column(name = "direction_id")
@@ -111,6 +115,14 @@ public class Trip implements Serializable{
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getGtfsId() {
+		return gtfsId;
+	}
+
+	public void setGtfsId(String gtfsId) {
+		this.gtfsId = gtfsId;
 	}
 
 	public Route getRoute() {

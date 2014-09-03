@@ -177,19 +177,19 @@ public class FareController {
 			return "fare";
 		}
 		
-		for (FareAttribute fa: fareAttributeDAO.getFareAttributesFromAgency(a)) {
-			if (fa.getGtfsId().equals(fareAttribute.getGtfsId())) {
-				logger.error("L'id della tariffa è già presente");
-				model.addAttribute("listaTariffe", a.getFareAttributes());
-				model.addAttribute("showCreateForm", true);
-				model.addAttribute("showAlertDuplicateFare", true);
-				return "fare";
-			}
-		}
-		
 		FareAttribute activeFareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (activeFareAttribute == null) {
 			return "redirect:tariffe";
+		}
+		
+		for (FareAttribute fa: fareAttributeDAO.getFareAttributesFromAgency(a)) {
+			if (!activeFareAttribute.getGtfsId().equals(fareAttribute.getGtfsId()) && fa.getGtfsId().equals(fareAttribute.getGtfsId())) {
+				logger.error("L'id della tariffa è già presente");
+				model.addAttribute("listaTariffe", a.getFareAttributes());
+				model.addAttribute("showEditForm", true);
+				model.addAttribute("showAlertDuplicateFare", true);
+				return "fare";
+			}
 		}
 		
 		// cerco la tariffa attiva tra quelle dell'agenzia e la aggiorno

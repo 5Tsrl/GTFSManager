@@ -373,7 +373,7 @@ public class ExportGTFSController {
 		String row = new String();
 		for (FareRule fr: fareRuleDAO.getAllFareRules()) {
 			row += fr.getFareAttribute().getGtfsId() + ",";
-			row += (fr.getRoute() != null ? fr.getRoute().getId() : "") + ",";
+			row += (fr.getRoute() != null ? fr.getRoute().getGtfsId() : "") + ",";
 			row += (fr.getOrigin() != null ? fr.getOrigin().getId() : "") + ",";
 			row += (fr.getDestination() != null ? fr.getDestination().getId() : "") + ",";
 			row += (fr.getContains() != null ? fr.getContains().getId() : "") + "\n";
@@ -399,7 +399,7 @@ public class ExportGTFSController {
 	private void fillFrequencies() throws IOException {
 		String row = new String();
 		for (Frequency f: frequencyDAO.getAllFrequencies()) {
-			row += f.getTrip().getId() + ",";
+			row += f.getTrip().getGtfsId() + ",";
 			row += formatTime(f.getStartTime()) + ",";
 			String endTime = formatTime(f.getEndTime());
 			if (f.getStartTime().after(f.getEndTime())) {
@@ -420,7 +420,7 @@ public class ExportGTFSController {
 	private void fillRoutes() throws IOException {
 		String row = new String();
 		for (Route r: routeDAO.getAllRoutes()) {
-			row += r.getId() + ",";
+			row += r.getGtfsId() + ",";
 			row += (r.getAgency()  != null ? r.getAgency().getGtfsId() : "") + ",";
 			row += r.getShortName() + ",";
 			row += r.getLongName() + ",";
@@ -474,7 +474,7 @@ public class ExportGTFSController {
 	private void fillStopTimes() throws IOException {
 		String row = new String();
 		for (StopTime st: stopTimeDAO.getAllStopTimes()) {
-			row += st.getTrip().getId() + ",";
+			row += st.getTrip().getGtfsId() + ",";
 			String arrivalTime = formatTime(st.getArrivalTime());
 			if (st.isContinueFromPreviousDay()) {
 				// if arrival and departure times continue from previous day, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
@@ -519,9 +519,9 @@ public class ExportGTFSController {
 	private void fillTrips() throws IOException {
 		String row = new String();
 		for (Trip t: tripDAO.getAllTrips()) {
-			row += t.getRoute().getId() + ",";
+			row += t.getRoute().getGtfsId() + ",";
 			row += t.getCalendar().getGtfsId() + ",";
-			row += t.getId() + ",";
+			row += t.getGtfsId() + ",";
 			row += t.getTripHeadsign() + ",";
 			row += t.getTripShortName() + ",";
 			row += formatOptionalInteger(t.getDirectionId()) + ",";

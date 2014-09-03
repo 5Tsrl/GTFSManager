@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import it.torino._5t.entity.Route;
 import it.torino._5t.entity.Trip;
 import it.torino._5t.persistence.HibernateUtil;
 
@@ -52,6 +53,14 @@ public class TripDAOImpl implements TripDAO {
 	public List<Trip> getAllTrips() {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		Query query = session.createQuery("from Trip");
+		return query.list();
+	}
+
+	@Override
+	public List<Trip> getTripsFromRoute(Route route) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Query query = session.createQuery("from Trip where route = :route");
+		query.setEntity("route", route);
 		return query.list();
 	}
 

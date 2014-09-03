@@ -213,11 +213,16 @@ public class CalendarController {
 			return "calendar";
 		}
 		
+		Calendar activeCalendar = (Calendar) session.getAttribute("calendarioAttivo");
+		if (activeCalendar == null) {
+			return "redirect:calendari";
+		}
+		
 		for (Calendar c: calendarDAO.getCalendarsFromAgency(a)) {
-			if (c.getGtfsId().equals(calendar.getGtfsId())) {
+			if (!activeCalendar.getGtfsId().equals(calendar.getGtfsId()) && c.getGtfsId().equals(calendar.getGtfsId())) {
 				logger.error("L'id del calendario è già presente");
 				model.addAttribute("listaCalendari", a.getCalendars());
-				model.addAttribute("showCreateForm", true);
+				model.addAttribute("showEditForm", true);
 				model.addAttribute("showAlertDuplicateCalendar", true);
 				model.addAttribute("calendarDate", new CalendarDate());
 				Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
@@ -230,11 +235,6 @@ public class CalendarController {
 					model.addAttribute("showAlertWrongCalendarDates", true);
 				return "calendar";
 			}
-		}
-		
-		Calendar activeCalendar = (Calendar) session.getAttribute("calendarioAttivo");
-		if (activeCalendar == null) {
-			return "redirect:calendari";
 		}
 		
 		// cerco il calendario attivo tra quelli dell'agenzia e lo aggiorno

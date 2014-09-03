@@ -1,5 +1,6 @@
 package it.torino._5t.dao;
 
+import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Route;
 import it.torino._5t.persistence.HibernateUtil;
 
@@ -53,6 +54,14 @@ public class RouteDAOImpl implements RouteDAO {
 	public Route loadRoute(Integer id) {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		return (Route) session.load(Route.class, id);
+	}
+
+	@Override
+	public List<Route> getRoutesFromAgency(Agency agency) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Query query = session.createQuery("from Route where agency = :agency");
+		query.setEntity("agency", agency);
+		return query.list();
 	}
 
 }
