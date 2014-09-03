@@ -454,7 +454,7 @@ public class ExportGTFSController {
 	private void fillStops() throws IOException {
 		String row = new String();
 		for (Stop s: stopDAO.getAllStops()) {
-			row += s.getId() + ",";
+			row += s.getGtfsId() + ",";
 			row += s.getCode() + ",";
 			row += s.getName() + ",";
 			row += s.getDesc() + ",";
@@ -493,7 +493,7 @@ public class ExportGTFSController {
 			} else {
 				row += departureTime + ",";
 			}
-			row += st.getStop().getId() + ",";
+			row += st.getStop().getGtfsId() + ",";
 			row += st.getStopSequence() + ",";
 			row += st.getStopHeadsign() + ",";
 			row += formatOptionalInteger(st.getPickupType()) + ",";

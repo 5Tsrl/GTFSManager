@@ -1,5 +1,6 @@
 package it.torino._5t.dao;
 
+import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Stop;
 import it.torino._5t.persistence.HibernateUtil;
 
@@ -29,6 +30,14 @@ public class StopDAOImpl implements StopDAO {
 			return stops.get(0);
 		}
 		return null;
+	}
+
+	@Override
+	public List<Stop> getStopsFromAgency(Agency agency) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Query query = session.createQuery("from Stop where agency = :agency");
+		query.setEntity("agency", agency);
+		return query.list();
 	}
 
 }

@@ -76,6 +76,13 @@
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group">' +
+											'<label for="gtfsId" class="required">Id</label>' +
+											'<form:input path="gtfsId" class="form-control" id="ngtfsIdame" value="${fermata.gtfsId}" maxlength="50" required="true" />' +
+											'<form:errors path="gtfsId" cssClass="error"></form:errors>' +
+										'</div>' +
+									'</div>' +
+									'<div class="row">' +
+										'<div class="form-group">' +
 											'<label for="name" class="required">Nome</label>' +
 											'<form:input path="name" class="form-control" id="name" value="${fermata.name}" maxlength="50" required="true" />' +
 											'<form:errors path="name" cssClass="error"></form:errors>' +
@@ -226,6 +233,13 @@
 			    				'</div>' +
 			    				'<div class="row">' +
 			    					'<div class="form-group">' +
+			    						'<label for="gtfsId" class="required">Id</label>' +
+			    						'<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l\'id" maxlength="50" required="true" />' +
+			    						'<form:errors path="gtfsId" cssClass="error"></form:errors>' +
+			    					'</div>' +
+			    				'</div>' +
+			    				'<div class="row">' +
+			    					'<div class="form-group">' +
 			    						'<label for="name" class="required">Nome</label>' +
 			    						'<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="50" required="true" />' +
 			    						'<form:errors path="name" cssClass="error"></form:errors>' +
@@ -309,6 +323,8 @@
 			}
 			
 			// Popover
+			$("#creaFermataForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una fermata o stazione. Più linee possono usare la stessa fermata." })
+				.blur(function () { $(this).popover('hide'); });
 			$("#creaFermataForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome della fermata o stazione. Usare un nome che le persone possano capire nella lingua locale e turistica." })
 				.blur(function () { $(this).popover('hide'); });
 			$("#creaFermataForm").find("#code").popover({ container: 'body', trigger: 'focus', title:"Codice", content:"Breve testo o numero che identifica univocamente la fermata per i passeggeri. I codici delle fermate sono spesso usati in sistemi informativi di transito basati sul telefono o stampati sulle paline per rendere più semplice ai passeggeri ottenere il calendario della fermata o informazioni di arrivo in tempo reale per una specifica fermata." })
@@ -325,6 +341,21 @@
 				.blur(function () { $(this).popover('hide'); });
 			$("#creaFermataForm").find("#wheelchairBoarding").popover({ container: 'body', trigger: 'focus', title:"Accessibile ai disabili", content:"Indica se la fermata o stazione è accessibile ai disabili." })
 				.blur(function () { $(this).popover('hide'); });
+		});
+	});
+	
+	$(document).ready(function() {
+		// alerts initially hidden
+		$(".alert").hide();
+		
+		// showAlertDuplicateStop variable is set to true by StopController if the stop id is already present
+		if ("${showAlertDuplicateStop}") {
+			$("#stop-already-inserted").show();
+		}
+		
+		// when alert are closed, they are hidden
+		$('.close').click(function() {
+			$(this).parent().hide();
 		});
 	});
     </script>
@@ -352,6 +383,12 @@
 		<c:if test="${not empty lineaAttiva.shortName && not empty corsaAttiva.tripShortName}">
 			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate alla corsa ${corsaAttiva.tripShortName}</a>
 		</c:if>
+	</div>
+	
+	<!-- Alerts -->
+	<div id="stop-already-inserted" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <strong>Attenzione!</strong> L'id della fermata che hai inserito è già presente.
 	</div>
 </body>
 </html>

@@ -35,6 +35,10 @@ public class Stop implements Serializable {
 	@Column(name = "stop_id")
 	private Integer id;
 	
+	@Column(name = "stop_gtfs_id")
+	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
+	private String gtfsId;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
@@ -128,6 +132,14 @@ public class Stop implements Serializable {
 
 	public void setId(Integer id) {
 		this.id = id;
+	}
+
+	public String getGtfsId() {
+		return gtfsId;
+	}
+
+	public void setGtfsId(String gtfsId) {
+		this.gtfsId = gtfsId;
 	}
 
 	public Agency getAgency() {

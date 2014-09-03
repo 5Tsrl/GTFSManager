@@ -64,6 +64,17 @@ public class StopController {
 			return "stop";
 		}
 		
+		for (Stop s: stopDAO.getStopsFromAgency(a)) {
+			if (s.getGtfsId().equals(stop.getGtfsId())) {
+				logger.error("L'id della fermata è già presente");
+				//agencyDAO.updateAgency(agency);
+				model.addAttribute("listaFermate", a.getStops());
+				model.addAttribute("stop", new Stop());
+				model.addAttribute("showAlertDuplicateStop", true);
+				return "stop";
+			}
+		}
+		
 		a.addStop(stop);
 		
 		logger.info("Fermata creata: " + stop.getName() + ".");
@@ -93,11 +104,23 @@ public class StopController {
 			return "stop";
 		}
 		
+		for (Stop s: stopDAO.getStopsFromAgency(a)) {
+			if (s.getGtfsId().equals(stop.getGtfsId())) {
+				logger.error("L'id della fermata è già presente");
+				//agencyDAO.updateAgency(agency);
+				model.addAttribute("listaFermate", a.getStops());
+				model.addAttribute("stop", new Stop());
+				model.addAttribute("showAlertDuplicateStop", true);
+				return "stop";
+			}
+		}
+		
 		Stop activeStop = stopDAO.getStop(id);
 		
 		// cerco la fermata da modificare tra quelle dell'agenzia e la aggiorno
 		for (Stop s: a.getStops()) {
 			if (s.equals(activeStop)) {
+				s.setGtfsId(stop.getGtfsId());
 				s.setCode(stop.getCode());
 				s.setName(stop.getName());
 				s.setDesc(stop.getDesc());
