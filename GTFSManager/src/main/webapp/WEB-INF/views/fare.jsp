@@ -32,6 +32,11 @@
 		$("#creaRegolaLinea").hide();
 		$(".alert").hide();
 		
+		// showAlertDuplicateFare variable is set to true by FareController if the fare id is already present
+		if ("${showAlertDuplicateFare}") {
+			$("#fare-already-inserted").show();
+		}
+		
 		// showCreateForm variable is set to true by FareController if the the submitted form to create a fare contains errors
 		if (!"${showCreateForm}") {
 			$("#creaTariffa").hide();
@@ -119,7 +124,7 @@
 		});
 		
 		// Popover
-		$("#creaTariffaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome della tariffa." })
+		$("#creaTariffaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una classe tariffaria." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaTariffaForm").find("#price").popover({ container: 'body', trigger: 'focus', title:"Prezzo", content:"Il prezzo." })
 			.blur(function () { $(this).popover('hide'); });
@@ -130,7 +135,7 @@
 		$("#creaTariffaForm").find("#transferDuration").popover({ container: 'body', trigger: 'focus', title:"Durata del trasferimento", content:"La durata del trasferimento indica entro quanto tempo il trasferimento scade. Quando è usato con \"Nessun trasferimento permesso\", questo campo indica per quanto tempo un biglietto è valido per una tariffa in cui non sono permessi trasferimenti. A meno che questo campo non sia usato per indicare la validità di un biglietto, dovrebbe essere lasciato vuoto quando nessun trasferimento è permesso." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaTariffaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome della tariffa." })
+		$("#modificaTariffaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una classe tariffaria." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaTariffaForm").find("#price").popover({ container: 'body', trigger: 'focus', title:"Prezzo", content:"Il prezzo." })
 			.blur(function () { $(this).popover('hide'); });
@@ -144,7 +149,7 @@
 		// Creation trip form validation
 		$("#creaTariffaForm").validate({
 			rules: {
-				name: {
+				gtfsId: {
 					required: true
 				},
 				price: {
@@ -154,8 +159,8 @@
 				}
 			},
 			messages: {
-				name: {
-					required: "Il campo nome è obbligatorio"
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
 				},
 				price: {
 					required: "Il campo prezzo è obbligatorio",
@@ -174,7 +179,7 @@
 		// Edit trip form validation
 		$("#modificaTariffaForm").validate({
 			rules: {
-				name: {
+				gtfsId: {
 					required: true
 				},
 				price: {
@@ -184,8 +189,8 @@
 				}
 			},
 			messages: {
-				name: {
-					required: "Il campo nome è obbligatorio"
+				gtfsId: {
+					required: "Il campo id è obbligatorio"
 				},
 				price: {
 					required: "Il campo prezzo è obbligatorio",
@@ -283,7 +288,7 @@
 			<table id="listaTariffe" class="table table-striped table-hover sortable">
 				<thead>
 					<tr>
-						<th>Nome</th>
+						<th>Id</th>
 						<th>Prezzo</th>
 						<th class="hidden"></th>
 					</tr>
@@ -300,7 +305,7 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
-							<td>${tariffa.name}</td>
+							<td>${tariffa.gtfsId}</td>
 							<td>${tariffa.price} ${tariffa.currencyType}</td>
 							<td class="hidden">${tariffa.id}</td>
 						</tr>
@@ -318,9 +323,9 @@
 				<form:form id="creaTariffaForm" commandName="fareAttribute" method="post" role="form">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name" class="required">Nome</label>
-				    		<form:input path="name" class="form-control" id="name" placeholder="Inserisci il nome" maxlength="50" />
-				    		<form:errors path="name" cssClass="error"></form:errors>
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l'id" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
@@ -381,7 +386,7 @@
 			<c:if test="${not empty tariffaAttiva}">
 				<div id="riassuntoTariffa" class="riassunto">
 					<div class="col-lg-8">
-						<b>Nome:</b> ${tariffaAttiva.name}
+						<b>Id:</b> ${tariffaAttiva.gtfsId}
 					</div>
 					<div class="col-lg-8">
 						<b>Prezzo:</b> ${tariffaAttiva.price} ${tariffaAttiva.currencyType}
@@ -417,9 +422,9 @@
 				<form:form id="modificaTariffaForm" commandName="fareAttribute" method="post" role="form" action="/_5t/modificaTariffa">
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="name" class="required">Nome</label>
-				    		<form:input path="name" class="form-control" id="name" value="${tariffaAttiva.name}" maxlength="50" />
-				    		<form:errors path="name" cssClass="error"></form:errors>
+							<label for="gtfsId" class="required">Id</label>
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${tariffaAttiva.gtfsId}" maxlength="50" />
+				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
@@ -513,7 +518,7 @@
 		<c:if test="${not empty tariffaAttiva}">
 			<!-- div with table containing routes using the selected fare -->
 			<div class="col-lg-6">
-				<h4>Linee associate alla tariffa ${tariffaAttiva.name}</h4>
+				<h4>Linee associate alla tariffa ${tariffaAttiva.gtfsId}</h4>
 				<table id="listaRegole" class="table sortable">
 					<thead>
 						<tr>
@@ -583,6 +588,10 @@
 	</div>
 	
 	<!-- Alerts -->
+	<div id="fare-already-inserted" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <strong>Attenzione!</strong> L'id della tariffa che hai inserito è già presente.
+	</div>
 	<div id="delete-fare" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
 	    <p>Vuoi veramente eliminare la tariffa ${tariifaAttiva.name}?</p>

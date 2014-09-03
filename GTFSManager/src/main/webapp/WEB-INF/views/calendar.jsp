@@ -119,14 +119,14 @@
 		});
 		
 		// Popover
-		$("#creaCalendarioForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamnete un set di date in cui il servizio è disponibile per una o più linee." })
+		$("#creaCalendarioForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente un set di date in cui il servizio è disponibile per una o più linee." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaCalendarioForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data di inizio del calendario." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaCalendarioForm").find("#endDate").popover({ container: 'body', trigger: 'focus', title:"Data fine", content:"La data di fine del calendario (questa data è iclusa nell'intervallo)." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaCalendarioForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamnete un set di date in cui il servizio è disponibile per una o più linee." })
+		$("#modificaCalendarioForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente un set di date in cui il servizio è disponibile per una o più linee." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaCalendarioForm").find("#startDate").popover({ container: 'body', trigger: 'focus', title:"Data inizio", content:"La data di inizio del calendario." })
 			.blur(function () { $(this).popover('hide'); });

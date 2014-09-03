@@ -358,7 +358,7 @@ public class ExportGTFSController {
 	private void fillFareAttributes() throws IOException {
 		String row = new String();
 		for (FareAttribute fa: fareAttributeDAO.getAllFareAttributes()) {
-			row += fa.getId() + ",";
+			row += fa.getGtfsId() + ",";
 			row += fa.getPrice() + ",";
 			row += fa.getCurrencyType() + ",";
 			row += fa.getPaymentMethod() + ",";
@@ -372,7 +372,7 @@ public class ExportGTFSController {
 	private void fillFareRules() throws IOException {
 		String row = new String();
 		for (FareRule fr: fareRuleDAO.getAllFareRules()) {
-			row += fr.getFareAttribute().getId() + ",";
+			row += fr.getFareAttribute().getGtfsId() + ",";
 			row += (fr.getRoute() != null ? fr.getRoute().getId() : "") + ",";
 			row += (fr.getOrigin() != null ? fr.getOrigin().getId() : "") + ",";
 			row += (fr.getDestination() != null ? fr.getDestination().getId() : "") + ",";

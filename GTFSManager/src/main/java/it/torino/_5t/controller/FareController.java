@@ -88,9 +88,19 @@ public class FareController {
 			return "fare";
 		}
 		
+		for (FareAttribute fa: fareAttributeDAO.getFareAttributesFromAgency(a)) {
+			if (fa.getGtfsId().equals(fareAttribute.getGtfsId())) {
+				logger.error("L'id della tariffa è già presente");
+				model.addAttribute("listaTariffe", a.getFareAttributes());
+				model.addAttribute("showCreateForm", true);
+				model.addAttribute("showAlertDuplicateFare", true);
+				return "fare";
+			}
+		}
+		
 		a.addFareAttribute(fareAttribute);
 		
-		logger.info("Tariffa creata: " + fareAttribute.getName() + ".");
+		logger.info("Tariffa creata: " + fareAttribute.getGtfsId() + ".");
 		
 		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("tariffaAttiva", fareAttribute);
@@ -103,7 +113,7 @@ public class FareController {
 	public String selectFareAttribute(@RequestParam("id") Integer fareAttributeId, Model model, HttpSession session) {
 		FareAttribute fareAttribute = fareAttributeDAO.getFareAttribute(fareAttributeId);
 		
-		logger.info("Tariffa selezionata: " + fareAttribute.getName() + ".");
+		logger.info("Tariffa selezionata: " + fareAttribute.getGtfsId() + ".");
 		
 		session.removeAttribute("regolaLineaAttiva");
 		session.setAttribute("tariffaAttiva", fareAttribute);
@@ -127,7 +137,7 @@ public class FareController {
 		
 		a.getFareAttributes().remove(fareAttribute);
 		
-		logger.info("Tariffa eliminata: " + fareAttribute.getName() + ".");
+		logger.info("Tariffa eliminata: " + fareAttribute.getGtfsId() + ".");
 		
 		session.removeAttribute("tariffaAttiva");
 		session.removeAttribute("regolaLineaAttiva");
@@ -167,6 +177,16 @@ public class FareController {
 			return "fare";
 		}
 		
+		for (FareAttribute fa: fareAttributeDAO.getFareAttributesFromAgency(a)) {
+			if (fa.getGtfsId().equals(fareAttribute.getGtfsId())) {
+				logger.error("L'id della tariffa è già presente");
+				model.addAttribute("listaTariffe", a.getFareAttributes());
+				model.addAttribute("showCreateForm", true);
+				model.addAttribute("showAlertDuplicateFare", true);
+				return "fare";
+			}
+		}
+		
 		FareAttribute activeFareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (activeFareAttribute == null) {
 			return "redirect:tariffe";
@@ -175,13 +195,13 @@ public class FareController {
 		// cerco la tariffa attiva tra quelle dell'agenzia e la aggiorno
 		for (FareAttribute f: a.getFareAttributes()) {
 			if (f.equals(activeFareAttribute)) {
-				f.setName(fareAttribute.getName());
+				f.setGtfsId(fareAttribute.getGtfsId());
 				f.setPrice(fareAttribute.getPrice());
 				f.setCurrencyType(fareAttribute.getCurrencyType());
 				f.setPaymentMethod(fareAttribute.getPaymentMethod());
 				f.setTransfers(fareAttribute.getTransfers());
 				f.setTransferDuration(fareAttribute.getTransferDuration());
-				logger.info("Tariffa modificata: " + f.getName() + ".");
+				logger.info("Tariffa modificata: " + f.getGtfsId() + ".");
 				session.setAttribute("tariffaAttiva", f);
 				break;
 			}
@@ -236,9 +256,9 @@ public class FareController {
 						f.addFareRule(fareRule);
 						route.addFareRule(fareRule);
 						session.setAttribute("tariffaAttiva", f);
-						logger.info("Associazione creata per la tariffa " + fareRule.getFareAttribute().getName() + " con la linea " + fareRule.getRoute().getShortName() + ".");
+						logger.info("Associazione creata per la tariffa " + fareRule.getFareAttribute().getGtfsId() + " con la linea " + fareRule.getRoute().getShortName() + ".");
 					} else {
-						logger.warn("Associazione già esistente per la tariffa " + f.getName() + " con la linea " + route.getShortName() + ".");
+						logger.warn("Associazione già esistente per la tariffa " + f.getGtfsId() + " con la linea " + route.getShortName() + ".");
 					}
 				}
 				break;
@@ -288,7 +308,7 @@ public class FareController {
 				}
 			}
 			
-			logger.info("Associazione eliminata tra la tariffa " + fareRule.getFareAttribute().getName() + " con la linea " + fareRule.getRoute().getShortName() + ".");
+			logger.info("Associazione eliminata tra la tariffa " + fareRule.getFareAttribute().getGtfsId() + " con la linea " + fareRule.getRoute().getShortName() + ".");
 		}
 		
 		session.setAttribute("tariffaAttiva", activeFareAttribute);

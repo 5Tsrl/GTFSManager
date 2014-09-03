@@ -6,6 +6,7 @@ import java.util.List;
 import org.hibernate.Query;
 import org.hibernate.Session;
 
+import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.FareAttribute;
 import it.torino._5t.persistence.HibernateUtil;
 
@@ -34,6 +35,14 @@ public class FareAttributeDAOImpl implements FareAttributeDAO {
 	public List<FareAttribute> getAllFareAttributes() {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		Query query = session.createQuery("from FareAttribute");
+		return query.list();
+	}
+
+	@Override
+	public List<FareAttribute> getFareAttributesFromAgency(Agency agency) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Query query = session.createQuery("from FareAttribute where agency = :agency");
+		query.setEntity("agency", agency);
 		return query.list();
 	}
 }
