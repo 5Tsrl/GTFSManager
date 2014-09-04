@@ -218,7 +218,7 @@
 			},
 			messages: {
 				date: {
-					required: "Il campo nome è obbligatorio"
+					required: "Il campo data è obbligatorio"
 				},
 				exceptionType: {
 					required: "Il campo tipo di eccezione è obbligatorio"
@@ -244,7 +244,7 @@
 			},
 			messages: {
 				date: {
-					required: "Il campo nome è obbligatorio"
+					required: "Il campo data è obbligatorio"
 				},
 				exceptionType: {
 					required: "Il campo tipo di eccezione è obbligatorio"
@@ -299,6 +299,8 @@
 	<ol class="breadcrumb">
 		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
 	</ol>
+	
+	<p>Cliccare su una riga della tabella per selezionare il calendario corrispondente.</p>
 	
 	<div class="row">
 		<!-- Div with table containing calendar list -->
@@ -536,6 +538,7 @@
 			<!-- div with table containing calendar dates associated to the selected calendar -->
 			<div class="col-lg-4">
 				<h4>Eccezioni associate al calendario ${calendarioAttivo.gtfsId}</h4>
+				<p>Cliccare su una riga della tabella per selezionare l'eccezione corrispondente.</p>
 				<table id="listaEccezioni" class="table table-striped table-hover sortable">
 					<thead>
 						<tr>

@@ -138,19 +138,19 @@ public class AgencyController {
 				model.addAttribute("showAlertDuplicateAgency", true);
 				return "agency";
 			}
+			if (a.getId().equals(activeAgency.getId())) {
+				a.setGtfsId(agency.getGtfsId());
+				a.setName(agency.getName());
+				a.setUrl(agency.getUrl());
+				a.setTimezone(agency.getTimezone());
+				a.setLanguage(agency.getLanguage());
+				a.setPhone(agency.getPhone());
+				a.setFareUrl(agency.getFareUrl());
+				logger.info("Agenzia modificata: " + a.getGtfsId() + ".");
+				session.setAttribute("agenziaAttiva", a);
+				break;
+			}
 		}
-		
-		activeAgency.setGtfsId(agency.getGtfsId());
-		activeAgency.setName(agency.getName());
-		activeAgency.setUrl(agency.getUrl());
-		activeAgency.setTimezone(agency.getTimezone());
-		activeAgency.setLanguage(agency.getLanguage());
-		activeAgency.setPhone(agency.getPhone());
-		activeAgency.setFareUrl(agency.getFareUrl());
-		
-		logger.info("Agenzia modificata: " + activeAgency.getGtfsId() + ".");
-		
-		session.setAttribute("agenziaAttiva", activeAgency);
 		
 		return "redirect:agenzie";
 	}

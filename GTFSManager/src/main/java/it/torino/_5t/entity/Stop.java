@@ -76,13 +76,12 @@ public class Stop implements Serializable {
 	@Max(1)
 	private Integer locationType;
 	
-	// TODO
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "parent_station")
 	private Stop parentStation;
 	
-	/*@OneToMany(fetch = FetchType.LAZY, mappedBy = "parentStation")
-	private Set<Stop> stops = new HashSet<Stop>();*/
+	@OneToMany(fetch = FetchType.LAZY, mappedBy = "parentStation")
+	private Set<Stop> stops = new HashSet<Stop>();
 	
 	@Column(name = "stop_timezone")
 	private String timezone;
@@ -222,6 +221,14 @@ public class Stop implements Serializable {
 		this.parentStation = parentStation;
 	}
 
+	public Set<Stop> getStops() {
+		return stops;
+	}
+
+	public void setStops(Set<Stop> stops) {
+		this.stops = stops;
+	}
+
 	public String getTimezone() {
 		return timezone;
 	}
@@ -265,5 +272,10 @@ public class Stop implements Serializable {
 	public void addStopTime(StopTime stopTime) {
 		stopTime.setStop(this);
 		stopTimes.add(stopTime);
+	}
+	
+	public void addChildStop(Stop stop) {
+		stop.setParentStation(this);
+		stops.add(stop);
 	}
 }

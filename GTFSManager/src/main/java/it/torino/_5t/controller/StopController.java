@@ -1,5 +1,8 @@
 package it.torino._5t.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
@@ -41,6 +44,13 @@ public class StopController {
 		
 		session.setAttribute("agenziaAttiva", a);
 		
+		Set<Stop> stations = new HashSet<Stop>();
+		for (Stop s: a.getStops()) {
+			if (s.getLocationType() == 1) {
+				stations.add(s);
+			}
+		}
+		model.addAttribute("listaStazioni", stations);
 		model.addAttribute("listaFermate", a.getStops());
 		model.addAttribute("stop", new Stop());
 		
@@ -49,7 +59,7 @@ public class StopController {
 	
 	// chiamata al submit del form per la creazione di una nuova fermata
 	@RequestMapping(value = "/fermate", method = RequestMethod.POST)
-	public String submitStopForm(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String submitStopForm(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("parentStationId") Integer parentStationId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -59,6 +69,13 @@ public class StopController {
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della fermata");
 			agencyDAO.updateAgency(agency);
+			Set<Stop> stations = new HashSet<Stop>();
+			for (Stop s: a.getStops()) {
+				if (s.getLocationType() == 1) {
+					stations.add(s);
+				}
+			}
+			model.addAttribute("listaStazioni", stations);
 			model.addAttribute("listaFermate", a.getStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
@@ -67,11 +84,42 @@ public class StopController {
 		for (Stop s: stopDAO.getStopsFromAgency(a)) {
 			if (s.getGtfsId().equals(stop.getGtfsId())) {
 				logger.error("L'id della fermata è già presente");
-				//agencyDAO.updateAgency(agency);
+				Set<Stop> stations = new HashSet<Stop>();
+				for (Stop s1: a.getStops()) {
+					if (s1.getLocationType() == 1) {
+						stations.add(s1);
+					}
+				}
+				model.addAttribute("listaStazioni", stations);
 				model.addAttribute("listaFermate", a.getStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
 				return "stop";
+			}
+		}
+		
+		// if it has a parent station, save the stop in the parent station children list
+		if (parentStationId != null) {
+			// unless it is not a station itself
+			if (stop.getLocationType() == 1) {
+				logger.error("Una stazione non può avere una stazione padre.");
+				Set<Stop> stations = new HashSet<Stop>();
+				for (Stop s1: a.getStops()) {
+					if (s1.getLocationType() == 1) {
+						stations.add(s1);
+					}
+				}
+				model.addAttribute("listaStazioni", stations);
+				model.addAttribute("listaFermate", a.getStops());
+				model.addAttribute("stop", new Stop());
+				model.addAttribute("showAlertParentStation", true);
+				return "stop";
+			}
+			for (Stop s: a.getStops()) {
+				if (s.getId().equals(parentStationId)) {
+					s.addChildStop(stop);
+					break;
+				}
 			}
 		}
 		
@@ -89,7 +137,7 @@ public class StopController {
 	
 	// chiamata al submit del form per la modifica di una linea
 	@RequestMapping(value = "/modificaFermata", method = RequestMethod.POST)
-	public String editSop(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("id") Integer id, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String editSop(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("id") Integer id, @RequestParam("parentStationId") Integer parentStationId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -99,6 +147,13 @@ public class StopController {
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella modifica della fermata");
 			agencyDAO.updateAgency(agency);
+			Set<Stop> stations = new HashSet<Stop>();
+			for (Stop s: a.getStops()) {
+				if (s.getLocationType() == 1) {
+					stations.add(s);
+				}
+			}
+			model.addAttribute("listaStazioni", stations);
 			model.addAttribute("listaFermate", a.getStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
@@ -109,7 +164,13 @@ public class StopController {
 		for (Stop s: stopDAO.getStopsFromAgency(a)) {
 			if (!activeStop.getGtfsId().equals(stop.getGtfsId()) && s.getGtfsId().equals(stop.getGtfsId())) {
 				logger.error("L'id della fermata è già presente");
-				//agencyDAO.updateAgency(agency);
+				Set<Stop> stations = new HashSet<Stop>();
+				for (Stop s1: a.getStops()) {
+					if (s1.getLocationType() == 1) {
+						stations.add(s1);
+					}
+				}
+				model.addAttribute("listaStazioni", stations);
 				model.addAttribute("listaFermate", a.getStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
@@ -117,6 +178,53 @@ public class StopController {
 			}
 		}
 		
+		// if it has a parent station, save the stop in the parent station children list
+		if (parentStationId != null) {
+			// unless it is not a station itself
+			if (stop.getLocationType() == 1) {
+				logger.error("Una stazione non può avere una stazione padre.");
+				Set<Stop> stations = new HashSet<Stop>();
+				for (Stop s1: a.getStops()) {
+					if (s1.getLocationType() == 1) {
+						stations.add(s1);
+					}
+				}
+				model.addAttribute("listaStazioni", stations);
+				model.addAttribute("listaFermate", a.getStops());
+				model.addAttribute("stop", new Stop());
+				model.addAttribute("showAlertParentStation", true);
+				return "stop";
+			}
+			logger.info("------> Sì staz padre");
+			// remove the stop from the previous parent station, if it had one
+			if (activeStop.getParentStation() != null) {
+				logger.info("------> Aveva una staz: la elimino");
+				for (Stop s: a.getStops()) {
+					if (s.getId().equals(activeStop.getParentStation().getId())) {
+						s.getStops().remove(activeStop);
+					}
+				}
+			}
+			for (Stop s: a.getStops()) {
+				if (s.getId().equals(parentStationId)) {
+					logger.info("------> NUOVA staz padre aggiunta: " + s.getId() + " " + s.getName());
+					s.addChildStop(stop);
+					break;
+				}
+			}
+		} else {
+			// remove the stop from the previous parent station, if it had one
+			logger.info("------> NO staz padre");
+			if (activeStop.getParentStation() != null) {
+				logger.info("------> Aveva una staz: la elimino");
+				for (Stop s: a.getStops()) {
+					if (s.getId().equals(activeStop.getParentStation().getId())) {
+						s.getStops().remove(activeStop);
+					}
+				}
+			}
+		}
+				
 		// cerco la fermata da modificare tra quelle dell'agenzia e la aggiorno
 		for (Stop s: a.getStops()) {
 			if (s.equals(activeStop)) {
@@ -128,7 +236,8 @@ public class StopController {
 				s.setLon(stop.getLon());
 				s.setUrl(stop.getUrl());
 				s.setLocationType(stop.getLocationType());
-				//s.setTimezone(stop.getTimezone());
+				s.setParentStation(stop.getParentStation());
+				s.setTimezone(stop.getTimezone());
 				s.setWheelchairBoarding(stop.getWheelchairBoarding());
 				logger.info("Fermata modificata: " + s.getName() + ".");
 				break;

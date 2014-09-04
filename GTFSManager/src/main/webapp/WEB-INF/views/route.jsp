@@ -444,7 +444,7 @@
 								<%
 								Route route = (Route) session.getAttribute("lineaAttiva");
 								if (route != null) {
-									for (int i=0; i<=types.size(); i++) {
+									for (int i=0; i<types.size(); i++) {
 										if (i == route.getType()) {
 								%>
 										<form:option value="<%= i %>" selected="true"><%= types.get(i) %></form:option>

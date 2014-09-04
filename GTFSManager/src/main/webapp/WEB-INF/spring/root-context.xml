@@ -17,6 +17,5 @@
 	<bean name="stopDAO" class="it.torino._5t.dao.StopDAOImpl"></bean>
 	<bean name="stopTimeDAO" class="it.torino._5t.dao.StopTimeDAOImpl"></bean>
 	<bean name="transferDAO" class="it.torino._5t.dao.TransferDAOImpl"></bean>
-	<bean name="gtfsDAO" class="it.torino._5t.dao.GTFSDAOImpl"></bean>
 		
 </beans>

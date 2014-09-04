@@ -356,8 +356,8 @@
 						<div class="form-group col-lg-8">
 							<label for="transfers" class="required">Numero di trasferimenti</label>
 							<form:select path="transfers" class="form-control">
-								<form:option value="0">Nessun trasferimento permesso</form:option>
-								<form:option value="1" selected="selected">1</form:option>
+								<form:option value="0" selected="selected">Nessun trasferimento permesso</form:option>
+								<form:option value="1">1</form:option>
 								<form:option value="2">2</form:option>
 								<form:option value="">Illimitati</form:option>
 							</form:select>
@@ -559,7 +559,7 @@
 					<form method="post" role="form" action="/_5t/creaRegolaLinea">
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<label for="routeId" class="required">Calendario</label>
+								<label for="routeId" class="required">Linee</label>
 								<select name="routeId" class="multiselect" multiple="multiple">
 									<c:forEach var="linea" items="${listaLinee}">
 										<option value="${linea.id}">${linea.shortName}</option>

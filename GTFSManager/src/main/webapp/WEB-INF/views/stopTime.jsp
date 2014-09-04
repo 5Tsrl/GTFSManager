@@ -154,7 +154,7 @@
 										'<p class="help-block">Selezionare solo se gli orari di arrivo e partenza continuano dal giorno precedente (una delle precedenti fermate ha orari del giorno precedente es. 23:58, mentre questa ha orari nel giorno successivo es. 00:02).</p>' + 
 									'</div>' +
 									'<div class="row">' +
-										'<div class="form-group col-lg-6">' +
+										'<div class="form-group col-lg-8">' +
 											'<label for="stopHeadsign">Display</label>' +
 											'<form:input path="stopHeadsign" class="form-control" id="stopHeadsign" maxlength="50" />' +
 										'</div>' +
@@ -243,7 +243,7 @@
 										'<p class="help-block">Selezionare solo se gli orari di arrivo e partenza continuano dal giorno precedente (una delle precedenti fermate ha orari del giorno precedente es. 23:58, mentre questa ha orari nel giorno successivo es. 00:02).</p>' + 
 									'</div>' +
 									'<div class="row">' +
-										'<div class="form-group col-lg-6">' +
+										'<div class="form-group col-lg-8">' +
 											'<label for="stopHeadsign">Display</label>' +
 											'<form:input path="stopHeadsign" class="form-control" id="stopHeadsign" value="${fermataCorsa.stopHeadsign}" maxlength="50" />' +
 										'</div>' +
@@ -407,7 +407,7 @@
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
-		<button id="unisciFermateButton" class="btn btn-default">Unisci fermate</button>
+		<button id="unisciFermateButton" class="btn btn-primary">Unisci fermate</button>
 		<form:form id="creaShapeForm" commandName="shape" role="form" method="post" action="/_5t/creaShape">
 			<div class="row">
 				<div class="form-group">
@@ -430,6 +430,10 @@
 				</div>
 			</div>
 		</form:form>
+		<br><br><br><br><br><br>
+		<div class="row col-lg-12">
+			<a type="button" class="btn btn-default" href="/_5t/fermate">Aggiungi altre fermate all'agenzia</a>
+		</div>
 	</div>
 	
 	<!-- Alerts -->

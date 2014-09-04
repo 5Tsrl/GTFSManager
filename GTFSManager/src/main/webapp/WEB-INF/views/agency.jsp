@@ -98,7 +98,7 @@
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaAgenziaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo dell'agenzia. Google Maps mostrerà questo nome." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaAgenziaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'agenzia." })
+		$("#creaAgenziaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'agenzia. L'url deve essere completa, includendo http:// o https://." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#creaAgenziaForm").find("#phone").popover({ container: 'body', trigger: 'focus', title:"Telefono", content:"Il numero di telefono dell'agenzia. Può contenere segni di punteggiatura per raggruppare le cifre del numero." })
 			.blur(function () { $(this).popover('hide'); });
@@ -109,7 +109,7 @@
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaAgenziaForm").find("#name").popover({ container: 'body', trigger: 'focus', title:"Nome", content:"Il nome completo dell'agenzia. Google Maps mostrerà questo nome." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaAgenziaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'agenzia." })
+		$("#modificaAgenziaForm").find("#url").popover({ container: 'body', trigger: 'focus', title:"Sito web", content:"Il sito web dell'agenzia. L'url deve essere completa, includendo http:// o https://." })
 			.blur(function () { $(this).popover('hide'); });
 		$("#modificaAgenziaForm").find("#phone").popover({ container: 'body', trigger: 'focus', title:"Telefono", content:"Il numero di telefono dell'agenzia. Può contenere segni di punteggiatura per raggruppare le cifre del numero." })
 			.blur(function () { $(this).popover('hide'); });
@@ -261,6 +261,8 @@
 	<ol class="breadcrumb">
 		<li class="active">Agenzie</li>
 	</ol>
+	
+	<p>Cliccare su una riga della tabella per selezionare l'agenzia corrispondente.</p>
 	
 	<div class="row">
 		<!-- Div with table containing agency list -->

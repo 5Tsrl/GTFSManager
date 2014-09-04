@@ -275,14 +275,11 @@
 							<td>
 								${fn:length(corsa.stopTimes)}
 								<c:choose>
-									<c:when test="${corsaAttiva.id == corsa.id && fn:length(corsa.stopTimes) == 0}">
-										<a class="btn btn-default" href="/_5t/fermate">
-									</c:when>
-									<c:when test="${corsaAttiva.id == corsa.id && fn:length(corsa.stopTimes) > 0}">
+									<c:when test="${corsaAttiva.id == corsa.id}">
 										<a class="btn btn-default" href="/_5t/fermateCorse">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/fermate">
+										<a class="btn btn-default disabled" href="/_5t/fermateCorse">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
