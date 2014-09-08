@@ -55,7 +55,7 @@
 		
 		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
 		$("#eliminaZonaButton").click(function() {
-			if ("${zonaAttiva.stops.size()}" > 0)
+			if ("${zonaAttiva.stops.size()}" > 0 || "${zonaAttiva.originFareRules.size()}" > 0 || "${zonaAttiva.destinationFareRules.size()}" > 0)
 				$("#zone-not-deletable").show();
 			else 
 				$("#delete-zone").show();
@@ -149,6 +149,26 @@
 	    	"language": {
 	    		"search": "Cerca:",
 	    		"zeroRecords": "Nessuna fermata è presente in questa zona"
+	    	}
+	    });
+		$('#listaTariffeOrigine').dataTable({
+	    	paging: false,
+	    	"bInfo": false,
+	    	// default sorting on the first column ("Id")
+	    	"order": [[0, "asc"]],
+	    	"language": {
+	    		"search": "Cerca:",
+	    		"zeroRecords": "Nessuna tariffa ha come origine questa zona"
+	    	}
+	    });
+		$('#listaTariffeDestinazione').dataTable({
+	    	paging: false,
+	    	"bInfo": false,
+	    	// default sorting on the first column ("Id")
+	    	"order": [[0, "asc"]],
+	    	"language": {
+	    		"search": "Cerca:",
+	    		"zeroRecords": "Nessuna tariffa ha come destinazione questa zona"
 	    	}
 	    });
 	});
@@ -277,7 +297,7 @@
 	<div class="row">
 		<c:if test="${not empty zonaAttiva}">
 			<!-- div with table containing stops in the selected zone -->
-			<div class="col-lg-8">
+			<div class="col-lg-4">
 				<h4>Fermate nella zona ${zonaAttiva.gtfsId}</h4>
 				<table id="listaFermate" class="table table-striped table-hover sortable">
 					<thead>
@@ -291,6 +311,44 @@
 							<tr>
 								<td>${fermata.gtfsId}</td>
 								<td>${fermata.name}</td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- div with table containing fare rules with origin zone in the selected zone -->
+			<div class="col-lg-4">
+				<h4>Tariffe con origine nella zona ${zonaAttiva.gtfsId}</h4>
+				<table id="listaTariffeOrigine" class="table table-striped table-hover sortable">
+					<thead>
+						<tr>
+							<th>Tariffa</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="tariffa" items="${listaTariffeOrigine}">
+							<tr>
+								<td><a href="/_5t/selezionaTariffa?id=${tariffa.id}">${tariffa.gtfsId}</a></td>
+							</tr>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- div with table containing fare rules with destination zone in the selected zone -->
+			<div class="col-lg-4">
+				<h4>Tariffe con destinazione nella zona ${zonaAttiva.gtfsId}</h4>
+				<table id="listaTariffeDestinazione" class="table table-striped table-hover sortable">
+					<thead>
+						<tr>
+							<th>Tariffa</th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="tariffa" items="${listaTariffeDestinazione}">
+							<tr>
+								<td><a href="/_5t/selezionaTariffa?id=${tariffa.id}">${tariffa.gtfsId}</a></td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -312,7 +370,7 @@
 	</div>
 	<div id="zone-not-deletable" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>
-	    <p>Non puoi eliminare la zona.<br>Devi prima modificare le fermate in essa presenti.</p>
+	    <p>Non puoi eliminare la zona.<br>Devi prima modificare le fermate in essa presenti o le tariffe con origine e/o destinazione da questa zona.</p>
 	</div>
 </body>
 </html>

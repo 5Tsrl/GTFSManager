@@ -380,9 +380,9 @@ public class ExportGTFSController {
 		for (FareRule fr: fareRuleDAO.getAllFareRules()) {
 			row += fr.getFareAttribute().getGtfsId() + ",";
 			row += (fr.getRoute() != null ? fr.getRoute().getGtfsId() : "") + ",";
-			row += (fr.getOrigin() != null ? fr.getOrigin().getId() : "") + ",";
-			row += (fr.getDestination() != null ? fr.getDestination().getId() : "") + ",";
-			row += (fr.getContains() != null ? fr.getContains().getId() : "") + "\n";
+			row += (fr.getOrigin() != null ? fr.getOrigin().getGtfsId() : "") + ",";
+			row += (fr.getDestination() != null ? fr.getDestination().getGtfsId() : "") + ",";
+			row += (fr.getContains() != null ? fr.getContains().getGtfsId() : "") + "\n";
 		}
 		fareRuleOutput.write(row.getBytes());
 		logger.info("fare_rules.txt completato.");
@@ -464,7 +464,7 @@ public class ExportGTFSController {
 			row += s.getDesc() + ",";
 			row += s.getLat() + ",";
 			row += s.getLon() + ",";
-			row += (s.getZone()  != null ? s.getZone().getId() : "") + ",";
+			row += (s.getZone()  != null ? s.getZone().getGtfsId() : "") + ",";
 			row += s.getUrl() + ",";
 			row += formatOptionalInteger(s.getLocationType()) + ",";
 			row += (s.getParentStation()  != null ? s.getParentStation().getId() : "") + ",";

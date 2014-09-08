@@ -1,13 +1,18 @@
 package it.torino._5t.controller;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.FareAttributeDAO;
 import it.torino._5t.dao.FareRuleDAO;
 import it.torino._5t.dao.RouteDAO;
+import it.torino._5t.dao.ZoneDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.FareAttribute;
 import it.torino._5t.entity.FareRule;
 import it.torino._5t.entity.Route;
+import it.torino._5t.entity.Zone;
 
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
@@ -33,6 +38,8 @@ public class FareController {
 	@Autowired
 	private RouteDAO routeDAO;
 	@Autowired
+	private ZoneDAO zoneDAO;
+	@Autowired
 	private FareAttributeDAO fareAttributeDAO;
 	@Autowired
 	private FareRuleDAO fareRuleDAO;
@@ -49,7 +56,18 @@ public class FareController {
 		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (fareAttribute != null) {
 			fareAttributeDAO.updateFareAttribute(fareAttribute);
-			model.addAttribute("listaRegole", fareAttribute.getFareRules());
+			List<FareRule> fareRuleRoutes = new ArrayList<FareRule>();
+			List<FareRule> fareRuleZones = new ArrayList<FareRule>();
+			for (FareRule fr: fareAttribute.getFareRules()) {
+				if (fr.getRoute() != null) {
+					fareRuleRoutes.add(fr);
+				}
+				if (fr.getOrigin() != null && fr.getDestination() != null) {
+					fareRuleZones.add(fr);
+				}
+			}
+			model.addAttribute("listaRegoleLinea", fareRuleRoutes);
+			model.addAttribute("listaRegoleZona", fareRuleZones);
 		}
 		
 		logger.info("Visualizzazione tariffe di " + agency.getName() + ".");
@@ -58,6 +76,7 @@ public class FareController {
 		
 		model.addAttribute("listaTariffe", a.getFareAttributes());
 		model.addAttribute("listaLinee", a.getRoutes());
+		model.addAttribute("listaZone", a.getZones());
 		model.addAttribute("fareAttribute", new FareAttribute());
 		
 		return "fare";
@@ -115,7 +134,6 @@ public class FareController {
 		
 		logger.info("Tariffa selezionata: " + fareAttribute.getGtfsId() + ".");
 		
-		session.removeAttribute("regolaLineaAttiva");
 		session.setAttribute("tariffaAttiva", fareAttribute);
 		
 		return "redirect:tariffe";
@@ -140,7 +158,6 @@ public class FareController {
 		logger.info("Tariffa eliminata: " + fareAttribute.getGtfsId() + ".");
 		
 		session.removeAttribute("tariffaAttiva");
-		session.removeAttribute("regolaLineaAttiva");
 		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:tariffe";
@@ -246,8 +263,11 @@ public class FareController {
 					Route route = routeDAO.getRoute(rId);
 					// controllo se l'associazione esiste già
 					for (FareRule fr: f.getFareRules()) {
-						if (fr.getFareAttribute().getId() == f.getId() && fr.getRoute().getId() == route.getId()) {
-							addFareRule = false;
+						if (fr.getFareAttribute().getId() == f.getId() && fr.getRoute() != null) {
+							if (fr.getRoute().getId() == route.getId()) {
+								addFareRule = false;
+								break;
+							}
 						}
 					}
 					// se l'associazione non è ancora stata inserita la aggiungo
@@ -292,7 +312,7 @@ public class FareController {
 				break;
 			}
 		}
-		logger.info("ids: "+fareRuleId.length);
+		
 		// scorro su tutti gli id delle associazioni selezionate
 		for (int i=0; i<fareRuleId.length; i++) {
 			FareRule fareRule = fareRuleDAO.getFareRule(fareRuleId[i]);
@@ -309,6 +329,115 @@ public class FareController {
 			}
 			
 			logger.info("Associazione eliminata tra la tariffa " + fareRule.getFareAttribute().getGtfsId() + " con la linea " + fareRule.getRoute().getShortName() + ".");
+		}
+		
+		session.setAttribute("tariffaAttiva", activeFareAttribute);
+		session.setAttribute("agenziaAttiva", a);
+		
+		return "redirect:tariffe";
+	}
+	
+	// chiamata al submit del form per la creazione di una nuova associazione con una zona
+	@RequestMapping(value = "/creaRegolaZona", method = RequestMethod.POST)
+	public String submitFareRuleRouteForm(@RequestParam("originId") Integer originId, @RequestParam("destinationId") Integer destinationId, Model model, HttpSession session) {
+		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+		if (agency == null) {
+			return "redirect:agenzie";
+		}
+		Agency a = agencyDAO.loadAgency(agency.getId());
+		
+		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
+		if (fareAttribute == null) {
+			return "redirect:tariffe";
+		}
+		FareAttribute fa = fareAttributeDAO.getFareAttribute(fareAttribute.getId());
+		
+		if (originId == null && destinationId == null) {
+			logger.error("Nessuna zona di origine e/o destinazione selezionata");
+			model.addAttribute("listaTariffe", a.getFareAttributes());
+			model.addAttribute("showCreateFareRuleForm", true);
+			model.addAttribute("fareAttribute", new FareAttribute());
+			model.addAttribute("listaRegole", fa.getFareRules());
+			return "fare";
+		}
+		
+		boolean addFareRule;
+		// cerco la tariffa attiva tra quelle dell'agenzia
+		for (FareAttribute f: a.getFareAttributes()) {
+			if (f.equals(fareAttribute)) {
+				// per tutte le linee che voglio aggiungere
+				addFareRule = true;
+				Zone origin = zoneDAO.getZone(originId);
+				Zone destination = zoneDAO.getZone(destinationId);
+				// controllo se l'associazione esiste già
+				for (FareRule fr: f.getFareRules()) {
+					if (fr.getFareAttribute().getId() == f.getId() && fr.getOrigin() != null && fr.getDestination() != null) {
+						if (fr.getOrigin().getId() == origin.getId() && fr.getDestination().getId() == destination.getId()) {
+							addFareRule = false;
+							break;
+						}
+					}
+				}
+				// se l'associazione non è ancora stata inserita la aggiungo
+				if (addFareRule) {
+					FareRule fareRule = new FareRule();
+					f.addFareRule(fareRule);
+					origin.addOriginFareRule(fareRule);
+					destination.addDestinationFareRule(fareRule);
+					session.setAttribute("tariffaAttiva", f);
+					logger.info("Associazione creata per la tariffa " + fareRule.getFareAttribute().getGtfsId() + " dalla zona " + fareRule.getOrigin().getGtfsId() + " alla zona " + fareRule.getDestination().getGtfsId() + ".");
+				} else {
+					logger.warn("Associazione già esistente per la tariffa " + f.getGtfsId() + " dalla zona " + origin.getGtfsId() + " alla zona " + destination.getGtfsId() + ".");
+				}
+				break;
+			}
+		}
+		
+		session.setAttribute("agenziaAttiva", a);
+		
+		return "redirect:tariffe";
+	}
+	
+	// chiamata quando clicco sul pulsante "Elimina associazione"
+	@RequestMapping(value = "/eliminaRegolaZona", method = RequestMethod.GET)
+	public String deleteFareRuleZone(Model model, HttpSession session, @RequestParam("id") Integer[] fareRuleId) {
+		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+		if (agency == null) {
+			return "redirect:agenzie";
+		}
+		Agency a = agencyDAO.loadAgency(agency.getId());
+		
+		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
+		if (fareAttribute == null) {
+			return "redirect:tariffe";
+		}
+		
+		// cerco tra le tariffe dell'agenzia quella attiva
+		FareAttribute activeFareAttribute = null;
+		for (FareAttribute f: a.getFareAttributes()) {
+			if (f.equals(fareAttribute)) {
+				activeFareAttribute = f;
+				break;
+			}
+		}
+		
+		// scorro su tutti gli id delle associazioni selezionate
+		for (int i=0; i<fareRuleId.length; i++) {
+			FareRule fareRule = fareRuleDAO.getFareRule(fareRuleId[i]);
+			
+			activeFareAttribute.getFareRules().remove(fareRule);
+			
+			// cerco tra le zone dell'agenzia quella attiva e le tolgo l'associazione selezionata
+			for (Zone z: a.getZones()) {
+				if (z.equals(fareRule.getOrigin())) {
+					z.getOriginFareRules().remove(fareRule);
+				}
+				if (z.equals(fareRule.getDestination())) {
+					z.getDestinationFareRules().remove(fareRule);
+				}
+			}
+			
+			logger.info("Associazione eliminata per la tariffa " + fareRule.getFareAttribute().getGtfsId() + " dalla zona " + fareRule.getOrigin().getGtfsId() + " alla zona " + fareRule.getDestination().getGtfsId() + ".");
 		}
 		
 		session.setAttribute("tariffaAttiva", activeFareAttribute);

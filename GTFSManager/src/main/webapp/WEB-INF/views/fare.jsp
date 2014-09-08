@@ -1,6 +1,7 @@
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -8,14 +9,14 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<title>GTFS Manager - Tariffe</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
-	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap.min.css">
+	<link rel="stylesheet" href="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/css/bootstrap-theme.min.css">
 	<link href="<c:url value='/resources/css/bootstrap-multiselect.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
-	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
+	<script src="https://maxcdn.bootstrapcdn.com/bootstrap/3.2.0/js/bootstrap.min.js"></script>
 	<script src="<c:url value='/resources/js/bootstrap-multiselect.js' />"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/currencies.js' />"></script>
 	<script type="text/javascript">
@@ -25,11 +26,27 @@
     		$("#liTariffe").addClass("active");
     	}); 
     });
+	
+	function validateCreaRegolaLineaForm() {
+		if ($('#routeId').val() == null) {
+			//if (document.forms["creaRegolaLineaForm"]["originId"].options[document.forms["creaRegolaLineaForm"]["originId"].selectedIndex].value === "" || document.forms["creaRegolaLineaForm"]["destinationId"].options[document.forms["creaRegolaLineaForm"]["destinationId"].selectedIndex].value === "") {
+				$("#no-routes-selected").show();
+				return false;
+			//}
+// 		} else {
+// 			if ((document.forms["creaRegolaLineaForm"]["originId"].options[document.forms["creaRegolaLineaForm"]["originId"].selectedIndex].value === "" && document.forms["creaRegolaLineaForm"]["destinationId"].options[document.forms["creaRegolaLineaForm"]["destinationId"].selectedIndex].value !== "") || (document.forms["creaRegolaLineaForm"]["originId"].options[document.forms["creaRegolaLineaForm"]["originId"].selectedIndex].value !== "" && document.forms["creaRegolaLineaForm"]["destinationId"].options[document.forms["creaRegolaLineaForm"]["destinationId"].selectedIndex].value === "")) {
+// 				$("#no-origin-or-destination-selected").show();
+// 				return false;
+// 			}
+		}
+		return true;
+	}
     
     $(document).ready(function() {
     	// edit fare form, create fare rule form and alerts initially hidden
 		$("#modificaTariffa").hide();
 		$("#creaRegolaLinea").hide();
+		$("#creaRegolaZona").hide();
 		$(".alert").hide();
 		
 		// showAlertDuplicateFare variable is set to true by FareController if the fare id is already present
@@ -47,6 +64,10 @@
 		// clicking on button to create a route association, the correspondent form is shown
 		$("#creaRegolaLineaButton").click(function() {
 			$("#creaRegolaLinea").show();
+		});
+		// clicking on button to create a zone association, the correspondent form is shown
+		$("#creaRegolaZonaButton").click(function() {
+			$("#creaRegolaZona").show();
 		});
 		
 		// clicking on "Modifica tariffa" button, "Crea tariffa" button and div with active fare summary should be hidden, while the form to modify the fare should be shown
@@ -217,7 +238,7 @@
 	    		"zeroRecords": "Nessuna tariffa"
 	    	}
 	    });
-		var listaRegoleTable = $('#listaRegole').DataTable({
+		var listaRegoleLineaTable = $('#listaRegoleLinea').DataTable({
 	    	paging: false,
 	    	"bInfo": false,
 	    	// default sorting on the first column ("Nome")
@@ -229,15 +250,15 @@
 	    });
 		
 		// if no row is selected in route association table, delete button for associations is disabled
-		if (listaRegoleTable.rows('.selected').data().length == 0) {
+		if (listaRegoleLineaTable.rows('.selected').data().length == 0) {
 			$('#eliminaRegolaLineaButton').addClass("disabled");
 		}
 		
 		// clicking on a row in route association table, the row is selected
-		$("#listaRegole").find("tbody").find("tr").click(function() {
+		$("#listaRegoleLinea").find("tbody").find("tr").click(function() {
 			$(this).toggleClass('selected');
 			// if the number of selected rows is greater than 0, "Elimina associazioni" button is active, otherwise it is disabled
-			if (listaRegoleTable.rows('.selected').data().length > 0) {
+			if (listaRegoleLineaTable.rows('.selected').data().length > 0) {
 				$('#eliminaRegolaLineaButton').removeClass("disabled");
 			} else {
 				$('#eliminaRegolaLineaButton').addClass("disabled");
@@ -249,9 +270,9 @@
 			$("#delete-fare-rule").show();
 		});
 		$("#delete-fare-rule-button").click(function() {
-			var routeSelected = listaRegoleTable.rows('.selected').data().length;
+			var routeSelected = listaRegoleLineaTable.rows('.selected').data().length;
 			var url = "/_5t/eliminaRegolaLinea?id=";
-			$("#listaRegole").find("tbody").find(".selected").each(function(index) {
+			$("#listaRegoleLinea").find("tbody").find(".selected").each(function(index) {
 				if (index == routeSelected - 1)
 					url += $(this).find(".hidden").html();
 				else
@@ -262,14 +283,101 @@
 		
 		// clicking on "Seleziona tutte le linee" button, all the associations are selected and "Elimina associazioni" button is enabled
 		$('#selezionaTutteLeLineeButton').click(function() {
-			$("#listaRegole").find("tbody").find("tr").addClass("selected");
-			$('#eliminaRegolaLineaButton').removeClass("disabled");
+			$("#listaRegoleLinea").find("tbody").find("tr").addClass("selected");
+			if ($("#listaRegoleLinea").find(".dataTables_empty").length != 1)
+				$('#eliminaRegolaLineaButton').removeClass("disabled");
+			else
+				$("#listaRegoleLinea").find(".dataTables_empty").parent().removeClass("selected");
 		});
 		
 		// clicking on "Deseleziona tutte le linee" button, all the associations are deselected and "Elimina associazioni" button is disabled
 		$('#deselezionaTutteLeLineeButton').click(function() {
-			$("#listaRegole").find("tbody").find("tr").removeClass("selected");
+			$("#listaRegoleLinea").find("tbody").find("tr").removeClass("selected");
 			$('#eliminaRegolaLineaButton').addClass("disabled");
+		});
+		
+		var listaRegoleZonaTable = $('#listaRegoleZona').DataTable({
+	    	paging: false,
+	    	"bInfo": false,
+	    	// default sorting on the first column ("Nome")
+	    	"order": [[0, "asc"]],
+	    	"language": {
+	    		"search": "Cerca:",
+	    		"zeroRecords": "Nessuna zona"
+	    	}
+	    });
+		
+		// if no row is selected in route association table, delete button for associations is disabled
+		if (listaRegoleZonaTable.rows('.selected').data().length == 0) {
+			$('#eliminaRegolaZonaButton').addClass("disabled");
+		}
+		
+		// clicking on a row in route association table, the row is selected
+		$("#listaRegoleZona").find("tbody").find("tr").click(function() {
+			$(this).toggleClass('selected');
+			// if the number of selected rows is greater than 0, "Elimina associazioni" button is active, otherwise it is disabled
+			if (listaRegoleZonaTable.rows('.selected').data().length > 0) {
+				$('#eliminaRegolaZonaButton').removeClass("disabled");
+			} else {
+				$('#eliminaRegolaZonaButton').addClass("disabled");
+			}
+		});
+		
+		// clicking on "Elimina associazioni" button, the array containing ids to be deleted is filled depending on the selected rows
+		$('#eliminaRegolaZonaButton').click(function(event) {
+			$("#delete-fare-rule-zone").show();
+		});
+		$("#delete-fare-rule-zone-button").click(function() {
+			var zoneSelected = listaRegoleZonaTable.rows('.selected').data().length;
+			var url = "/_5t/eliminaRegolaZona?id=";
+			$("#listaRegoleZona").find("tbody").find(".selected").each(function(index) {
+				if (index == zoneSelected - 1)
+					url += $(this).find(".hidden").html();
+				else
+					url += $(this).find(".hidden").html() + ",";
+			});
+			window.location.href = url;
+	    });
+		
+		// clicking on "Seleziona tutte le linee" button, all the associations are selected and "Elimina associazioni" button is enabled
+		$('#selezionaTutteLeZoneButton').click(function() {
+			$("#listaRegoleZona").find("tbody").find("tr").addClass("selected");
+			if ($("#listaRegoleZona").find(".dataTables_empty").length != 1)
+				$('#eliminaRegolaZonaButton').removeClass("disabled");
+			else
+				$("#listaRegoleZona").find(".dataTables_empty").parent().removeClass("selected");
+		});
+		
+		// clicking on "Deseleziona tutte le linee" button, all the associations are deselected and "Elimina associazioni" button is disabled
+		$('#deselezionaTutteLeZoneButton').click(function() {
+			$("#listaRegoleZona").find("tbody").find("tr").removeClass("selected");
+			$('#eliminaRegolaZonaButton').addClass("disabled");
+		});
+		
+		// Creation trip form validation
+		$("#creaRegolaZonaForm").validate({
+			rules: {
+				originId: {
+					required: true
+				},
+				destinationId: {
+					required: true
+				}
+			},
+			messages: {
+				originId: {
+					required: "Selezionare una zona di origine"
+				},
+				destinationId: {
+					required: "Selezionare una zona di destinazione"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
 		});
 	});
 	</script>
@@ -520,7 +628,7 @@
 			<!-- div with table containing routes using the selected fare -->
 			<div class="col-lg-6">
 				<h4>Linee associate alla tariffa ${tariffaAttiva.gtfsId}</h4>
-				<table id="listaRegole" class="table sortable">
+				<table id="listaRegoleLinea" class="table sortable">
 					<thead>
 						<tr>
 							<th>Linea</th>
@@ -529,20 +637,11 @@
 						</tr>
 					</thead>
 					<tbody>
-						<c:forEach var="regola" items="${listaRegole}">
+						<c:forEach var="regola" items="${listaRegoleLinea}">
 							<c:if test="${not empty regola.route}">
-								<c:choose>
-									<c:when test="${not empty regolaLineaAttiva}">
-										<c:if test="${regolaLineaAttiva.id == regola.id}">
-											<tr class="success">
-										</c:if>
-									</c:when>
-									<c:otherwise>
-										<tr>
-									</c:otherwise>
-								</c:choose>
+								<tr>
 									<td><a href="/_5t/selezionaLinea?id=${regola.route.id}">${regola.route.shortName}</a></td>
-									<td>${regola.route.longName}</td>
+									<td>${regola.route.shortName}</td>
 									<td class="hidden">${regola.id}</td>
 								</tr>
 							</c:if>
@@ -557,11 +656,11 @@
 				
 				<!-- Div with create fare rule form -->
 				<div id="creaRegolaLinea">
-					<form method="post" role="form" action="/_5t/creaRegolaLinea">
+					<form name="creaRegolaLineaForm" id="creaRegolaLineaForm" method="post" role="form" action="/_5t/creaRegolaLinea" onsubmit="return validateCreaRegolaLineaForm()">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="routeId" class="required">Linee</label>
-								<select name="routeId" class="multiselect" multiple="multiple">
+								<select name="routeId" id="routeId" class="multiselect" multiple="multiple">
 									<c:forEach var="linea" items="${listaLinee}">
 										<option value="${linea.id}">${linea.shortName}</option>
 									</c:forEach>
@@ -570,7 +669,7 @@
 						</div>
 						<div class="row">
 							<div class="form-group col-lg-8">
-								<input class="btn btn-success" type="submit" value="Associa linee" />
+								<input class="btn btn-success" type="submit" value="Associa" />
 								<a class="btn btn-default" href="/_5t/tariffe">Annulla</a>
 							</div>
 						</div>
@@ -583,6 +682,84 @@
 					<button id="selezionaTutteLeLineeButton" type="button" class="btn btn-default">Seleziona tutte le linee</button>
 					<button id="deselezionaTutteLeLineeButton" type="button" class="btn btn-default">Deseleziona tutte le linee</button>
 					<button id="eliminaRegolaLineaButton" type="button" class="btn btn-danger">Elimina associazioni</button>
+				</div>
+			</div>
+		</c:if>
+	</div>
+	
+	<hr>
+	
+	<div class="row">
+		<c:if test="${not empty tariffaAttiva}">
+			<!-- div with table containing routes using the selected fare -->
+			<div class="col-lg-6">
+				<h4>Zone associate alla tariffa ${tariffaAttiva.gtfsId}</h4>
+				<table id="listaRegoleZona" class="table sortable">
+					<thead>
+						<tr>
+							<th>Zona origine</th>
+							<th>Zona destinazione</th>
+							<th class="hidden"></th>
+						</tr>
+					</thead>
+					<tbody>
+						<c:forEach var="regola" items="${listaRegoleZona}">
+							<c:if test="${not empty regola.origin && not empty regola.destination}">
+								<tr>
+									<td><a href="/_5t/selezionaZona?id=${regola.origin.id}">${regola.origin.gtfsId}</a></td>
+									<td><a href="/_5t/selezionaZona?id=${regola.destination.id}">${regola.destination.gtfsId}</a></td>
+									<td class="hidden">${regola.id}</td>
+								</tr>
+							</c:if>
+						</c:forEach>
+					</tbody>
+				</table>
+			</div>
+			
+			<!-- Div with button to create a fare rule (association fare-route) and selected rule summary -->
+			<div class="col-lg-6">
+				<button id="creaRegolaZonaButton" class="btn btn-primary">Associa zone</button>
+				
+				<!-- Div with create fare rule form -->
+				<div id="creaRegolaZona">
+					<form name="creaRegolaZonaForm" id="creaRegolaZonaForm" method="post" role="form" action="/_5t/creaRegolaZona">
+						<div class="row">
+							<div class="form-group col-lg-8">
+								<label for="originId" class="required">Zona di origine</label>
+								<select name="originId" class="form-control">
+									<option value="">Seleziona la zona di origine</option>
+									<c:forEach var="zona" items="${listaZone}">
+										<option value="${zona.id}">${zona.gtfsId}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-lg-8">
+								<label for="destinationId" class="required">Zona di destinazione</label>
+								<select name="destinationId" class="form-control">
+									<option value="">Seleziona la zona di destinazione</option>
+									<c:forEach var="zona" items="${listaZone}">
+										<option value="${zona.id}">${zona.gtfsId}</option>
+									</c:forEach>
+								</select>
+							</div>
+						</div>
+						<div class="row">
+							<div class="form-group col-lg-8">
+								<input class="btn btn-success" type="submit" value="Associa" />
+								<a class="btn btn-default" href="/_5t/tariffe">Annulla</a>
+							</div>
+						</div>
+					</form>
+				</div>
+				
+				<hr>
+				
+				<div>
+					<button id="selezionaTutteLeZoneButton" type="button" class="btn btn-default">Seleziona tutte le zone</button>
+					<button id="deselezionaTutteLeZoneButton" type="button" class="btn btn-default">Deseleziona tutte le zone</button>
+					<button id="eliminaRegolaZonaButton" type="button" class="btn btn-danger">Elimina associazioni</button>
 				</div>
 			</div>
 		</c:if>
@@ -605,9 +782,15 @@
 	    <button id="delete-fare-rule-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>
+	<div id="delete-fare-rule-zone" class="alert alert-danger">
+	    <button type="button" class="close">&times;</button>
+	    <p>Vuoi veramente eliminare le associazioni selezionate?</p>
+	    <button id="delete-fare-rule-zone-button" type="button" class="btn btn-danger">Elimina</button>
+	    <button type="button" class="btn btn-default annulla">Annulla</button>
+	</div>
 	<div id="no-routes-selected" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>
-	    <p>Devi selezionare almeno una linea da associare alla tariffa</p>
+	    <strong>Attenzione!</strong> Devi selezionare almeno una linea da associare alla tariffa
 	</div>
 </body>
 </html>

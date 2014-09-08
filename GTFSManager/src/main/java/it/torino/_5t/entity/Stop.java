@@ -61,7 +61,6 @@ public class Stop implements Serializable {
 	@Column(name = "stop_lon")
 	private double lon;
 	
-	// TODO
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "zone_id")
 	private Zone zone;

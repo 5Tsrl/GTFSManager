@@ -145,6 +145,16 @@ public class Zone implements Serializable {
 		this.stops = stops;
 	}
 	
+	public void addOriginFareRule(FareRule fareRule) {
+		fareRule.setOrigin(this);
+		originFareRules.add(fareRule);
+	}
+	
+	public void addDestinationFareRule(FareRule fareRule) {
+		fareRule.setDestination(this);
+		destinationFareRules.add(fareRule);
+	}
+	
 	public void addStop(Stop stop) {
 		stop.setZone(this);
 		stops.add(stop);

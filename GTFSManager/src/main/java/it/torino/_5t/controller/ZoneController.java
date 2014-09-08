@@ -1,8 +1,13 @@
 package it.torino._5t.controller;
 
+import java.util.HashSet;
+import java.util.Set;
+
 import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.ZoneDAO;
 import it.torino._5t.entity.Agency;
+import it.torino._5t.entity.FareAttribute;
+import it.torino._5t.entity.FareRule;
 import it.torino._5t.entity.Zone;
 
 import javax.servlet.http.HttpSession;
@@ -40,8 +45,22 @@ public class ZoneController {
 		// se c'è una zona attiva, la rendo persistent per poter accedere alla lista delle fermate
 		Zone zone = (Zone) session.getAttribute("zonaAttiva");
 		if (zone != null) {
-			zoneDAO.updateZone(zone);;
+			zoneDAO.updateZone(zone);
 			model.addAttribute("listaFermate", zone.getStops());
+			Set<FareAttribute> faOrigin = new HashSet<FareAttribute>();
+			for (FareRule fr: zone.getOriginFareRules()) {
+				if (!faOrigin.contains(fr.getFareAttribute())) {
+					faOrigin.add(fr.getFareAttribute());
+				}
+			}
+			Set<FareAttribute> faDestination = new HashSet<FareAttribute>();
+			for (FareRule fr: zone.getDestinationFareRules()) {
+				if (!faDestination.contains(fr.getFareAttribute())) {
+					faDestination.add(fr.getFareAttribute());
+				}
+			}
+			model.addAttribute("listaTariffeOrigine", faOrigin);
+			model.addAttribute("listaTariffeDestinazione", faDestination);
 		}
 		
 		logger.info("Visualizzazione zone di " + agency.getName() + ".");
@@ -80,6 +99,20 @@ public class ZoneController {
 			if (zon != null) {
 				zoneDAO.updateZone(zon);
 				model.addAttribute("listaFermate", zon.getStops());
+				Set<FareAttribute> faOrigin = new HashSet<FareAttribute>();
+				for (FareRule fr: zon.getOriginFareRules()) {
+					if (!faOrigin.contains(fr.getFareAttribute())) {
+						faOrigin.add(fr.getFareAttribute());
+					}
+				}
+				Set<FareAttribute> faDestination = new HashSet<FareAttribute>();
+				for (FareRule fr: zon.getDestinationFareRules()) {
+					if (!faDestination.contains(fr.getFareAttribute())) {
+						faDestination.add(fr.getFareAttribute());
+					}
+				}
+				model.addAttribute("listaTariffeOrigine", faOrigin);
+				model.addAttribute("listaTariffeDestinazione", faDestination);
 			}
 			return "zone";
 		}
@@ -94,6 +127,20 @@ public class ZoneController {
 				if (zon != null) {
 					zoneDAO.updateZone(zon);
 					model.addAttribute("listaFermate", zon.getStops());
+					Set<FareAttribute> faOrigin = new HashSet<FareAttribute>();
+					for (FareRule fr: zon.getOriginFareRules()) {
+						if (!faOrigin.contains(fr.getFareAttribute())) {
+							faOrigin.add(fr.getFareAttribute());
+						}
+					}
+					Set<FareAttribute> faDestination = new HashSet<FareAttribute>();
+					for (FareRule fr: zon.getDestinationFareRules()) {
+						if (!faDestination.contains(fr.getFareAttribute())) {
+							faDestination.add(fr.getFareAttribute());
+						}
+					}
+					model.addAttribute("listaTariffeOrigine", faOrigin);
+					model.addAttribute("listaTariffeDestinazione", faDestination);
 				}
 				return "zone";
 			}
@@ -177,6 +224,20 @@ public class ZoneController {
 			if (zon != null) {
 				zoneDAO.updateZone(zon);
 				model.addAttribute("listaFermate", zon.getStops());
+				Set<FareAttribute> faOrigin = new HashSet<FareAttribute>();
+				for (FareRule fr: zon.getOriginFareRules()) {
+					if (!faOrigin.contains(fr.getFareAttribute())) {
+						faOrigin.add(fr.getFareAttribute());
+					}
+				}
+				Set<FareAttribute> faDestination = new HashSet<FareAttribute>();
+				for (FareRule fr: zon.getDestinationFareRules()) {
+					if (!faDestination.contains(fr.getFareAttribute())) {
+						faDestination.add(fr.getFareAttribute());
+					}
+				}
+				model.addAttribute("listaTariffeOrigine", faOrigin);
+				model.addAttribute("listaTariffeDestinazione", faDestination);
 			}
 			return "zone";
 		}
@@ -196,6 +257,20 @@ public class ZoneController {
 				if (zon != null) {
 					zoneDAO.updateZone(zon);
 					model.addAttribute("listaFermate", zon.getStops());
+					Set<FareAttribute> faOrigin = new HashSet<FareAttribute>();
+					for (FareRule fr: zon.getOriginFareRules()) {
+						if (!faOrigin.contains(fr.getFareAttribute())) {
+							faOrigin.add(fr.getFareAttribute());
+						}
+					}
+					Set<FareAttribute> faDestination = new HashSet<FareAttribute>();
+					for (FareRule fr: zon.getDestinationFareRules()) {
+						if (!faDestination.contains(fr.getFareAttribute())) {
+							faDestination.add(fr.getFareAttribute());
+						}
+					}
+					model.addAttribute("listaTariffeOrigine", faOrigin);
+					model.addAttribute("listaTariffeDestinazione", faDestination);
 				}
 				return "zone";
 			}
