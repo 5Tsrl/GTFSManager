@@ -211,6 +211,8 @@
 		<li class="active">Linee</li>
 	</ol>
 	
+	<p>Cliccare su una riga della tabella per selezionare la linea corrispondente.</p>
+	
 	<% 
 	HashMap<Integer, String> types = new HashMap<Integer, String>(); 
 	types.put(0, "Tram");

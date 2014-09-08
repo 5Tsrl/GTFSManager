@@ -77,6 +77,9 @@ public class Agency implements Serializable {
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
 	private Set<Shape> shapes = new HashSet<Shape>();
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
+	private Set<Zone> zones = new HashSet<Zone>();
 
 	@Override
 	public int hashCode() {
@@ -207,6 +210,14 @@ public class Agency implements Serializable {
 		this.shapes = shapes;
 	}
 
+	public Set<Zone> getZones() {
+		return zones;
+	}
+
+	public void setZones(Set<Zone> zones) {
+		this.zones = zones;
+	}
+
 	public void addRoute(Route route) {
 		route.setAgency(this);
 		routes.add(route);
@@ -230,5 +241,10 @@ public class Agency implements Serializable {
 	public void addShape(Shape shape) {
 		shape.setAgency(this);
 		shapes.add(shape);
+	}
+	
+	public void addZone(Zone zone) {
+		zone.setAgency(this);
+		zones.add(zone);
 	}
 }

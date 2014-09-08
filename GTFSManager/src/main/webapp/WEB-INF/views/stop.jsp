@@ -105,6 +105,24 @@
 										'</div>' +
 										'<div class="row">' +
 											'<div class="form-group">' +
+												'<label for="zoneId">Zona</label>' +
+												'<select name="zoneId" class="form-control" id="zoneId">' +
+													'<option></option>';
+				<c:forEach var="zone" items="${listaZone}">
+					<c:choose>
+						<c:when test="${zone.id == fermata.zone.id}">
+								popupContent += '<option value="${zone.id}" selected="true">${zone.gtfsId}</option>';
+						</c:when>
+						<c:otherwise>
+								popupContent += '<option value="${zone.id}">${zone.gtfsId}</option>';
+						</c:otherwise>
+					</c:choose>
+				</c:forEach>
+								popupContent += '</select>' +
+											'</div>' +
+										'</div>' +
+										'<div class="row">' +
+											'<div class="form-group">' +
 												'<label for="url">Sito web</label>' +
 												'<form:input type="url" path="url" class="form-control" id="url" value="${fermata.url}" maxlength="255" />' +
 												'<form:errors path="url" cssClass="error"></form:errors>' +
@@ -300,6 +318,17 @@
 										'<label for="desc">Descrizione</label>' +
 										'<form:textarea path="desc" class="form-control" id="desc" placeholder="Inserisci la descrizione" maxlength="255" rows="2" />' +
 										'<form:errors path="desc" cssClass="error"></form:errors>' +
+									'</div>' +
+								'</div>' +
+								'<div class="row">' +
+									'<div class="form-group">' +
+										'<label for="zoneId">Zona</label>' +
+										'<select name="zoneId" class="form-control" id="zoneId">' +
+											'<option></option>';
+			<c:forEach var="zone" items="${listaZone}">
+							popupContent += '<option value="${zone.id}">${zone.gtfsId}</option>';
+			</c:forEach>
+						popupContent += '</select>' +
 									'</div>' +
 								'</div>' +
 								'<div class="row">' +

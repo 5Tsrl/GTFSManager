@@ -10,6 +10,8 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
+import javax.persistence.JoinColumn;
+import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -28,6 +30,14 @@ public class Zone implements Serializable {
 	@SequenceGenerator(name = "zone_id", sequenceName = "zone_zone_id_seq")
 	@Column(name = "zone_id")
 	private Integer id;
+	
+	@Column(name = "zone_gtfs_id")
+	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
+	private String gtfsId;
+	
+	@ManyToOne(fetch = FetchType.LAZY)
+	@JoinColumn(name = "agency_id")
+	private Agency agency;
 	
 	@Column(name = "name")
 	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
@@ -79,6 +89,22 @@ public class Zone implements Serializable {
 		this.id = id;
 	}
 
+	public String getGtfsId() {
+		return gtfsId;
+	}
+
+	public void setGtfsId(String gtfsId) {
+		this.gtfsId = gtfsId;
+	}
+
+	public Agency getAgency() {
+		return agency;
+	}
+
+	public void setAgency(Agency agency) {
+		this.agency = agency;
+	}
+
 	public String getName() {
 		return name;
 	}
@@ -117,5 +143,10 @@ public class Zone implements Serializable {
 
 	public void setStops(Set<Stop> stops) {
 		this.stops = stops;
+	}
+	
+	public void addStop(Stop stop) {
+		stop.setZone(this);
+		stops.add(stop);
 	}
 }

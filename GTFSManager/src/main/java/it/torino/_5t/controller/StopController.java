@@ -10,6 +10,7 @@ import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.StopDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Stop;
+import it.torino._5t.entity.Zone;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -51,6 +52,7 @@ public class StopController {
 			}
 		}
 		model.addAttribute("listaStazioni", stations);
+		model.addAttribute("listaZone", a.getZones());
 		model.addAttribute("listaFermate", a.getStops());
 		model.addAttribute("stop", new Stop());
 		
@@ -59,7 +61,7 @@ public class StopController {
 	
 	// chiamata al submit del form per la creazione di una nuova fermata
 	@RequestMapping(value = "/fermate", method = RequestMethod.POST)
-	public String submitStopForm(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("parentStationId") Integer parentStationId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String submitStopForm(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("parentStationId") Integer parentStationId, @RequestParam("zoneId") Integer zoneId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -76,6 +78,7 @@ public class StopController {
 				}
 			}
 			model.addAttribute("listaStazioni", stations);
+			model.addAttribute("listaZone", a.getZones());
 			model.addAttribute("listaFermate", a.getStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
@@ -91,6 +94,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
+				model.addAttribute("listaZone", a.getZones());
 				model.addAttribute("listaFermate", a.getStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
@@ -110,6 +114,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
+				model.addAttribute("listaZone", a.getZones());
 				model.addAttribute("listaFermate", a.getStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertParentStation", true);
@@ -118,6 +123,16 @@ public class StopController {
 			for (Stop s: a.getStops()) {
 				if (s.getId().equals(parentStationId)) {
 					s.addChildStop(stop);
+					break;
+				}
+			}
+		}
+		
+		// if it is in a zone, save the stop in the zone stops list
+		if (zoneId != null) {
+			for (Zone z: a.getZones()) {
+				if (z.getId().equals(zoneId)) {
+					z.addStop(stop);
 					break;
 				}
 			}
@@ -137,7 +152,7 @@ public class StopController {
 	
 	// chiamata al submit del form per la modifica di una linea
 	@RequestMapping(value = "/modificaFermata", method = RequestMethod.POST)
-	public String editSop(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("id") Integer id, @RequestParam("parentStationId") Integer parentStationId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
+	public String editSop(@ModelAttribute @Valid Stop stop, BindingResult bindingResult, @RequestParam("id") Integer id, @RequestParam("parentStationId") Integer parentStationId, @RequestParam("zoneId") Integer zoneId, Model model, RedirectAttributes redirectAttributes, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -154,6 +169,7 @@ public class StopController {
 				}
 			}
 			model.addAttribute("listaStazioni", stations);
+			model.addAttribute("listaZone", a.getZones());
 			model.addAttribute("listaFermate", a.getStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
@@ -171,6 +187,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
+				model.addAttribute("listaZone", a.getZones());
 				model.addAttribute("listaFermate", a.getStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
@@ -190,36 +207,67 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
+				model.addAttribute("listaZone", a.getZones());
 				model.addAttribute("listaFermate", a.getStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertParentStation", true);
 				return "stop";
 			}
-			logger.info("------> Sì staz padre");
+			//logger.info("------> Sì staz padre");
 			// remove the stop from the previous parent station, if it had one
 			if (activeStop.getParentStation() != null) {
-				logger.info("------> Aveva una staz: la elimino");
+				//logger.info("------> Aveva una staz: la elimino");
 				for (Stop s: a.getStops()) {
 					if (s.getId().equals(activeStop.getParentStation().getId())) {
 						s.getStops().remove(activeStop);
+						break;
 					}
 				}
 			}
 			for (Stop s: a.getStops()) {
 				if (s.getId().equals(parentStationId)) {
-					logger.info("------> NUOVA staz padre aggiunta: " + s.getId() + " " + s.getName());
+					//logger.info("------> NUOVA staz padre aggiunta: " + s.getId() + " " + s.getName());
 					s.addChildStop(stop);
 					break;
 				}
 			}
 		} else {
 			// remove the stop from the previous parent station, if it had one
-			logger.info("------> NO staz padre");
+			//logger.info("------> NO staz padre");
 			if (activeStop.getParentStation() != null) {
-				logger.info("------> Aveva una staz: la elimino");
+				//logger.info("------> Aveva una staz: la elimino");
 				for (Stop s: a.getStops()) {
 					if (s.getId().equals(activeStop.getParentStation().getId())) {
 						s.getStops().remove(activeStop);
+						break;
+					}
+				}
+			}
+		}
+		// if it is in a zone, save the stop in the zone stops list
+		if (zoneId != null) {
+			// remove the stop from the previous zone, if it had one
+			if (activeStop.getZone() != null) {
+				for (Zone z: a.getZones()) {
+					if (z.getId().equals(activeStop.getZone().getId())) {
+						z.getStops().remove(activeStop);
+						break;
+					}
+				}
+			}
+			for (Zone z: a.getZones()) {
+				if (z.getId().equals(zoneId)) {
+					z.addStop(stop);
+					break;
+				}
+			}
+		} else {
+			// remove the stop from the previous zone, if it had one
+			if (activeStop.getZone() != null) {
+				for (Zone z: a.getZones()) {
+					if (z.getId().equals(activeStop.getZone().getId())) {
+						z.getStops().remove(activeStop);
+						break;
 					}
 				}
 			}
@@ -234,6 +282,7 @@ public class StopController {
 				s.setDesc(stop.getDesc());
 				s.setLat(stop.getLat());
 				s.setLon(stop.getLon());
+				s.setZone(stop.getZone());
 				s.setUrl(stop.getUrl());
 				s.setLocationType(stop.getLocationType());
 				s.setParentStation(stop.getParentStation());
@@ -263,6 +312,24 @@ public class StopController {
 		
 		Stop stop = stopDAO.getStop(id);
 		
+		// remove the stop from the parent station, if it had one
+		if (stop.getParentStation() != null) {
+			for (Stop s: a.getStops()) {
+				if (s.getId().equals(stop.getParentStation().getId())) {
+					s.getStops().remove(stop);
+					break;
+				}
+			}
+		}
+		// remove the stop from the previous zone, if it had one
+		if (stop.getZone() != null) {
+			for (Zone z: a.getZones()) {
+				if (z.getId().equals(stop.getZone().getId())) {
+					z.getStops().remove(stop);
+					break;
+				}
+			}
+		}
 		a.getStops().remove(stop);
 		
 		logger.info("Fermata eliminata: " + stop.getName() + ".");

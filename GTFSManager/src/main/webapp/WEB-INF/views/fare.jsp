@@ -146,7 +146,7 @@
 		$("#modificaTariffaForm").find("#transferDuration").popover({ container: 'body', trigger: 'focus', title:"Durata del trasferimento", content:"La durata del trasferimento indica entro quanto tempo il trasferimento scade. Quando è usato con \"Nessun trasferimento permesso\", questo campo indica per quanto tempo un biglietto è valido per una tariffa in cui non sono permessi trasferimenti. A meno che questo campo non sia usato per indicare la validità di un biglietto, dovrebbe essere lasciato vuoto quando nessun trasferimento è permesso." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		// Creation trip form validation
+		// Creation fare form validation
 		$("#creaTariffaForm").validate({
 			rules: {
 				gtfsId: {
@@ -176,7 +176,7 @@
 			}
 		});
 		
-		// Edit trip form validation
+		// Edit fare form validation
 		$("#modificaTariffaForm").validate({
 			rules: {
 				gtfsId: {
@@ -281,6 +281,8 @@
 	<ol class="breadcrumb">
 		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
 	</ol>
+	
+	<p>Cliccare su una riga della tabella per selezionare la tariffa corrispondente.</p>
 	
 	<div class="row">
 		<!-- Div with table containing fare list -->
@@ -511,7 +513,6 @@
 		</div>
 	</div>
 	
-	
 	<hr>
 	
 	<div class="row">
@@ -594,7 +595,7 @@
 	</div>
 	<div id="delete-fare" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
-	    <p>Vuoi veramente eliminare la tariffa ${tariifaAttiva.name}?</p>
+	    <p>Vuoi veramente eliminare la tariffa ${tariffaAttiva.gtfsId}?</p>
 	    <button id="delete-fare-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>
