@@ -6,4 +6,5 @@ import java.util.List;
 
 public interface TransferDAO {
 	public List<Transfer> getAllTransfers();
+	public Transfer getTransfer(Integer id);
 }

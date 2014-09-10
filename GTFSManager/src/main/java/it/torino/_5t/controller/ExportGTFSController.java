@@ -511,10 +511,10 @@ public class ExportGTFSController {
 	private void fillTransfers() throws IOException {
 		String row = new String();
 		for (Transfer t: transferDAO.getAllTransfers()) {
-			row += t.getFromStop().getId() + ",";
-			row += t.getToStop().getId() + ",";
+			row += t.getFromStop().getGtfsId() + ",";
+			row += t.getToStop().getGtfsId() + ",";
 			row += t.getTransferType() + ",";
-			row += formatOptionalInteger(t.getMinTransferTime()) + "\n";
+			row += (t.getMinTransferTime() != null ? t.getMinTransferTime() * 60 : "") + "\n";
 		}
 		transferOutput.write(row.getBytes());
 		logger.info("transfers.txt completato.");

@@ -4,6 +4,7 @@ import java.io.Serializable;
 import java.util.HashSet;
 import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -93,10 +94,10 @@ public class Stop implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "stop")
 	private Set<StopTime> stopTimes = new HashSet<StopTime>();
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "fromStop")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval=true, mappedBy = "fromStop")
 	private Set<Transfer> fromStopTransfers = new HashSet<Transfer>();
 	
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "toStop")
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval=true, mappedBy = "toStop")
 	private Set<Transfer> toStopTransfers = new HashSet<Transfer>();
 
 	@Override
@@ -276,5 +277,15 @@ public class Stop implements Serializable {
 	public void addChildStop(Stop stop) {
 		stop.setParentStation(this);
 		stops.add(stop);
+	}
+	
+	public void addFromStopTransfer(Transfer transfer) {
+		transfer.setFromStop(this);
+		fromStopTransfers.add(transfer);
+	}
+	
+	public void addToStopTransfer(Transfer transfer) {
+		transfer.setToStop(this);
+		toStopTransfers.add(transfer);
 	}
 }
