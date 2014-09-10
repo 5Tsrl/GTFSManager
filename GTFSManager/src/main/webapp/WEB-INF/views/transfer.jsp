@@ -238,6 +238,8 @@
 		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttivo.gtfsId}</a></li>
 	</ol>
 	
+	<p>Cliccare su una riga della tabella per selezionare il trasferimento corrispondente.</p>
+	
 	<div class="row">
 		<!-- Div with table containing transfer list -->
 		<div class="col-lg-8">

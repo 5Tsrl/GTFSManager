@@ -25,6 +25,160 @@
     	}); 
     });
 	
+	function validateCreaEccezioneForm() {
+		if (document.forms["creaEccezioneForm"]["date"].value < "${calendarioAttivo.startDate}" || document.forms["creaEccezioneForm"]["date"].value > "${calendarioAttivo.endDate}") {
+			$("#wrong-exception-date").show();
+			return false;
+		}
+		var d = new Date(document.forms["creaEccezioneForm"]["date"].value);
+		var exceptionType = document.forms["creaEccezioneForm"]["exceptionType"].options[document.forms["creaEccezioneForm"]["exceptionType"].selectedIndex].value;
+		switch (d.getDay()) {
+		case 0:
+			if ("${calendarioAttivo.sunday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.sunday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 1:
+			if ("${calendarioAttivo.monday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.monday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 2:
+			if ("${calendarioAttivo.tuesday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.tuesday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 3:
+			if ("${calendarioAttivo.wednesday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.wednesday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 4:
+			if ("${calendarioAttivo.thursday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.thursday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 5:
+			if ("${calendarioAttivo.friday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.friday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 6:
+			if ("${calendarioAttivo.saturday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.saturday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+	
+	function validateModificaEccezioneForm() {
+		if (document.forms["modificaEccezioneForm"]["date"].value < "${calendarioAttivo.startDate}" || document.forms["modificaEccezioneForm"]["date"].value > "${calendarioAttivo.endDate}") {
+			$("#wrong-exception-date").show();
+			return false;
+		}
+		var d = new Date(document.forms["modificaEccezioneForm"]["date"].value);
+		var exceptionType = document.forms["modificaEccezioneForm"]["exceptionType"].options[document.forms["modificaEccezioneForm"]["exceptionType"].selectedIndex].value;
+		switch (d.getDay()) {
+		case 0:
+			if ("${calendarioAttivo.sunday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.sunday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 1:
+			if ("${calendarioAttivo.monday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.monday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 2:
+			if ("${calendarioAttivo.tuesday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.tuesday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 3:
+			if ("${calendarioAttivo.wednesday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.wednesday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 4:
+			if ("${calendarioAttivo.thursday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.thursday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 5:
+			if ("${calendarioAttivo.friday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.friday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		case 6:
+			if ("${calendarioAttivo.saturday}" == "true" && exceptionType == 1) {
+				$("#service-already-present").show();
+				return false;
+			} else if ("${calendarioAttivo.saturday}" == "false" && exceptionType == 2) {
+				$("#service-already-not-present").show();
+				return false;
+			}
+			break;
+		default:
+			break;
+		}
+		return true;
+	}
+	
 	$(document).ready(function() {
 		// edit calendar and calendar dates form and alerts initially hidden
 		$("#modificaCalendario").hide();
@@ -579,7 +733,7 @@
 			
 				<!-- Div with create calendar date form -->
 				<div id="creaEccezione">
-					<form:form id="creaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/creaEccezione">
+					<form:form id="creaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/creaEccezione" onsubmit="return validateCreaEccezioneForm()">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="date" class="required">Data</label>
@@ -630,7 +784,7 @@
 				
 				<!-- Div with edit calendar date form -->
 				<div id="modificaEccezione">
-					<form:form id="modificaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/modificaEccezione">
+					<form:form id="modificaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/modificaEccezione" onsubmit="return validateModificaEccezioneForm()">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="date" class="required">Data</label>
@@ -696,6 +850,14 @@
 	<div id="calendar-not-deletable" class="alert alert-warning">
 	    <button type="button" class="close">&times;</button>
 	    <p>Non puoi eliminare il calendario.<br>Devi prima modificare le corse associate ad esso.</p>
+	</div>
+	<div id="service-already-present" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p><strong>Attenzione!</strong> L'eccezione inserita è in un giorno in cui il servizio è già attivo.</p>
+	</div>
+	<div id="service-already-not-present" class="alert alert-warning">
+	    <button type="button" class="close">&times;</button>
+	    <p><strong>Attenzione!</strong> L'eccezione inserita è in un giorno in cui il servizio è già non attivo.</p>
 	</div>
 </body>
 </html>
