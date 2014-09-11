@@ -30,5 +30,7 @@
 	<mapping class="it.torino._5t.entity.Transfer"/>
 	<mapping class="it.torino._5t.entity.FeedInfo"/>
 	<mapping class="it.torino._5t.entity.Shape"/>
+	<mapping class="it.torino._5t.entity.TripPattern"/>
+	<mapping class="it.torino._5t.entity.StopTimeRelative"/>
   </session-factory>
 </hibernate-configuration>

@@ -1,7 +1,8 @@
+<%@page import="it.torino._5t.entity.Trip"%>
+<%@page import="it.torino._5t.entity.TripPattern"%>
+<%@page import="java.util.HashMap"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
-<%@ page import="java.util.HashMap" %>
-<%@ page import="it.torino._5t.entity.Trip" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
@@ -9,7 +10,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>GTFS Manager - Corse</title>
+	<title>GTFS Manager - Corse singole</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
@@ -27,46 +28,46 @@
     });
 	
 	$(document).ready(function() {
-		// edit trip form and alerts initially hidden
-		$("#modificaCorsa").hide();
+		// edit tripPattern form and alerts initially hidden
+		$("#modificaCorsaSingola").hide();
 		$(".alert").hide();
 		
-		// showAlertDuplicateTrip variable is set to true by TripController if the trip id is already present
+		// showAlertDuplicateTripPattern variable is set to true by TripPatternController if the tripPattern id is already present
 		if ("${showAlertDuplicateTrip}") {
 			$("#trip-already-inserted").show();
 		}
 		
-		// showCreateForm variable is set to true by TripController if the the submitted form to create a trip contains errors
+		// showCreateForm variable is set to true by TripPatternController if the the submitted form to create a tripPattern contains errors
 		if (!"${showCreateForm}") {
-			$("#creaCorsa").hide();
+			$("#creaCorsaSingola").hide();
 		} else {
-			$("#creaCorsa").show();
+			$("#creaCorsaSingola").show();
 		}
 		
-		// clicking on "Modifica corsa" button, "Crea corsa" button and div with active trip summary should be hidden, while the form to modify the trip should be shown
-		$("#modificaCorsaButton").click(function() {
-			$("#creaCorsaButton").hide();
-			$("#riassuntoCorsa").hide();
-			$("#modificaCorsa").show();
+		// clicking on "Modifica schema corsa" button, "Crea schema corsa" button and div with active tripPattern summary should be hidden, while the form to modify the tripPattern should be shown
+		$("#modificaCorsaSingolaButton").click(function() {
+			$("#creaCorsaSingolaButton").hide();
+			$("#riassuntoCorsaSingola").hide();
+			$("#modificaCorsaSingola").show();
 		});
 		if ("${showEditForm}") {
-			$("#creaCorsaButton").hide();
-			$("#riassuntoCorsa").hide();
-			$("#modificaCorsa").show();
+			$("#creaCorsaSingolaButton").hide();
+			$("#riassuntoCorsaSingola").hide();
+			$("#modificaCorsaSingola").show();
 		};
 		
 		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
-		$("#eliminaCorsaButton").click(function() {
+		$("#eliminaCorsaSingolaButton").click(function() {
 			$("#delete-trip").show();
 		});
 		$("#delete-trip-button").click(function() {
-			window.location.href = "/_5t/eliminaCorsa";
+			window.location.href = "/_5t/eliminaCorsaSingola";
 		});
 		
 		// clicking on a row, the correspondent trip is selected
-		$("#listaCorse").find("tbody").find("tr").click(function() {
+		$("#listaCorseSingole").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaCorsa?id=" + tripId;
+			window.location.href = "/_5t/selezionaCorsaSingola?id=" + tripId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -78,26 +79,34 @@
 		});
 		
 		// Popover
-		$("#creaCorsaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
+		$("#creaCorsaSingolaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+		$("#creaCorsaSingolaForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora partenza", content:"L'ora di partenza della corsa." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+		$("#creaCorsaSingolaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+		$("#creaCorsaSingolaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaSingolaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaSingolaForm").find("#blockId").popover({ container: 'body', trigger: 'focus', title:"Id blocco", content:"Il blocco a cui appartiene la corsa. Un blocco consiste di due o più corse in sequenza fatte usando lo stesso veicolo, dove un passeggero può passare da una corsa alla successiva rimanendo sul veicolo." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaCorsaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
+		$("#modificaCorsaSingolaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
 		.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+		$("#modificaCorsaSingolaForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora partenza", content:"L'ora di partenza della corsa." })
+		.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaSingolaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+		$("#modificaCorsaSingolaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+		$("#modificaCorsaSingolaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
 			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaSingolaForm").find("#blockId").popover({ container: 'body', trigger: 'focus', title:"Id blocco", content:"Il blocco a cui appartiene la corsa. Un blocco consiste di due o più corse in sequenza fatte usando lo stesso veicolo, dove un passeggero può passare da una corsa alla successiva rimanendo sul veicolo." })
+		.blur(function () { $(this).popover('hide'); });
 		
-		// Creation trip form validation
-		$("#creaCorsaForm").validate({
+		// Creation tripPattern form validation
+		$("#creaCorsaSingolaForm").validate({
 			rules: {
 				gtfsId: {
 					required: true
@@ -106,6 +115,9 @@
 					required: true
 				},
 				serviceId: {
+					required: true
+				},
+				start: {
 					required: true
 				}
 			},
@@ -118,6 +130,9 @@
 				},
 				serviceId: {
 					required: "Selezionare un calendario"
+				},
+				start: {
+					required: "Inserire l'ora di partenza"
 				}
 			},
 			highlight: function(label) {
@@ -128,8 +143,8 @@
 			}
 		});
 		
-		// Edit trip form validation
-		$("#modificaCorsaForm").validate({
+		// Edit tripPattern form validation
+		$("#modificaCorsaSingolaForm").validate({
 			rules: {
 				gtfsId: {
 					required: true
@@ -138,6 +153,9 @@
 					required: true
 				},
 				serviceId: {
+					required: true
+				},
+				start: {
 					required: true
 				}
 			},
@@ -150,6 +168,9 @@
 				},
 				serviceId: {
 					required: "Selezionare un calendario"
+				},
+				start: {
+					required: "Inserire l'ora di partenza"
 				}
 			},
 			highlight: function(label) {
@@ -160,27 +181,6 @@
 			}
 		});
 		
-		// Duplicate trip form validation
-		$("#duplicaCorsaForm").validate({
-			rules: {
-				newGtfsId: {
-					required: true
-				}
-			},
-			messages: {
-				newGtfsId: {
-					required: "Il campo id è obbligatorio"
-				}
-			},
-			highlight: function(label) {
-				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
-			},
-			success: function(label) {
-				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
-			}
-		});
-		
-		// table initialization to have sortable columns
 		$('.sortable').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
@@ -188,7 +188,7 @@
 	    	"order": [[0, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
-	    		"zeroRecords": "Nessuna corsa"
+	    		"zeroRecords": "Nessuna corsa singola"
 	    	}
 	    });
 	});
@@ -201,8 +201,10 @@
 	<ol class="breadcrumb">
 		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
 		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-		<li class="active">Corse</li>
+		<li><a href="/_5t/schemiCorse">Schema corsa ${schemaCorsaAttivo.gtfsId}</a></li>
+		<li class="active">Corse singole</li>
 	</ol>
+	
 	
 	<% 
 	HashMap<Integer, String> direction = new HashMap<Integer, String>(); 
@@ -221,25 +223,24 @@
 	%>
 	
 	<div class="row">
-		<!-- Div with table containing trip list -->
+		<!-- Div with table containing tripPattern list -->
 		<div class="col-lg-8">
-			<table id="listaCorse" class="table table-striped table-hover sortable">
+			<table id="listaCorseSingole" class="table table-striped table-hover sortable">
 				<thead>
 					<tr>
 						<th>Id</th>
 						<th>Nome abbreviato</th>
 						<th>Direzione</th>
 						<th>Calendario</th>
-						<th>Servizi</th>
-						<th>Fermate</th>
+						<th>Ora partenza</th>
 						<th class="hidden"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="corsa" items="${listaCorse}">
+					<c:forEach var="corsaSingola" items="${listaCorseSingole}">
 						<c:choose>
-							<c:when test="${not empty corsaAttiva}">
-								<c:if test="${corsaAttiva.id == corsa.id}">
+							<c:when test="${not empty corsaSingolaAttiva}">
+								<c:if test="${corsaSingolaAttiva.id == corsaSingola.id}">
 									<tr class="success">
 								</c:if>
 							</c:when>
@@ -247,88 +248,84 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
-							<td>${corsa.gtfsId}</td>
-							<td>${corsa.tripShortName}</td>
+							<td>${corsaSingola.gtfsId}</td>
+							<td>${corsaSingola.tripShortName}</td>
 							<td>
 								<c:choose>
-									<c:when test="${corsa.directionId == 0}">Andata</c:when>
+									<c:when test="${corsaSingola.directionId == 0}">Andata</c:when>
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${corsa.calendar.id}">${corsa.calendar.gtfsId}</a></td>
-							<td>
-								${fn:length(corsa.frequencies)}
-								<c:choose>
-									<c:when test="${corsaAttiva.id == corsa.id}">
-										<a class="btn btn-default" href="/_5t/servizi">
-									</c:when>
-									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/servizi">
-									</c:otherwise>
-								</c:choose>
-								<c:choose>
-									<c:when test="${fn:length(corsa.frequencies) == 0}">Inserisci servizi</c:when>
-									<c:when test="${fn:length(corsa.frequencies) > 0}">Visualizza/modifica servizi</c:when>
-								</c:choose>
-								</a>
-							</td>
-							<td>
-								${fn:length(corsa.stopTimes)}
-								<c:choose>
-									<c:when test="${corsaAttiva.id == corsa.id}">
-										<a class="btn btn-default" href="/_5t/fermateCorse">
-									</c:when>
-									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/fermateCorse">
-									</c:otherwise>
-								</c:choose>
-								<c:choose>
-									<c:when test="${fn:length(corsa.stopTimes) == 0}">Inserisci fermate</c:when>
-									<c:when test="${fn:length(corsa.stopTimes) > 0}">Visualizza/modifica fermate</c:when>
-								</c:choose>
-								</a>
-							</td>
-							<td class="hidden">${corsa.id}</td>
+							<td><a href="/_5t/selezionaCalendario?id=${corsaSingola.calendar.id}">${corsaSingola.calendar.gtfsId}</a></td>
+							<td>${corsaSingola.startTime}</td>
+							<td class="hidden">${corsaSingola.id}</td>
 						</tr>
 					</c:forEach>
 				</tbody>
 			</table>
 		</div>
 		
-		<!-- Div with button to create trip and selected trip summary -->
+		<!-- Div with button to create tripPattern and selected tripPattern summary -->
 		<div class="col-lg-4">
-			<a id="creaCorsaButton" class="btn btn-primary" href="/_5t/creaCorsa">Crea una corsa</a>
+			<a id="creaCorsaSingolaButton" class="btn btn-primary" href="/_5t/creaCorsaSingola">Crea una corsa singola</a>
 			
-			<!-- Div with create trip form -->
-			<div id="creaCorsa">
-				<form:form id="creaCorsaForm" commandName="trip" method="post" role="form">
+			<!-- Div with create tripPattern form -->
+			<div id="creaCorsaSingola">
+				<form:form id="creaCorsaSingolaForm" commandName="trip" method="post" role="form">
+					<% TripPattern tripPattern = (TripPattern) session.getAttribute("schemaCorsaAttivo"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
-				    		<form:input path="gtfsId" class="form-control" id="gtfsId" placeholder="Inserisci l'id" maxlength="50" />
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${schemaCorsaAttivo.gtfsId}" maxlength="50" />
 				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
+							<label for="start" class="required">Ora partenza</label>
+				    		<input name="start" class="form-control" id="start" type="time" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
 							<label for="tripShortName" class="required">Nome abbreviato</label>
-				    		<form:input path="tripShortName" class="form-control" id="tripShortName" placeholder="Inserisci il nome abbreviato" maxlength="50" />
+				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${schemaCorsaAttivo.tripShortName}" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="tripHeadsign">Display</label>
-				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" placeholder="Inserisci la scritta per il display" maxlength="50" />
+				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${schemaCorsaAttivo.tripHeadsign}" maxlength="50" />
 				    		<form:errors path="tripHeadsign" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="blockId">Id blocco</label>
+				    		<form:input path="blockId" class="form-control" id="blockId" placeholder="Inserire l'id del blocco" maxlength="50" />
+				    		<form:errors path="blockId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="directionId">Direzione</label>
 							<form:select path="directionId" class="form-control">
-								<form:option value="0" selected="true"><%= direction.get(0) %></form:option>
-								<form:option value="1"><%= direction.get(1) %></form:option>
+								<%
+								if (tripPattern != null) {
+									for (int i=0; i<direction.size(); i++) {
+										if (i == tripPattern.getDirectionId()) {
+								%>
+										<form:option value="<%= i %>" selected="true"><%= direction.get(i) %></form:option>
+								<%
+										} else { 
+								%>
+										<form:option value="<%= i %>"><%= direction.get(i) %></form:option>
+								<%
+										}
+									}
+								}
+								%>
 							</form:select>
 							<form:errors path="directionId" cssClass="error"></form:errors>
 						</div>
@@ -339,7 +336,14 @@
 							<select name="serviceId" class="form-control" required>
 								<option value="">Seleziona un calendario</option>
 								<c:forEach var="calendario" items="${listaCalendari}">
-									<option value="${calendario.id}">${calendario.gtfsId}</option>
+									<c:choose>
+										<c:when test="${schemaCorsaAttivo.calendar.id == calendario.id}">
+											<option value="${calendario.id}" selected>${calendario.gtfsId}</option>
+										</c:when>
+										<c:otherwise>
+											<option value="${calendario.id}">${calendario.gtfsId}</option>
+										</c:otherwise>
+									</c:choose>
 								</c:forEach>
 							</select>
 						</div>
@@ -348,9 +352,21 @@
 						<div class="form-group col-lg-8">
 							<label for="wheelchairAccessible">Accessibile ai disabili</label>
 							<form:select path="wheelchairAccessible" class="form-control">
-								<form:option value="0" selected="true"><%= wheelchairAccessible.get(0) %></form:option>
-								<form:option value="1"><%= wheelchairAccessible.get(1) %></form:option>
-								<form:option value="2"><%= wheelchairAccessible.get(2) %></form:option>
+								<%
+								if (tripPattern != null) {
+									for (int i=0; i<wheelchairAccessible.size(); i++) {
+										if (i == tripPattern.getWheelchairAccessible()) {
+								%>
+										<form:option value="<%= i %>" selected="true"><%= wheelchairAccessible.get(i) %></form:option>
+								<%
+										} else { 
+								%>
+										<form:option value="<%= i %>"><%= wheelchairAccessible.get(i) %></form:option>
+								<%
+										}
+									}
+								}
+								%>
 							</form:select>
 							<form:errors path="wheelchairAccessible" cssClass="error"></form:errors>
 						</div>
@@ -359,17 +375,30 @@
 						<div class="form-group col-lg-8">
 							<label for="bikesAllowed">Bici permesse</label>
 							<form:select path="bikesAllowed" class="form-control">
-								<form:option value="0" selected="true"><%= bikesAllowed.get(0) %></form:option>
-								<form:option value="1"><%= bikesAllowed.get(1) %></form:option>
-								<form:option value="2"><%= bikesAllowed.get(2) %></form:option>
+								<%
+								if (tripPattern != null) {
+									for (int i=0; i<bikesAllowed.size(); i++) {
+										if (i == tripPattern.getBikesAllowed()) {
+								%>
+										<form:option value="<%= i %>" selected="true"><%= bikesAllowed.get(i) %></form:option>
+								<%
+										} else { 
+								%>
+										<form:option value="<%= i %>"><%= bikesAllowed.get(i) %></form:option>
+								<%
+										}
+									}
+								}
+								%>
 							</form:select>
 							<form:errors path="bikesAllowed" cssClass="error"></form:errors>
 						</div>
 					</div>
+					<form:input path="singleTrip" type="hidden" value="true" />
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<input class="btn btn-success" type="submit" value="Crea corsa" />
-							<a class="btn btn-default" href="/_5t/corse">Annulla</a>
+							<input class="btn btn-success" type="submit" value="Crea corsa singola" />
+							<a class="btn btn-default" href="/_5t/corseSingole">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -377,25 +406,31 @@
 			
 			<hr>
 			
-			<!-- Div with selected trip summary -->
-			<c:if test="${not empty corsaAttiva}">
-				<div id="riassuntoCorsa" class="riassunto">
-					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
+			<!-- Div with selected tripPattern summary -->
+			<c:if test="${not empty corsaSingolaAttiva}">
+				<div id="riassuntoCorsaSingola" class="riassunto">
+					<% Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva"); %>
 					<div class="col-lg-8">
-						<b>Id:</b> ${corsaAttiva.gtfsId}
+						<b>Id:</b> ${corsaSingolaAttiva.gtfsId}
 					</div>
 					<div class="col-lg-8">
-						<b>Nome:</b> ${corsaAttiva.tripShortName}
+						<b>Ora partenza:</b> ${corsaSingolaAttiva.startTime}
 					</div>
 					<div class="col-lg-8">
-						<b>Display:</b> ${corsaAttiva.tripHeadsign}
+						<b>Nome:</b> ${corsaSingolaAttiva.tripShortName}
+					</div>
+					<div class="col-lg-8">
+						<b>Display:</b> ${corsaSingolaAttiva.tripHeadsign}
 					</div>
 					<div class="col-lg-8">
 						<b>Direzione:</b>
 						<% out.write(direction.get(trip.getDirectionId())); %>
 					</div>
 					<div class="col-lg-8">
-						<b>Calendario:</b> ${corsaAttiva.calendar.gtfsId}
+						<b>Id blocco:</b> ${corsaSingolaAttiva.blockId}
+					</div>
+					<div class="col-lg-8">
+						<b>Calendario:</b> ${corsaSingolaAttiva.calendar.gtfsId}
 					</div>
 					<div class="col-lg-8">
 						<b>Accessibile ai disabili:</b>
@@ -406,44 +441,57 @@
 						<% out.write(bikesAllowed.get(trip.getBikesAllowed())); %>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaCorsaButton" class="btn btn-primary" href="/_5t/modificaCorsa">Modifica</a>
-						<button id="eliminaCorsaButton" type="button" class="btn btn-danger">Elimina</button>
+						<a id="modificaCorsaSingolaButton" class="btn btn-primary" href="/_5t/modificaCorsaSingola">Modifica</a>
+						<button id="eliminaCorsaSingolaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
-					<div class="col-lg-12">
-						<form id="duplicaCorsaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsa">
-							<div class="form-group">
-								<label for="newGtfsId" class="required">Duplica con id</label>
-					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" />
-							</div>
-							<input class="btn btn-info" type="submit" value="Duplica" />
-						</form>
-					</div>
+<!-- 					<div class="col-lg-12"> -->
+<%-- 						<form id="duplicaCorsaSingolaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsaSingola"> --%>
+<!-- 							<div class="form-group"> -->
+<!-- 								<label for="newGtfsId" class="required">Duplica con id</label> -->
+<!-- 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" /> -->
+<!-- 							</div> -->
+<!-- 							<input class="btn btn-info" type="submit" value="Duplica" /> -->
+<%-- 						</form> --%>
+<!-- 					</div> -->
 				</div>
 			</c:if>
 			
-			<!-- Div with edit trip form -->
-			<div id="modificaCorsa">
-				<form:form id="modificaCorsaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsa">
-					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
+			<!-- Div with edit tripPattern form -->
+			<div id="modificaCorsaSingola">
+				<form:form id="modificaCorsaSingolaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsaSingola">
+					<% Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
-				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${corsaAttiva.gtfsId}" maxlength="50" />
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${corsaSingolaAttiva.gtfsId}" maxlength="50" />
 				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
+							<label for="start" class="required">Ora partenza</label>
+				    		<input name="start" class="form-control" id="start" type="time" value="${corsaSingolaAttiva.startTime}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
 							<label for="tripShortName" class="required">Nome abbreviato</label>
-				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaAttiva.tripShortName}" maxlength="50" />
+				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaSingolaAttiva.tripShortName}" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="tripHeadsign">Display</label>
-				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${corsaAttiva.tripHeadsign}" maxlength="50" />
+				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${corsaSingolaAttiva.tripHeadsign}" maxlength="50" />
 				    		<form:errors path="tripHeadsign" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="blockId">Id blocco</label>
+				    		<form:input path="blockId" class="form-control" id="blockId" value="${corsaSingolaAttiva.blockId}" maxlength="50" />
+				    		<form:errors path="blockId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
@@ -476,7 +524,7 @@
 								<option value="">Seleziona un calendario</option>
 								<c:forEach var="calendario" items="${listaCalendari}">
 									<c:choose>
-										<c:when test="${corsaAttiva.calendar.id == calendario.id}">
+										<c:when test="${corsaSingolaAttiva.calendar.id == calendario.id}">
 											<option value="${calendario.id}" selected>${calendario.gtfsId}</option>
 										</c:when>
 										<c:otherwise>
@@ -533,10 +581,11 @@
 							<form:errors path="bikesAllowed" cssClass="error"></form:errors>
 						</div>
 					</div>
+					<form:input path="singleTrip" type="hidden" value="true" />
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica corsa" />
-							<a class="btn btn-default" href="/_5t/corse">Annulla</a>
+							<a class="btn btn-default" href="/_5t/corseSingole">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -551,7 +600,7 @@
 	</div>
 	<div id="delete-trip" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
-	    <p>Vuoi veramente eliminare la corsa ${corsaAttiva.tripShortName}?</p>
+	    <p>Vuoi veramente eliminare la corsa ${corsaSingolaAttiva.gtfsId}?</p>
 	    <button id="delete-trip-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>

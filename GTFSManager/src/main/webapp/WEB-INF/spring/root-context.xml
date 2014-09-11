@@ -18,5 +18,6 @@
 	<bean name="stopTimeDAO" class="it.torino._5t.dao.StopTimeDAOImpl"></bean>
 	<bean name="transferDAO" class="it.torino._5t.dao.TransferDAOImpl"></bean>
 	<bean name="zoneDAO" class="it.torino._5t.dao.ZoneDAOImpl"></bean>
+	<bean name="tripPatternDAO" class="it.torino._5t.dao.TripPatternDAOImpl"></bean>
 		
 </beans>

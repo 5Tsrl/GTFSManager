@@ -75,7 +75,7 @@ public class Route implements Serializable {
 	private String textColor;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "route")
-	private Set<Trip> trips = new HashSet<Trip>();
+	private Set<TripPattern> tripPatterns = new HashSet<TripPattern>();
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "route")
 	private Set<FareRule> fareRules = new HashSet<FareRule>();
@@ -185,12 +185,12 @@ public class Route implements Serializable {
 		this.textColor = textColor;
 	}
 
-	public Set<Trip> getTrips() {
-		return trips;
+	public Set<TripPattern> getTripPatterns() {
+		return tripPatterns;
 	}
 
-	public void setTrips(Set<Trip> trips) {
-		this.trips = trips;
+	public void setTripPatterns(Set<TripPattern> tripPatterns) {
+		this.tripPatterns = tripPatterns;
 	}
 	
 	public Set<FareRule> getFareRules() {
@@ -201,9 +201,9 @@ public class Route implements Serializable {
 		this.fareRules = fareRules;
 	}
 
-	public void addTrip(Trip trip) {
-		trip.setRoute(this);
-		trips.add(trip);
+	public void addTripPattern(TripPattern tripPattern) {
+		tripPattern.setRoute(this);
+		tripPatterns.add(tripPattern);
 	}
 	
 	public void addFareRule(FareRule fareRule) {

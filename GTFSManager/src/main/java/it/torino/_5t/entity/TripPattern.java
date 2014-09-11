@@ -1,8 +1,10 @@
 package it.torino._5t.entity;
 
 import java.io.Serializable;
-import java.sql.Time;
+import java.util.HashSet;
+import java.util.Set;
 
+import javax.persistence.CascadeType;
 import javax.persistence.Column;
 import javax.persistence.Entity;
 import javax.persistence.FetchType;
@@ -11,6 +13,7 @@ import javax.persistence.GenerationType;
 import javax.persistence.Id;
 import javax.persistence.JoinColumn;
 import javax.persistence.ManyToOne;
+import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
 import javax.validation.constraints.Max;
@@ -18,29 +21,22 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "trip")
-public class Trip implements Serializable{
+@Table(name = "trip_pattern")
+public class TripPattern implements Serializable{
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trip_id")
-	@SequenceGenerator(name = "trip_id", sequenceName = "trip_trip_id_seq")
-	@Column(name = "trip_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "trip_pattern_id")
+	@SequenceGenerator(name = "trip_pattern_id", sequenceName = "trip_pattern_trip_pattern_id_seq")
+	@Column(name = "trip_pattern_id")
 	private Integer id;
 	
-	@Column(name = "trip_gtfs_id")
+	@Column(name = "trip_pattern_gtfs_id")
 	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
 	private String gtfsId;
-	
-	@Column(name = "start_time")
-	private Time startTime;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trip_pattern_id")
-	private TripPattern tripPattern;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "route_id")
@@ -63,14 +59,7 @@ public class Trip implements Serializable{
 	@Max(1)
 	private Integer directionId;
 	
-	@Column(name = "block_id")
-	@Size(max = 50)
-	private String blockId;
-	
-	@Column(name = "single_trip")
-	private boolean singleTrip;
-	
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "shape_id")
 	private Shape shape;
 	
@@ -84,11 +73,14 @@ public class Trip implements Serializable{
 	@Max(2)
 	private Integer bikesAllowed;
 	
-//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "trip")
-//	private Set<Frequency> frequencies = new HashSet<Frequency>();
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "tripPattern")
+	private Set<Frequency> frequencies = new HashSet<Frequency>();
 	
-//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "trip")
-//	private Set<StopTime> stopTimes = new HashSet<StopTime>();
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "tripPattern")
+	private Set<StopTimeRelative> stopTimeRelatives = new HashSet<StopTimeRelative>();
+	
+	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "tripPattern")
+	private Set<Trip> trips = new HashSet<Trip>();
 
 	@Override
 	public int hashCode() {
@@ -106,7 +98,7 @@ public class Trip implements Serializable{
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		Trip other = (Trip) obj;
+		TripPattern other = (TripPattern) obj;
 		if (id == null) {
 			if (other.id != null)
 				return false;
@@ -129,38 +121,6 @@ public class Trip implements Serializable{
 
 	public void setGtfsId(String gtfsId) {
 		this.gtfsId = gtfsId;
-	}
-
-	public TripPattern getTripPattern() {
-		return tripPattern;
-	}
-
-	public void setTripPattern(TripPattern tripPattern) {
-		this.tripPattern = tripPattern;
-	}
-
-	public Time getStartTime() {
-		return startTime;
-	}
-
-	public void setStartTime(Time startTime) {
-		this.startTime = startTime;
-	}
-
-	public String getBlockId() {
-		return blockId;
-	}
-
-	public void setBlockId(String blockId) {
-		this.blockId = blockId;
-	}
-
-	public boolean isSingleTrip() {
-		return singleTrip;
-	}
-
-	public void setSingleTrip(boolean singleTrip) {
-		this.singleTrip = singleTrip;
 	}
 
 	public Route getRoute() {
@@ -227,29 +187,42 @@ public class Trip implements Serializable{
 		this.bikesAllowed = bikesAllowed;
 	}
 
-//	public Set<Frequency> getFrequencies() {
-//		return frequencies;
-//	}
-//	
-//	public void setFrequencies(Set<Frequency> frequencies) {
-//		this.frequencies = frequencies;
-//	}
+	public Set<Frequency> getFrequencies() {
+		return frequencies;
+	}
 
-//	public Set<StopTime> getStopTimes() {
-//		return stopTimes;
-//	}
-//
-//	public void setStopTimes(Set<StopTime> stopTimes) {
-//		this.stopTimes = stopTimes;
-//	}
+	public void setFrequencies(Set<Frequency> frequencies) {
+		this.frequencies = frequencies;
+	}
 	
-//	public void addFrequency(Frequency frequency) {
-//		frequency.setTrip(this);
-//		frequencies.add(frequency);
-//	}
+	public Set<StopTimeRelative> getStopTimeRelatives() {
+		return stopTimeRelatives;
+	}
 	
-//	public void addStopTime(StopTime stopTime) {
-//		stopTime.setTrip(this);
-//		stopTimes.add(stopTime);
-//	}
+	public void setStopTimeRelatives(Set<StopTimeRelative> stopTimeRelatives) {
+		this.stopTimeRelatives = stopTimeRelatives;
+	}
+	
+	public Set<Trip> getTrips() {
+		return trips;
+	}
+
+	public void setTrips(Set<Trip> trips) {
+		this.trips = trips;
+	}
+
+	public void addFrequency(Frequency frequency) {
+		frequency.setTripPattern(this);
+		frequencies.add(frequency);
+	}
+	
+	public void addStopTimeRelative(StopTimeRelative stopTimeRelative) {
+		stopTimeRelative.setTripPattern(this);
+		stopTimeRelatives.add(stopTimeRelative);
+	}
+	
+	public void addTrip(Trip trip) {
+		trip.setTripPattern(this);
+		trips.add(trip);
+	}
 }

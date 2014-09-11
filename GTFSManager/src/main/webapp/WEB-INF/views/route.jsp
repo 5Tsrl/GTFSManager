@@ -234,7 +234,7 @@
 						<th>Id</th>
 						<th>Nome abbreviato</th>
 						<th>Nome completo</th>
-						<th>Corse</th>
+						<th>Schemi corse</th>
 						<th class="hidden"></th>
 					</tr>
 				</thead>
@@ -254,18 +254,18 @@
 							<td>${linea.shortName}</td>
 							<td>${linea.longName}</td>
 							<td>
-								${fn:length(linea.trips)}
+								${fn:length(linea.tripPatterns)}
 								<c:choose>
 									<c:when test="${lineaAttiva.id == linea.id}">
-										<a class="btn btn-default" href="/_5t/corse">
+										<a class="btn btn-default" href="/_5t/schemiCorse">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/corse">
+										<a class="btn btn-default disabled" href="/_5t/schemiCorse">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
-									<c:when test="${fn:length(linea.trips) == 0}">Inserisci corse</c:when>
-									<c:when test="${fn:length(linea.trips) > 0}">Visualizza/modifica corse</c:when>
+									<c:when test="${fn:length(linea.tripPatterns) == 0}">Inserisci schemi corse</c:when>
+									<c:when test="${fn:length(linea.tripPatterns) > 0}">Visualizza/modifica schemi corse</c:when>
 								</c:choose>
 								</a>
 							</td>

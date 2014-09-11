@@ -31,8 +31,8 @@ public class Frequency implements Serializable {
 	private Integer id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trip_id")
-	private Trip trip;
+	@JoinColumn(name = "trip_pattern_id")
+	private TripPattern tripPattern;
 	
 	@Column(name = "start_time")
 	private Time startTime;
@@ -52,10 +52,10 @@ public class Frequency implements Serializable {
 	public Frequency() {
 	}
 
-	public Frequency(Trip trip, Time startTime, Time endTime, int headwaySecs,
+	public Frequency(TripPattern tripPattern, Time startTime, Time endTime, int headwaySecs,
 			Integer exactTimes) {
 		super();
-		this.trip = trip;
+		this.tripPattern = tripPattern;
 		this.startTime = startTime;
 		this.endTime = endTime;
 		this.headwaySecs = headwaySecs;
@@ -111,12 +111,12 @@ public class Frequency implements Serializable {
 		this.id = id;
 	}
 
-	public Trip getTrip() {
-		return trip;
+	public TripPattern getTripPattern() {
+		return tripPattern;
 	}
 
-	public void setTrip(Trip trip) {
-		this.trip = trip;
+	public void setTripPattern(TripPattern tripPattern) {
+		this.tripPattern = tripPattern;
 	}
 
 	public Time getStartTime() {

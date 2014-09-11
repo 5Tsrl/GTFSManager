@@ -18,28 +18,28 @@ import javax.validation.constraints.Min;
 import javax.validation.constraints.Size;
 
 @Entity
-@Table(name = "stop_time")
-public class StopTime implements Serializable {
+@Table(name = "stop_time_relative")
+public class StopTimeRelative implements Serializable {
 	/**
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
 
 	@Id
-	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stop_time_id")
-	@SequenceGenerator(name = "stop_time_id", sequenceName = "stop_time_stop_time_id_seq")
-	@Column(name = "stop_time_id")
+	@GeneratedValue(strategy = GenerationType.SEQUENCE, generator = "stop_time_relative_id")
+	@SequenceGenerator(name = "stop_time_relative_id", sequenceName = "stop_time_relative_stop_time_relative_id_seq")
+	@Column(name = "stop_time_relative_id")
 	private Integer id;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "trip_id")
-	private Trip trip;
+	@JoinColumn(name = "trip_pattern_id")
+	private TripPattern tripPattern;
 	
-	@Column(name = "arrival_time")
-	private Time arrivalTime;
+	@Column(name = "relative_arrival_time")
+	private Time relativeArrivalTime;
 	
-	@Column(name = "departure_time")
-	private Time departureTime;
+	@Column(name = "relative_departure_time")
+	private Time relativeDepartureTime;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "stop_id")
@@ -67,15 +67,16 @@ public class StopTime implements Serializable {
 	@Column(name = "shape_dist_traveled")
 	private Double shapeDistTraveled;
 
-	public StopTime() {
+	public StopTimeRelative() {
 	}
 
-	public StopTime(Time arrivalTime, Time departureTime,
-			Integer stopSequence, String stopHeadsign, Integer pickupType,
-			Integer dropOffType, Double shapeDistTraveled) {
+	public StopTimeRelative(Time relativeArrivalTime,
+			Time relativeDepartureTime, Integer stopSequence,
+			String stopHeadsign, Integer pickupType, Integer dropOffType,
+			Double shapeDistTraveled) {
 		super();
-		this.arrivalTime = arrivalTime;
-		this.departureTime = departureTime;
+		this.relativeArrivalTime = relativeArrivalTime;
+		this.relativeDepartureTime = relativeDepartureTime;
 		this.stopSequence = stopSequence;
 		this.stopHeadsign = stopHeadsign;
 		this.pickupType = pickupType;
@@ -88,9 +89,9 @@ public class StopTime implements Serializable {
 		final int prime = 31;
 		int result = 1;
 		result = prime * result
-				+ ((arrivalTime == null) ? 0 : arrivalTime.hashCode());
+				+ ((relativeArrivalTime == null) ? 0 : relativeArrivalTime.hashCode());
 		result = prime * result
-				+ ((departureTime == null) ? 0 : departureTime.hashCode());
+				+ ((relativeDepartureTime == null) ? 0 : relativeDepartureTime.hashCode());
 		result = prime * result + ((id == null) ? 0 : id.hashCode());
 		result = prime * result
 				+ ((stopSequence == null) ? 0 : stopSequence.hashCode());
@@ -105,16 +106,16 @@ public class StopTime implements Serializable {
 			return false;
 		if (getClass() != obj.getClass())
 			return false;
-		StopTime other = (StopTime) obj;
-		if (arrivalTime == null) {
-			if (other.arrivalTime != null)
+		StopTimeRelative other = (StopTimeRelative) obj;
+		if (relativeArrivalTime == null) {
+			if (other.relativeArrivalTime != null)
 				return false;
-		} else if (!arrivalTime.equals(other.arrivalTime))
+		} else if (!relativeArrivalTime.equals(other.relativeArrivalTime))
 			return false;
-		if (departureTime == null) {
-			if (other.departureTime != null)
+		if (relativeDepartureTime == null) {
+			if (other.relativeDepartureTime != null)
 				return false;
-		} else if (!departureTime.equals(other.departureTime))
+		} else if (!relativeDepartureTime.equals(other.relativeDepartureTime))
 			return false;
 		if (id == null) {
 			if (other.id != null)
@@ -137,28 +138,28 @@ public class StopTime implements Serializable {
 		this.id = id;
 	}
 
-	public Trip getTrip() {
-		return trip;
+	public TripPattern getTripPattern() {
+		return tripPattern;
 	}
 
-	public void setTrip(Trip trip) {
-		this.trip = trip;
+	public void setTripPattern(TripPattern tripPattern) {
+		this.tripPattern = tripPattern;
 	}
 
-	public Time getArrivalTime() {
-		return arrivalTime;
+	public Time getRelativeArrivalTime() {
+		return relativeArrivalTime;
 	}
 
-	public void setArrivalTime(Time arrivalTime) {
-		this.arrivalTime = arrivalTime;
+	public void setRelativeArrivalTime(Time relativeArrivalTime) {
+		this.relativeArrivalTime = relativeArrivalTime;
 	}
 
-	public Time getDepartureTime() {
-		return departureTime;
+	public Time getRelativeDepartureTime() {
+		return relativeDepartureTime;
 	}
 
-	public void setDepartureTime(Time departureTime) {
-		this.departureTime = departureTime;
+	public void setRelativeDepartureTime(Time relativeDepartureTime) {
+		this.relativeDepartureTime = relativeDepartureTime;
 	}
 
 	public Stop getStop() {

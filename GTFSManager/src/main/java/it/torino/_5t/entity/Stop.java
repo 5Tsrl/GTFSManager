@@ -92,7 +92,7 @@ public class Stop implements Serializable {
 	private Integer wheelchairBoarding;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "stop")
-	private Set<StopTime> stopTimes = new HashSet<StopTime>();
+	private Set<StopTimeRelative> stopTimeRelatives = new HashSet<StopTimeRelative>();
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE, orphanRemoval=true, mappedBy = "fromStop")
 	private Set<Transfer> fromStopTransfers = new HashSet<Transfer>();
@@ -244,13 +244,13 @@ public class Stop implements Serializable {
 	public void setWheelchairBoarding(Integer wheelchairBoarding) {
 		this.wheelchairBoarding = wheelchairBoarding;
 	}
-	
-	public Set<StopTime> getStopTimes() {
-		return stopTimes;
+
+	public Set<StopTimeRelative> getStopTimeRelatives() {
+		return stopTimeRelatives;
 	}
-	
-	public void setStopTimes(Set<StopTime> stopTimes) {
-		this.stopTimes = stopTimes;
+
+	public void setStopTimeRelatives(Set<StopTimeRelative> stopTimeRelatives) {
+		this.stopTimeRelatives = stopTimeRelatives;
 	}
 
 	public Set<Transfer> getFromStopTransfers() {
@@ -269,9 +269,9 @@ public class Stop implements Serializable {
 		this.toStopTransfers = toStopTransfers;
 	}
 	
-	public void addStopTime(StopTime stopTime) {
-		stopTime.setStop(this);
-		stopTimes.add(stopTime);
+	public void addStopTimeRelative(StopTimeRelative stopTimeRelative) {
+		stopTimeRelative.setStop(this);
+		stopTimeRelatives.add(stopTimeRelative);
 	}
 	
 	public void addChildStop(Stop stop) {

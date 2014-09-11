@@ -13,6 +13,7 @@ import it.torino._5t.dao.StopDAO;
 import it.torino._5t.dao.StopTimeDAO;
 import it.torino._5t.dao.TransferDAO;
 import it.torino._5t.dao.TripDAO;
+import it.torino._5t.dao.TripPatternDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
 import it.torino._5t.entity.CalendarDate;
@@ -23,9 +24,10 @@ import it.torino._5t.entity.Frequency;
 import it.torino._5t.entity.Route;
 import it.torino._5t.entity.Shape;
 import it.torino._5t.entity.Stop;
-import it.torino._5t.entity.StopTime;
+import it.torino._5t.entity.StopTimeRelative;
 import it.torino._5t.entity.Transfer;
 import it.torino._5t.entity.Trip;
+import it.torino._5t.entity.TripPattern;
 
 import java.awt.geom.Point2D;
 import java.io.File;
@@ -38,6 +40,9 @@ import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
+import java.util.GregorianCalendar;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -151,6 +156,8 @@ public class ExportGTFSController {
 	private TransferDAO transferDAO;
 	@Autowired
 	private TripDAO tripDAO;
+	@Autowired
+	private TripPatternDAO tripPatternDAO;
 	
 	private FeedInfo currentFeedInfo;
 
@@ -403,7 +410,7 @@ public class ExportGTFSController {
 	private void fillFrequencies() throws IOException {
 		String row = new String();
 		for (Frequency f: frequencyDAO.getAllFrequencies()) {
-			row += f.getTrip().getGtfsId() + ",";
+//			row += f.getTrip().getGtfsId() + ",";
 			row += formatTime(f.getStartTime()) + ",";
 			String endTime = formatTime(f.getEndTime());
 			if (f.getStartTime().after(f.getEndTime())) {
@@ -477,32 +484,47 @@ public class ExportGTFSController {
 	
 	private void fillStopTimes() throws IOException {
 		String row = new String();
-		for (StopTime st: stopTimeDAO.getAllStopTimes()) {
-			row += st.getTrip().getGtfsId() + ",";
-			String arrivalTime = formatTime(st.getArrivalTime());
-			if (st.isContinueFromPreviousDay()) {
-				// if arrival and departure times continue from previous day, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
-				String[] arrival = arrivalTime.split(":");
-				int hhArr = Integer.parseInt(arrival[0]) + 24;
-				row += hhArr + ":" + arrival[1] + ":" + arrival[2] + ",";
-			} else {
-				row += arrivalTime + ",";
+		for (TripPattern tp: tripPatternDAO.getAllTripPatterns()) {
+			List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>(tp.getStopTimeRelatives());
+			Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
+			for (Trip t: tp.getTrips()) {
+				java.util.Calendar cal = new GregorianCalendar();
+				cal.setTime(t.getStartTime());
+				if (t.isSingleTrip()) {
+					// corsa singola
+					for (StopTimeRelative str: stopTimeRelatives) {
+						row += t.getGtfsId() + ",";
+						java.util.Calendar toAdd = new GregorianCalendar();
+						toAdd.setTime(str.getRelativeArrivalTime());
+						cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+						row += formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0)) + ",";
+						toAdd.setTime(str.getRelativeDepartureTime());
+						cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+						row += formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0)) + ",";
+						row += str.getStop().getGtfsId() + ",";
+						row += str.getStopSequence() + ",";
+						row += str.getStopHeadsign() + ",";
+						row += formatOptionalInteger(str.getPickupType()) + ",";
+						row += formatOptionalInteger(str.getDropOffType()) + ",";
+						row += formatOptionalDouble(str.getShapeDistTraveled()) + "\n";
+					}
+				} else {
+					// corsa a frequenza
+					for (StopTimeRelative str: stopTimeRelatives) {
+						row += t.getGtfsId() + ",";
+						row += formatTime(str.getRelativeArrivalTime()) + ",";
+						row += formatTime(str.getRelativeDepartureTime()) + ",";
+						row += str.getStop().getGtfsId() + ",";
+						row += str.getStopSequence() + ",";
+						row += str.getStopHeadsign() + ",";
+						row += formatOptionalInteger(str.getPickupType()) + ",";
+						row += formatOptionalInteger(str.getDropOffType()) + ",";
+						row += formatOptionalDouble(str.getShapeDistTraveled()) + "\n";
+					}
+				}
 			}
-			String departureTime = formatTime(st.getDepartureTime());
-			if (st.getArrivalTime().after(st.getDepartureTime()) || st.isContinueFromPreviousDay()) {
-				// if arrival time > departure time or arrival and departure times continue from previous day, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
-				String[] departure = departureTime.split(":");
-				int hhDep = Integer.parseInt(departure[0]) + 24;
-				row += hhDep + ":" + departure[1] + ":" + departure[2] + ",";
-			} else {
-				row += departureTime + ",";
-			}
-			row += st.getStop().getGtfsId() + ",";
-			row += st.getStopSequence() + ",";
-			row += st.getStopHeadsign() + ",";
-			row += formatOptionalInteger(st.getPickupType()) + ",";
-			row += formatOptionalInteger(st.getDropOffType()) + ",";
-			row += formatOptionalDouble(st.getShapeDistTraveled()) + "\n";
 		}
 		stopTimeOutput.write(row.getBytes());
 		logger.info("stop_times.txt completato.");
@@ -529,7 +551,7 @@ public class ExportGTFSController {
 			row += t.getTripHeadsign() + ",";
 			row += t.getTripShortName() + ",";
 			row += formatOptionalInteger(t.getDirectionId()) + ",";
-			//TODO: row += (t.getBlock()  != null ? t.getBlock().getId() : "") + ",";
+			row += t.getBlockId() + ",";
 			row += (t.getShape()  != null ? t.getShape().getId() : "") + ",";
 			row += formatOptionalInteger(t.getWheelchairAccessible()) + ",";
 			row += formatOptionalInteger(t.getBikesAllowed()) + "\n";
@@ -677,5 +699,14 @@ public class ExportGTFSController {
 	    double dist = (double) (earthRadius * c);
 
 	    return dist;
+	}
+	
+	public class StopTimeRelativeComparator implements Comparator<StopTimeRelative> {
+
+		@Override
+		public int compare(StopTimeRelative o1, StopTimeRelative o2) {
+			return o1.getStopSequence().compareTo(o2.getStopSequence());
+		}
+		
 	}
 }

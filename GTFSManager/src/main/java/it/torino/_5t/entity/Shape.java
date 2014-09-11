@@ -33,24 +33,12 @@ public class Shape implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
-	/*
-	@Column(name = "shape_pt_lat")
-	private double lat;
 	
-	@Column(name = "shape_pt_lon")
-	private double lon;
-	
-	@Column(name = "shape_pt_sequence")
-	private int sequence;
-	
-	@Column(name = "shape_dist_traveled")
-	private Double shapeDistTraveled;
-	*/
 	@Column(name = "shape_encoded_polyline")
 	private String encodedPolyline;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "shape")
-	private Set<Trip> trips = new HashSet<Trip>();
+	private Set<TripPattern> tripPatterns = new HashSet<TripPattern>();
 	
 	@Override
 	public int hashCode() {
@@ -132,17 +120,17 @@ public class Shape implements Serializable {
 	public void setEncodedPolyline(String encodedPolyline) {
 		this.encodedPolyline = encodedPolyline;
 	}
-
-	public Set<Trip> getTrips() {
-		return trips;
-	}
-
-	public void setTrips(Set<Trip> trips) {
-		this.trips = trips;
-	}
 	
-	public void addTrip(Trip trip) {
-		trip.setShape(this);
-		trips.add(trip);
+	public Set<TripPattern> getTripPatterns() {
+		return tripPatterns;
+	}
+
+	public void setTripPatterns(Set<TripPattern> tripPatterns) {
+		this.tripPatterns = tripPatterns;
+	}
+
+	public void addTripPattern(TripPattern tripPattern) {
+		tripPattern.setShape(this);
+		tripPatterns.add(tripPattern);
 	}
 }

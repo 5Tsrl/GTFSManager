@@ -31,4 +31,16 @@ public class StopTimeDAOImpl implements StopTimeDAO {
 		return null;
 	}
 
+	@Override
+	public void addStopTime(StopTime stopTime) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.save(stopTime);
+	}
+
+	@Override
+	public void deleteStopTime(StopTime stopTime) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.delete(stopTime);
+	}
+
 }

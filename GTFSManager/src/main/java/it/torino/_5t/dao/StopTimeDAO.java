@@ -7,4 +7,6 @@ import java.util.List;
 public interface StopTimeDAO {
 	public List<StopTime> getAllStopTimes();
 	public StopTime getStopTime(Integer id);
+	public void addStopTime(StopTime stopTime);
+	public void deleteStopTime(StopTime stopTime);
 }

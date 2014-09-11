@@ -28,33 +28,8 @@
 	<script type="text/javascript" src="<c:url value='/resources/js/leaflet.encoded-polyline.js' />"></script>
 	<script type="text/javascript" src="<c:url value='/resources/js/timezones.js' />"></script>
 	<script type="text/javascript">
-	// create trip-stop association form validation 
-	function validateCreaFermataCorsaForm() {
-		if (document.forms["creaFermataCorsaForm"]["sameDay"].checked) {
-			// if arrival and departure time are in the same day check if arrival time > departure time
-			var arrivalTime = document.forms["creaFermataCorsaForm"]["arrival"].value;
-			var departureTime = document.forms["creaFermataCorsaForm"]["departure"].value;
-			if (arrivalTime > departureTime) {
-				$("#wrong-times").show();
-				return false;
-			}
-		}
-		
-		return true;
-	};
-	
 	// edit trip-stop association form validation 
 	function validateModificaFermataCorsaForm() {
-		if (document.forms["modificaFermataCorsaForm"]["sameDay"].checked) {
-			// if arrival and departure time are in the same day check if arrival time > departure time
-			var arrivalTime = document.forms["modificaFermataCorsaForm"]["arrival"].value;
-			var departureTime = document.forms["modificaFermataCorsaForm"]["departure"].value;
-			if (arrivalTime > departureTime) {
-				$("#wrong-times").show();
-				return false;
-			}
-		}
-		
 		// check if stop number > max between all stop numbers
 		var stopSequence = document.forms["modificaFermataCorsaForm"]["stopSequence"].value;
 		var stopSequences = [];
@@ -126,7 +101,7 @@
 		
 		// per ogni fermata dell'agenzia non associata alla corsa attiva (listaFermate) creo un marker, con un popup contenente il form per l'associazione con la corsa
 		<c:forEach var="fermata" items="${listaFermate}">
-			var popupContent = '<form:form name="creaFermataCorsaForm" commandName="stopTime" method="post" role="form" onsubmit="return validateCreaFermataCorsaForm()">' +
+			var popupContent = '<form:form name="creaFermataCorsaForm" commandName="stopTimeRelative" method="post" role="form">' +
 									"<b>Fermata: </b> ${fermata.name}" +
 									'<input name="stopId" type="hidden" value="${fermata.id}" />' +
 									'<div class="row">' +
@@ -140,18 +115,6 @@
 											'<label for="departure" class="required">Ora partenza</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
 										'</div>' +
-									'</div>' +
-									'<div class="checkbox">' +
-										'<label>' +
-							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora partenza e arrivo nello stesso giorno' +
-										'</label>' +
-										'<p class="help-block">Deselezionare solo se l\'ora di arrivo è nel giorno successivo all\'ora di partenza.</p>' + 
-									'</div>' +
-									'<div class="checkbox">' +
-										'<label>' +
-							    			'<form:checkbox path="continueFromPreviousDay" id="continueFromPreviousDay" />Ora partenza e arrivo continuano dal giorno precedente' +
-										'</label>' +
-										'<p class="help-block">Selezionare solo se gli orari di arrivo e partenza continuano dal giorno precedente (una delle precedenti fermate ha orari del giorno precedente es. 23:58, mentre questa ha orari nel giorno successivo es. 00:02).</p>' + 
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
@@ -201,7 +164,7 @@
 		
 		// per ogni fermata associata alla corsa attiva (listaFermateCorsa) creo un marker, con un popup contenente il form per la modifica dell'associazione con la corsa
 		<c:forEach var="fermataCorsa" items="${listaFermateCorsa}">
-			var popupContent = '<form:form name="modificaFermataCorsaForm" commandName="stopTime" method="post" role="form" action="/_5t/modificaFermataCorsa" onsubmit="return validateModificaFermataCorsaForm()">' +
+			var popupContent = '<form:form name="modificaFermataCorsaForm" commandName="stopTimeRelative" method="post" role="form" action="/_5t/modificaFermataCorsa" onsubmit="return validateModificaFermataCorsaForm()">' +
 									"<b>Fermata: </b> ${fermataCorsa.stop.name}" +
 									'<input name="stopTimeId" type="hidden" value="${fermataCorsa.id}" />' +
 									'<div class="row">' +
@@ -214,33 +177,14 @@
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="arrival" class="required">Ora arrivo</label>' +
-											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.arrivalTime}" required="true" />' +
+											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.relativeArrivalTime}" required="true" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="departure" class="required">Ora partenza</label>' +
-											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.departureTime}" required="true" />' +
+											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.relativeDepartureTime}" required="true" />' +
 										'</div>' +
-									'</div>' +
-									'<div class="checkbox">' +
-										'<label>' +
-							    			'<input type="checkbox" name="sameDay" id="sameDay" checked>Ora partenza e arrivo nello stesso giorno' +
-										'</label>' +
-										'<p class="help-block">Deselezionare solo se l\'ora di arrivo è nel giorno successivo all\'ora di partenza.</p>' + 
-									'</div>' +
-									'<div class="checkbox">' +
-										'<label>';
-			<c:choose>
-				<c:when test="${not fermataCorsa.continueFromPreviousDay}">
-						popupContent += '<form:checkbox path="continueFromPreviousDay" id="continueFromPreviousDay" />Ora partenza e arrivo continuano dal giorno precedente';
-				</c:when>
-				<c:otherwise>
-						popupContent += '<form:checkbox path="continueFromPreviousDay" id="continueFromPreviousDay" checked="true" />Ora partenza e arrivo continuano dal giorno precedente';
-				</c:otherwise>
-			</c:choose>							
-							popupContent += '</label>' +
-										'<p class="help-block">Selezionare solo se gli orari di arrivo e partenza continuano dal giorno precedente (una delle precedenti fermate ha orari del giorno precedente es. 23:58, mentre questa ha orari nel giorno successivo es. 00:02).</p>' + 
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
@@ -396,7 +340,7 @@
 	<ol class="breadcrumb">
 		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
 		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-		<li><a href="/_5t/corse">Corsa ${corsaAttiva.tripShortName}</a></li>
+		<li><a href="/_5t/schemiCorse">Schema corsa ${schemaCorsaAttivo.gtfsId}</a></li>
 		<li class="active">Fermate</li>
 	</ol>
 	

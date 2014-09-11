@@ -69,7 +69,7 @@ public class Calendar implements Serializable{
 	private Date endDate;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "calendar")
-	private Set<Trip> trips = new HashSet<Trip>();
+	private Set<TripPattern> tripPatterns = new HashSet<TripPattern>();
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "calendar")
 	private Set<CalendarDate> calendarDates = new HashSet<CalendarDate>();
@@ -195,12 +195,12 @@ public class Calendar implements Serializable{
 		this.endDate = endDate;
 	}
 
-	public Set<Trip> getTrips() {
-		return trips;
+	public Set<TripPattern> getTripPatterns() {
+		return tripPatterns;
 	}
 
-	public void setTrips(Set<Trip> trips) {
-		this.trips = trips;
+	public void setTripPatterns(Set<TripPattern> tripPatterns) {
+		this.tripPatterns = tripPatterns;
 	}
 	
 	public Set<CalendarDate> getCalendarDates() {
@@ -211,9 +211,9 @@ public class Calendar implements Serializable{
 		this.calendarDates = calendarDates;
 	}
 
-	public void addTrip(Trip trip) {
-		trip.setCalendar(this);
-		trips.add(trip);
+	public void addTripPattern(TripPattern tripPattern) {
+		tripPattern.setCalendar(this);
+		tripPatterns.add(tripPattern);
 	}
 	
 	public void addCalendarDate(CalendarDate calendarDate) {
