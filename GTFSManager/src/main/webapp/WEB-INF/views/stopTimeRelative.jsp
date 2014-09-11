@@ -1,7 +1,18 @@
+<%@page import="java.util.Comparator"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.util.Set"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="it.torino._5t.entity.StopTimeRelative"%>
+<%@page import="java.sql.Time"%>
+<%@page import="java.util.GregorianCalendar"%>
+<%@page import="java.util.Calendar"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib prefix="form" uri="http://www.springframework.org/tags/form"%>
 <!DOCTYPE html PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
@@ -15,6 +26,7 @@
 	<link href="<c:url value='/resources/css/leaflet.label.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.markcluster.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
+	<link href="<c:url value='/resources/css/timeline.css' />" type="text/css" rel="stylesheet">
 	<link href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css" type="text/css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
@@ -377,6 +389,51 @@
 		<br><br><br><br><br><br>
 		<div class="row col-lg-12">
 			<a type="button" class="btn btn-default" href="/_5t/fermate">Aggiungi altre fermate all'agenzia</a>
+		</div>
+		<br><br><br>
+		<div class="row col-lg-12">
+			<ul class="timeline">
+				<%
+				class StopTimeRelativeComparator implements Comparator<StopTimeRelative> {
+
+					@Override
+					public int compare(StopTimeRelative o1, StopTimeRelative o2) {
+						return o1.getStopSequence().compareTo(o2.getStopSequence());
+					}
+					
+				}
+				List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
+				Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
+				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+				Calendar cal = new GregorianCalendar();
+				cal.setTime(new Time(0, 0, 0));
+				for (StopTimeRelative str: stopTimeRelatives) {
+				%>
+			        <li class="timeline-inverted">
+				        <div class="timeline-badge"></div>
+				        <div class="timeline-panel">
+			            	<div class="timeline-heading">
+			              		<h4 class="timeline-title"><% out.write(str.getStop().getName()); %></h4>
+			            	</div>
+				            <div class="timeline-body">
+				            	<%
+				            	Calendar toAdd = new GregorianCalendar();
+				            	toAdd.setTime(str.getRelativeArrivalTime());
+				            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+								cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+				            	%>
+				              	<p>Arrivo: <% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></p>
+				            	<%
+				            	toAdd.setTime(str.getRelativeDepartureTime());
+				            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+								cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+				            	%>
+				              	<p>Partenza: <% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></p>
+				            </div>
+			          	</div>
+			        </li>
+				<% } %>
+		    </ul>
 		</div>
 	</div>
 	
