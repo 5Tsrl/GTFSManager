@@ -21,12 +21,10 @@
 	<mapping class="it.torino._5t.entity.Trip"/>
 	<mapping class="it.torino._5t.entity.Calendar"/>
 	<mapping class="it.torino._5t.entity.CalendarDate"/>
-	<mapping class="it.torino._5t.entity.Frequency"/>
 	<mapping class="it.torino._5t.entity.FareAttribute"/>
 	<mapping class="it.torino._5t.entity.FareRule"/>
 	<mapping class="it.torino._5t.entity.Zone"/>
 	<mapping class="it.torino._5t.entity.Stop"/>
-	<mapping class="it.torino._5t.entity.StopTime"/>
 	<mapping class="it.torino._5t.entity.Transfer"/>
 	<mapping class="it.torino._5t.entity.FeedInfo"/>
 	<mapping class="it.torino._5t.entity.Shape"/>

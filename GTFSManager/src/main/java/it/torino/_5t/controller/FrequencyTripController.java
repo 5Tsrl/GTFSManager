@@ -32,8 +32,8 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 
 @Controller
-public class SingleTripController {
-	private static final Logger logger = LoggerFactory.getLogger(SingleTripController.class);
+public class FrequencyTripController {
+	private static final Logger logger = LoggerFactory.getLogger(FrequencyTripController.class);
 	
 	@Autowired
 	private TripDAO tripDAO;
@@ -48,7 +48,7 @@ public class SingleTripController {
 	@Autowired
 	private ShapeDAO shapeDAO;
 	
-	@RequestMapping(value = "/corseSingole", method = RequestMethod.GET)
+	@RequestMapping(value = "/corseAFrequenza", method = RequestMethod.GET)
 	public String showTrips(Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
@@ -64,31 +64,31 @@ public class SingleTripController {
 		
 		logger.info("Visualizzazione lista corse singole di " + tp.getGtfsId() + ".");
 		
-		List<Trip> singleTrips = new ArrayList<Trip>();
+		List<Trip> frequencyTrips = new ArrayList<Trip>();
 		for (Trip t: tp.getTrips()) {
-			if (t.isSingleTrip())
-				singleTrips.add(t);
+			if (!t.isSingleTrip())
+				frequencyTrips.add(t);
 		}
-		model.addAttribute("listaCorseSingole", singleTrips);
+		model.addAttribute("listaCorseAFrequenza", frequencyTrips);
 		model.addAttribute("listaCalendari", agency.getCalendars());
 		model.addAttribute("listaFermateCorsa", tp.getStopTimeRelatives());
 		model.addAttribute("trip", new Trip());
 		
-		return "singleTrip";
+		return "frequencyTrip";
 	}
 	
 	// chiamata quando clicco sul pulsante "Crea uno schema corsa"
-	@RequestMapping(value = "/creaCorsaSingola", method = RequestMethod.GET)
+	@RequestMapping(value = "/creaCorsaAFrequenza", method = RequestMethod.GET)
 	public String showCreateTripForm(RedirectAttributes redirectAttributes, HttpSession session) {
 		redirectAttributes.addFlashAttribute("showCreateForm", true);
 		redirectAttributes.addFlashAttribute("trip", new Trip());
 		
-		return "redirect:corseSingole";
+		return "redirect:corseAFrequenza";
 	}
 	
 	// chiamata al submit del form per la creazione di una nuova corsa
-	@RequestMapping(value = "/corseSingole", method = RequestMethod.POST)
-	public String submitTripForm(@ModelAttribute @Valid Trip trip, BindingResult bindingResult, @RequestParam("serviceId") Integer serviceId, @RequestParam("start") String startTime, Model model, HttpSession session) {
+	@RequestMapping(value = "/corseAFrequenza", method = RequestMethod.POST)
+	public String submitTripForm(@ModelAttribute @Valid Trip trip, BindingResult bindingResult, @RequestParam("serviceId") Integer serviceId, @RequestParam("start") String startTime, @RequestParam("end") String endTime, Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -106,31 +106,31 @@ public class SingleTripController {
 		}
 		tripPatternDAO.updateTripPattern(tripPattern);
 		
-		List<Trip> singleTrips = new ArrayList<Trip>();
+		List<Trip> frequencyTrips = new ArrayList<Trip>();
 		for (Trip t: tripPattern.getTrips()) {
-			if (t.isSingleTrip())
-				singleTrips.add(t);
+			if (!t.isSingleTrip())
+				frequencyTrips.add(t);
 		}
 		
 		for (Trip t: tripPattern.getTrips()) {
 			if (t.getGtfsId().equals(trip.getGtfsId())) {
-				logger.error("L'id della corsa singola è già presente");
-				model.addAttribute("listaCorseSingole", singleTrips);
+				logger.error("L'id della corsa a frequenza è già presente");
+				model.addAttribute("listaCorseAFrequenza", frequencyTrips);
 				model.addAttribute("listaCalendari", a.getCalendars());
 				model.addAttribute("listaFermateCorsa", tripPattern.getStopTimeRelatives());
 				model.addAttribute("showCreateForm", true);
 				model.addAttribute("showAlertDuplicateTrip", true);
-				return "singleTrip";
+				return "frequencyTrip";
 			}
 		}
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della corsa");
-			model.addAttribute("listaCorseSingole", singleTrips);
+			model.addAttribute("listaCorseAFrequenza", frequencyTrips);
 			model.addAttribute("listaCalendari", agency.getCalendars());
 			model.addAttribute("listaFermateCorsa", tripPattern.getStopTimeRelatives());
 			model.addAttribute("showCreateForm", true);
-			return "singleTrip";
+			return "frequencyTrip";
 		}
 		
 		for (Route r: a.getRoutes()) {
@@ -143,8 +143,11 @@ public class SingleTripController {
 						String[] startT = startTime.split(":");
 						Time start = new Time(Integer.parseInt(startT[0]), Integer.parseInt(startT[1]), 0);
 						trip.setStartTime(start);
+						String[] endT = endTime.split(":");
+						Time end = new Time(Integer.parseInt(endT[0]), Integer.parseInt(endT[1]), 0);
+						trip.setEndTime(end);
 						tp.addTrip(trip);
-						session.setAttribute("corsaSingolaAttiva", trip);
+						session.setAttribute("corsaAFrequenzaAttiva", trip);
 						session.setAttribute("schemaCorsaAttivo", tp);
 						session.setAttribute("agenziaAttiva", a);
 						break;
@@ -154,14 +157,14 @@ public class SingleTripController {
 			}
 		}
 		
-		logger.info("Corsa singola creata: " + trip.getGtfsId() + ".");
+		logger.info("Corsa a frequenza creata: " + trip.getGtfsId() + ".");
 		
 		
-		return "redirect:corseSingole";
+		return "redirect:corseAFrequenza";
 	}
 	
 	// chiamata quando seleziono uno schema corsa (verrà salvata nella sessione)
-	@RequestMapping(value = "/selezionaCorsaSingola", method = RequestMethod.GET)
+	@RequestMapping(value = "/selezionaCorsaAFrequenza", method = RequestMethod.GET)
 	public String selectTrip(@RequestParam("id") Integer tripId, RedirectAttributes redirectAttributes, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
@@ -171,18 +174,18 @@ public class SingleTripController {
 		
 		Trip trip = tripDAO.getTrip(tripId);
 		
-		logger.info("Corsa singola selezionata: " + trip.getGtfsId() + ".");
+		logger.info("Corsa a frequenza selezionata: " + trip.getGtfsId() + ".");
 		
 		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
 
 		session.removeAttribute("servizioAttivo");
-		session.setAttribute("corsaSingolaAttiva", trip);
+		session.setAttribute("corsaAFrequenzaAttiva", trip);
 		
-		return "redirect:corseSingole";
+		return "redirect:corseAFrequenza";
 	}
 	
 	// chiamata quando clicco sul pulsante "Elimina"
-	@RequestMapping(value = "/eliminaCorsaSingola", method = RequestMethod.GET)
+	@RequestMapping(value = "/eliminaCorsaAFrequenza", method = RequestMethod.GET)
 	public String deleteTrip(Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
@@ -200,9 +203,9 @@ public class SingleTripController {
 			return "redirect:schemiCorse";
 		}
 		
-		Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva");
+		Trip trip = (Trip) session.getAttribute("corsaAFrequenzaAttiva");
 		if (trip == null) {
-			return "redirect:corseSingole";
+			return "redirect:corseAFrequenza";
 		}
 		
 		// cerco tra le linee dell'agenzia quella attiva e le tolgo lo schema corsa selezionato
@@ -220,16 +223,16 @@ public class SingleTripController {
 			}
 		}
 		
-		logger.info("Corsa singola eliminata: " + trip.getGtfsId() + ".");
+		logger.info("Corsa a frequenza eliminata: " + trip.getGtfsId() + ".");
 		
-		session.removeAttribute("corsaSingolaAttiva");
+		session.removeAttribute("corsaAFrequenzaAttiva");
 		session.setAttribute("agenziaAttiva", a);
 		
-		return "redirect:corseSingole";
+		return "redirect:corseAFrequenza";
 	}
 	
 	// chiamata quando clicco sul pulsante "Modifica schema corsa"
-	@RequestMapping(value = "/modificaCorsaSingola", method = RequestMethod.GET)
+	@RequestMapping(value = "/modificaCorsaAFrequenza", method = RequestMethod.GET)
 	public String showEditTripForm(RedirectAttributes redirectAttributes, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
@@ -237,21 +240,21 @@ public class SingleTripController {
 		}
 		Agency a = agencyDAO.loadAgency(agency.getId());
 		
-		Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva");
+		Trip trip = (Trip) session.getAttribute("corsaAFrequenzaAttiva");
 		if (trip == null) {
-			return "redirect:corseSingole";
+			return "redirect:corseAFrequenza";
 		}
 		
 		redirectAttributes.addFlashAttribute("showEditForm", true);
 		redirectAttributes.addFlashAttribute("trip", trip);
 		redirectAttributes.addFlashAttribute("listaCalendari", a.getCalendars());
 		
-		return "redirect:corseSingole";
+		return "redirect:corseAFrequenza";
 	}
 	
 	// chiamata al submit del form per la modifica di uno schema corsa
-	@RequestMapping(value = "/modificaCorsaSingola", method = RequestMethod.POST)
-	public String editTrip(@ModelAttribute @Valid Trip trip, BindingResult bindingResult, @RequestParam("serviceId") Integer serviceId, @RequestParam("start") String startTime, Model model, HttpSession session) {
+	@RequestMapping(value = "/modificaCorsaAFrequenza", method = RequestMethod.POST)
+	public String editTrip(@ModelAttribute @Valid Trip trip, BindingResult bindingResult, @RequestParam("serviceId") Integer serviceId, @RequestParam("start") String startTime, @RequestParam("end") String endTime, Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -269,36 +272,36 @@ public class SingleTripController {
 		}
 		tripPatternDAO.updateTripPattern(tripPattern);
 		
-		Trip activetrip = (Trip) session.getAttribute("corsaSingolaAttiva");
+		Trip activetrip = (Trip) session.getAttribute("corsaAFrequenzaAttiva");
 		if (activetrip == null) {
-			return "redirect:corseSingole";
+			return "redirect:corseAFrequenza";
 		}
 		
-		List<Trip> singleTrips = new ArrayList<Trip>();
+		List<Trip> frequencyTrips = new ArrayList<Trip>();
 		for (Trip t: tripPattern.getTrips()) {
-			if (t.isSingleTrip())
-				singleTrips.add(t);
+			if (!t.isSingleTrip())
+				frequencyTrips.add(t);
 		}
 		
 		for (Trip t: tripPattern.getTrips()) {
 			if (!activetrip.getGtfsId().equals(trip.getGtfsId()) && t.getGtfsId().equals(trip.getGtfsId())) {
-				logger.error("L'id della corsa singola è già presente");
-				model.addAttribute("listaCorseSingole", singleTrips);
+				logger.error("L'id della corsa a frequenza è già presente");
+				model.addAttribute("listaCorseAFrequenza", frequencyTrips);
 				model.addAttribute("listaCalendari", a.getCalendars());
 				model.addAttribute("listaFermateCorsa", tripPattern.getStopTimeRelatives());
 				model.addAttribute("showCreateForm", true);
 				model.addAttribute("showAlertDuplicateTrip", true);
-				return "singleTrip";
+				return "frequencyTrip";
 			}
 		}
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della corsa");
-			model.addAttribute("listaCorseSingole", singleTrips);
+			model.addAttribute("listaCorseAFrequenza", frequencyTrips);
 			model.addAttribute("listaCalendari", agency.getCalendars());
 			model.addAttribute("listaFermateCorsa", tripPattern.getStopTimeRelatives());
 			model.addAttribute("showCreateForm", true);
-			return "singleTrip";
+			return "frequencyTrip";
 		}
 		
 		Calendar calendar = calendarDAO.getCalendar(serviceId);
@@ -321,10 +324,15 @@ public class SingleTripController {
 								String[] startT = startTime.split(":");
 								Time start = new Time(Integer.parseInt(startT[0]), Integer.parseInt(startT[1]), 0);
 								t.setStartTime(start);
-								session.setAttribute("corsaSingolaAttiva", t);
+								String[] endT = endTime.split(":");
+								Time end = new Time(Integer.parseInt(endT[0]), Integer.parseInt(endT[1]), 0);
+								t.setEndTime(end);
+								t.setHeadwaySecs(trip.getHeadwaySecs());
+								t.setExactTimes(trip.getExactTimes());
+								session.setAttribute("corsaAFrequenzaAttiva", t);
 								session.setAttribute("schemaCorsaAttivo", tp);
 								session.setAttribute("lineaAttiva", r);
-								logger.info("Corsa singola modificata: " + t.getGtfsId() + ".");
+								logger.info("Corsa a frequenza modificata: " + t.getGtfsId() + ".");
 								break;
 							}
 						}
@@ -337,7 +345,7 @@ public class SingleTripController {
 		
 		session.setAttribute("agenziaAttiva", a);
 		
-		return "redirect:corseSingole";
+		return "redirect:corseAFrequenza";
 	}
 	
 //	// chiamata al submit del form per la duplicazione di una corsa

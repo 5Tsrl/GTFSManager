@@ -169,7 +169,7 @@
 		<li class="active">Gestione GTFS</li>
 	</ol>
 	
-	<div class="col-md-6">
+	<div class="col-md-8">
 		<table id="listaGTFS" class="table sortable">
 			<thead>
 				<tr>
@@ -183,34 +183,20 @@
 			</thead>
 			<tbody>
 				<c:forEach var="gtfs" items="${listaGTFS}">
-<%-- 				<% --%>
-<!-- 				String pathDir = (String) request.getAttribute("GTFSHistoryDirName"); -->
-<!-- 				java.io.File dir = new java.io.File(pathDir); -->
-<!-- 				java.io.File file; -->
-<!-- 				String[] list = dir.list(); -->
-<!-- 				if (list != null && list.length > 0) { -->
-<!-- 					for (int i=0; i<list.length; i++) { -->
-<!-- 						file = new java.io.File(pathDir + list[i]); -->
-<!-- 				%> -->
 					<tr>
-<%-- 						<td><a href="/_5t/scaricaGTFS?file=<%= list[i] %>"><%= list[i] %></a></td> --%>
 						<td><a href="/_5t/scaricaGTFS?id=${gtfs.id}">${gtfs.name}</a></td>
 						<td>${gtfs.version}</td>
-						<td>${gtfs.startDate}</td>
-						<td>${gtfs.endDate}</td>
+						<td><fmt:formatDate type="date" dateStyle="short" timeStyle="short" value="${gtfs.startDate}" /></td>
+						<td><fmt:formatDate type="date" dateStyle="short" timeStyle="short" value="${gtfs.endDate}" /></td>
 						<td>${gtfs.description}</td>
 						<td class="hidden">${gtfs.id}</td>
 					</tr>
-<%-- 				<% --%>
-<!-- 					} -->
-<!-- 				} -->
-<!-- 				%> -->
 				</c:forEach>
 			</tbody>
 		</table>
 	</div>
 	
-	<div class="col-md-6">
+	<div class="col-md-4">
 		<div class="row">
 			<button id="creaGTFSButton" class="btn btn-primary">Crea GTFS</button>
 			<button id="eliminaGTFSButton" type="button" class="btn btn-danger">Elimina GTFS</button>
@@ -219,42 +205,42 @@
 		<div id="creaGTFS">
 			<form:form id="creaGTFSForm" commandName="feedInfo" method="post" role="form" action="/_5t/creaGTFS">
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="publisherName" class="required">Pubblicato da</label>
 			    		<form:input path="publisherName" class="form-control" id="publisherName" placeholder="Inserire il nome del pubblicatore" required="true" maxlength="50" />
 			    		<form:errors path="publisherName" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="publisherUrl" class="required">Sito web</label>
 			    		<form:input path="publisherUrl" class="form-control" id="publisherUrl" placeholder="Inserire l'url del pubblicatore" required="true" maxlength="255" />
 			    		<form:errors path="publisherUrl" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="language" class="required">Lingua</label>
 			    		<form:input path="language" class="form-control" id="language" placeholder="Inserire la lingua" required="true" maxlength="20" />
 			    		<form:errors path="language" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="startDate">Data inizio</label>
 			    		<form:input path="startDate" class="form-control" id="startDate" type="date" />
 			    		<form:errors path="startDate" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="endDate">Data fine</label>
 			    		<form:input path="endDate" class="form-control" id="endDate" type="date" />
 			    		<form:errors path="endDate" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="name">Nome</label>
 						<jsp:useBean id="now" class="java.util.Date" />
 						<fmt:formatDate pattern="yyyy-MM-dd HH.mm.ss" value="${now}" var="formattedNow" />
@@ -263,21 +249,21 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="version">Versione</label>
 			    		<form:input path="version" class="form-control" id="version" placeholder="Inserire la versione del feed" maxlength="50" />
 			    		<form:errors path="version" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<label for="description">Descrizione</label>
 			    		<form:textarea path="description" class="form-control" id="description" maxlength="255" rows="2" />
 			    		<form:errors path="description" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-8">
+					<div class="form-group col-lg-12">
 						<input class="btn btn-success" type="submit" value="Crea GTFS" />
 						<a class="btn btn-default" href="/_5t/esportaGTFS">Annulla</a>
 					</div>

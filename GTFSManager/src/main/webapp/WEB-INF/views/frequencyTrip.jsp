@@ -20,7 +20,7 @@
 <html>
 <head>
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
-	<title>GTFS Manager - Corse singole</title>
+	<title>GTFS Manager - Corse a frequenza</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/timeline.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
@@ -40,7 +40,7 @@
 	
 	$(document).ready(function() {
 		// edit tripPattern form and alerts initially hidden
-		$("#modificaCorsaSingola").hide();
+		$("#modificaCorsaAFrequenza").hide();
 		$(".alert").hide();
 		
 		// showAlertDuplicateTripPattern variable is set to true by TripPatternController if the tripPattern id is already present
@@ -50,35 +50,35 @@
 		
 		// showCreateForm variable is set to true by TripPatternController if the the submitted form to create a tripPattern contains errors
 		if (!"${showCreateForm}") {
-			$("#creaCorsaSingola").hide();
+			$("#creaCorsaAFrequenza").hide();
 		} else {
-			$("#creaCorsaSingola").show();
+			$("#creaCorsaAFrequenza").show();
 		}
 		
 		// clicking on "Modifica schema corsa" button, "Crea schema corsa" button and div with active tripPattern summary should be hidden, while the form to modify the tripPattern should be shown
-		$("#modificaCorsaSingolaButton").click(function() {
-			$("#creaCorsaSingolaButton").hide();
-			$("#riassuntoCorsaSingola").hide();
-			$("#modificaCorsaSingola").show();
+		$("#modificaCorsaAFrequenzaButton").click(function() {
+			$("#creaCorsaAFrequenzaButton").hide();
+			$("#riassuntoCorsaAFrequenza").hide();
+			$("#modificaCorsaAFrequenza").show();
 		});
 		if ("${showEditForm}") {
-			$("#creaCorsaSingolaButton").hide();
-			$("#riassuntoCorsaSingola").hide();
-			$("#modificaCorsaSingola").show();
+			$("#creaCorsaAFrequenzaButton").hide();
+			$("#riassuntoCorsaAFrequenza").hide();
+			$("#modificaCorsaAFrequenza").show();
 		};
 		
 		// clicking on "Elimina" button, a dialog window with the delete confirmation is shown
-		$("#eliminaCorsaSingolaButton").click(function() {
+		$("#eliminaCorsaAFrequenzaButton").click(function() {
 			$("#delete-trip").show();
 		});
 		$("#delete-trip-button").click(function() {
-			window.location.href = "/_5t/eliminaCorsaSingola";
+			window.location.href = "/_5t/eliminaCorsaAFrequenza";
 		});
 		
 		// clicking on a row, the correspondent trip is selected
-		$("#listaCorseSingole").find("tbody").find("tr").click(function() {
+		$("#listaCorseAFrequenza").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaCorsaSingola?id=" + tripId;
+			window.location.href = "/_5t/selezionaCorsaAFrequenza?id=" + tripId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -90,34 +90,46 @@
 		});
 		
 		// Popover
-		$("#creaCorsaSingolaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
+		$("#creaCorsaAFrequenzaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaSingolaForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora partenza", content:"L'ora di partenza della corsa." })
+		$("#creaCorsaAFrequenzaForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora inizio", content:"L'ora di inizio del servizio con la frequenza specificata." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaSingolaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+		$("#creaCorsaAFrequenzaForm").find("#end").popover({ container: 'body', trigger: 'focus', title:"Ora fine", content:"L'ora di fine del servizio con la frequenza specificata." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaSingolaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+		$("#creaCorsaAFrequenzaForm").find("#headwaySecs").popover({ container: 'body', trigger: 'focus', title:"Frequenza", content:"Il tempo tra le partenze dalla stessa fermata (capolinea) per questa corsa a frequenza." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaSingolaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+		$("#creaCorsaAFrequenzaForm").find("#exactTimes").popover({ container: 'body', trigger: 'focus', title:"Tempi esatti", content:"Determina se le corse a frequenza dovrebbero essere esattamente schedulate in base alle informazioni del capolinea specificato." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#creaCorsaSingolaForm").find("#blockId").popover({ container: 'body', trigger: 'focus', title:"Id blocco", content:"Il blocco a cui appartiene la corsa. Un blocco consiste di due o più corse in sequenza fatte usando lo stesso veicolo, dove un passeggero può passare da una corsa alla successiva rimanendo sul veicolo." })
+		$("#creaCorsaAFrequenzaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaAFrequenzaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaAFrequenzaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#creaCorsaAFrequenzaForm").find("#blockId").popover({ container: 'body', trigger: 'focus', title:"Id blocco", content:"Il blocco a cui appartiene la corsa. Un blocco consiste di due o più corse in sequenza fatte usando lo stesso veicolo, dove un passeggero può passare da una corsa alla successiva rimanendo sul veicolo." })
 			.blur(function () { $(this).popover('hide'); });
 		
-		$("#modificaCorsaSingolaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
+		$("#modificaCorsaAFrequenzaForm").find("#gtfsId").popover({ container: 'body', trigger: 'focus', title:"Id", content:"L'id identifica univocamente una corsa." })
 		.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaSingolaForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora partenza", content:"L'ora di partenza della corsa." })
+		$("#modificaCorsaAFrequenzaForm").find("#start").popover({ container: 'body', trigger: 'focus', title:"Ora inizio", content:"L'ora di inizio del servizio con la frequenza specificata." })
 		.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaSingolaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+		$("#modificaCorsaAFrequenzaForm").find("#end").popover({ container: 'body', trigger: 'focus', title:"Ora fine", content:"L'ora di fine del servizio con la frequenza specificata." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaSingolaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+		$("#modificaCorsaAFrequenzaForm").find("#headwaySecs").popover({ container: 'body', trigger: 'focus', title:"Frequenza", content:"Il tempo tra le partenze dalla stessa fermata (capolinea) per questa corsa a frequenza." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaSingolaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+		$("#modificaCorsaAFrequenzaForm").find("#exactTimes").popover({ container: 'body', trigger: 'focus', title:"Tempi esatti", content:"Determina se le corse a frequenza dovrebbero essere esattamente schedulate in base alle informazioni del capolinea specificato." })
 			.blur(function () { $(this).popover('hide'); });
-		$("#modificaCorsaSingolaForm").find("#blockId").popover({ container: 'body', trigger: 'focus', title:"Id blocco", content:"Il blocco a cui appartiene la corsa. Un blocco consiste di due o più corse in sequenza fatte usando lo stesso veicolo, dove un passeggero può passare da una corsa alla successiva rimanendo sul veicolo." })
+		$("#modificaCorsaAFrequenzaForm").find("#tripShortName").popover({ container: 'body', trigger: 'focus', title:"Nome abbreviato", content:"Il nome che compare sugli orari e sulle insegne per identificare la corsa ai passeggeri." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaAFrequenzaForm").find("#tripHeadsign").popover({ container: 'body', trigger: 'focus', title:"Display", content:"Il testo che compare sul display per identificare la destinazione della corsa ai passeggeri. Usare questo campo per distinguere tra schemi di servizio diversi sulla stessa linea. Se il display cambia durante la corsa, questo campo può essere sovrascritto specificando dei valori per i display nelle fermate." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaAFrequenzaForm").find("#directionId").popover({ container: 'body', trigger: 'focus', title:"Direzione", content:"La direzione di viaggio della corsa. Usare questo campo per distinguere tra corse con due direzioni sulla stessa linea." })
+			.blur(function () { $(this).popover('hide'); });
+		$("#modificaCorsaAFrequenzaForm").find("#blockId").popover({ container: 'body', trigger: 'focus', title:"Id blocco", content:"Il blocco a cui appartiene la corsa. Un blocco consiste di due o più corse in sequenza fatte usando lo stesso veicolo, dove un passeggero può passare da una corsa alla successiva rimanendo sul veicolo." })
 		.blur(function () { $(this).popover('hide'); });
 		
 		// Creation tripPattern form validation
-		$("#creaCorsaSingolaForm").validate({
+		$("#creaCorsaAFrequenzaForm").validate({
 			rules: {
 				gtfsId: {
 					required: true
@@ -130,6 +142,14 @@
 				},
 				start: {
 					required: true
+				},
+				end: {
+					required: true
+				},
+				headwaySecs: {
+					required: true,
+					number: true,
+					min: 1
 				}
 			},
 			messages: {
@@ -143,7 +163,15 @@
 					required: "Selezionare un calendario"
 				},
 				start: {
-					required: "Inserire l'ora di partenza"
+					required: "Inserire l'ora di inizio"
+				},
+				end: {
+					required: "Inserire l'ora di fine"
+				},
+				headwaySecs: {
+					required: "Il campo frequenza è obbligatorio",
+					number: "Il campo frequenza deve essere un numero",
+					min: "Inserire una frequenza di almeno un minuto"
 				}
 			},
 			highlight: function(label) {
@@ -155,7 +183,7 @@
 		});
 		
 		// Edit tripPattern form validation
-		$("#modificaCorsaSingolaForm").validate({
+		$("#modificaCorsaAFrequenzaForm").validate({
 			rules: {
 				gtfsId: {
 					required: true
@@ -168,6 +196,14 @@
 				},
 				start: {
 					required: true
+				},
+				end: {
+					required: true
+				},
+				headwaySecs: {
+					required: true,
+					number: true,
+					min: 1
 				}
 			},
 			messages: {
@@ -181,7 +217,15 @@
 					required: "Selezionare un calendario"
 				},
 				start: {
-					required: "Inserire l'ora di partenza"
+					required: "Inserire l'ora di inizio"
+				},
+				end: {
+					required: "Inserire l'ora di fine"
+				},
+				headwaySecs: {
+					required: "Il campo frequenza è obbligatorio",
+					number: "Il campo frequenza deve essere un numero",
+					min: "Inserire una frequenza di almeno un minuto"
 				}
 			},
 			highlight: function(label) {
@@ -213,7 +257,7 @@
 		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
 		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
 		<li><a href="/_5t/schemiCorse">Schema corsa ${schemaCorsaAttivo.gtfsId}</a></li>
-		<li class="active">Corse singole</li>
+		<li class="active">Corse a frequenza</li>
 	</ol>
 	
 	
@@ -236,22 +280,24 @@
 	<div class="row">
 		<!-- Div with table containing tripPattern list -->
 		<div class="col-lg-8">
-			<table id="listaCorseSingole" class="table table-striped table-hover sortable">
+			<table id="listaCorseAFrequenza" class="table table-striped table-hover sortable">
 				<thead>
 					<tr>
 						<th>Id</th>
 						<th>Nome abbreviato</th>
 						<th>Direzione</th>
 						<th>Calendario</th>
-						<th>Ora partenza</th>
+						<th>Ora inizio</th>
+						<th>Ora fine</th>
+						<th>Frequenza (min)</th>
 						<th class="hidden"></th>
 					</tr>
 				</thead>
 				<tbody>
-					<c:forEach var="corsaSingola" items="${listaCorseSingole}">
+					<c:forEach var="corsaAFrequenza" items="${listaCorseAFrequenza}">
 						<c:choose>
-							<c:when test="${not empty corsaSingolaAttiva}">
-								<c:if test="${corsaSingolaAttiva.id == corsaSingola.id}">
+							<c:when test="${not empty corsaAFrequenzaAttiva}">
+								<c:if test="${corsaAFrequenzaAttiva.id == corsaAFrequenza.id}">
 									<tr class="success">
 								</c:if>
 							</c:when>
@@ -259,17 +305,19 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
-							<td>${corsaSingola.gtfsId}</td>
-							<td>${corsaSingola.tripShortName}</td>
+							<td>${corsaAFrequenza.gtfsId}</td>
+							<td>${corsaAFrequenza.tripShortName}</td>
 							<td>
 								<c:choose>
-									<c:when test="${corsaSingola.directionId == 0}">Andata</c:when>
+									<c:when test="${corsaAFrequenza.directionId == 0}">Andata</c:when>
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${corsaSingola.calendar.id}">${corsaSingola.calendar.gtfsId}</a></td>
-							<td>${corsaSingola.startTime}</td>
-							<td class="hidden">${corsaSingola.id}</td>
+							<td><a href="/_5t/selezionaCalendario?id=${corsaAFrequenza.calendar.id}">${corsaAFrequenza.calendar.gtfsId}</a></td>
+							<td>${corsaAFrequenza.startTime}</td>
+							<td>${corsaAFrequenza.endTime}</td>
+							<td>${corsaAFrequenza.headwaySecs}</td>
+							<td class="hidden">${corsaAFrequenza.id}</td>
 						</tr>
 					</c:forEach>
 				</tbody>
@@ -278,11 +326,11 @@
 		
 		<!-- Div with button to create tripPattern and selected tripPattern summary -->
 		<div class="col-lg-4">
-			<a id="creaCorsaSingolaButton" class="btn btn-primary" href="/_5t/creaCorsaSingola">Crea una corsa singola</a>
+			<a id="creaCorsaAFrequenzaButton" class="btn btn-primary" href="/_5t/creaCorsaAFrequenza">Crea una corsa a frequenza</a>
 			
 			<!-- Div with create tripPattern form -->
-			<div id="creaCorsaSingola">
-				<form:form id="creaCorsaSingolaForm" commandName="trip" method="post" role="form">
+			<div id="creaCorsaAFrequenza">
+				<form:form id="creaCorsaAFrequenzaForm" commandName="trip" method="post" role="form">
 					<% TripPattern tripPattern = (TripPattern) session.getAttribute("schemaCorsaAttivo"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -293,8 +341,31 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="start" class="required">Ora partenza</label>
+							<label for="start" class="required">Ora inizio</label>
 				    		<input name="start" class="form-control" id="start" type="time" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="end" class="required">Ora fine</label>
+				    		<input name="end" class="form-control" id="end" type="time" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="headwaySecs" class="required">Frequenza (min)</label>
+				    		<form:input path="headwaySecs" class="form-control" id="headwaySecs" type="number" min="1" required="required" />
+				    		<form:errors path="headwaySecs" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="exactTimes">Corsa programmata esattamente</label>
+				    		<form:select path="exactTimes" class="form-control">
+								<form:option value="0" selected="true">No</form:option>
+								<form:option value="1">Sì</form:option>
+							</form:select>
+							<form:errors path="exactTimes" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
@@ -405,11 +476,11 @@
 							<form:errors path="bikesAllowed" cssClass="error"></form:errors>
 						</div>
 					</div>
-					<form:input path="singleTrip" type="hidden" value="true" />
+					<form:input path="singleTrip" type="hidden" value="false" />
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<input class="btn btn-success" type="submit" value="Crea corsa singola" />
-							<a class="btn btn-default" href="/_5t/corseSingole">Annulla</a>
+							<input class="btn btn-success" type="submit" value="Crea corsa a frequenza" />
+							<a class="btn btn-default" href="/_5t/corseAFrequenza">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -418,45 +489,92 @@
 			<hr>
 			
 			<!-- Div with selected tripPattern summary -->
-			<c:if test="${not empty corsaSingolaAttiva}">
-				<div id="riassuntoCorsaSingola" class="riassunto">
-					<% Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva"); %>
-					<div class="col-lg-8">
-						<b>Id:</b> ${corsaSingolaAttiva.gtfsId}
+			<c:if test="${not empty corsaAFrequenzaAttiva}">
+				<div id="riassuntoCorsaAFrequenza" class="riassunto">
+					<% Trip trip = (Trip) session.getAttribute("corsaAFrequenzaAttiva"); %>
+					<div class="col-lg-12">
+						<b>Id:</b> ${corsaAFrequenzaAttiva.gtfsId}
 					</div>
-					<div class="col-lg-8">
-						<b>Ora partenza:</b> ${corsaSingolaAttiva.startTime}
+					<div class="col-lg-12">
+						<b>Ora inizio:</b> ${corsaAFrequenzaAttiva.startTime}
 					</div>
-					<div class="col-lg-8">
-						<b>Nome:</b> ${corsaSingolaAttiva.tripShortName}
+					<div class="col-lg-12">
+						<b>Ora fine:</b> ${corsaAFrequenzaAttiva.endTime}
 					</div>
-					<div class="col-lg-8">
-						<b>Display:</b> ${corsaSingolaAttiva.tripHeadsign}
+					<div class="col-lg-12">
+						<b>Frequenza (min):</b> ${corsaAFrequenzaAttiva.headwaySecs}
 					</div>
-					<div class="col-lg-8">
+					<div class="col-lg-12">
+						<b>Corsa programmata esattamente:</b> 
+						<c:choose>
+							<c:when test="${corsaAFrequenzaAttiva.exactTimes == 0}">No</c:when>
+							<c:otherwise>Sì</c:otherwise>
+						</c:choose>
+					</div>
+					<div class="col-lg-12">
+						<b>Nome:</b> ${corsaAFrequenzaAttiva.tripShortName}
+					</div>
+					<div class="col-lg-12">
+						<b>Display:</b> ${corsaAFrequenzaAttiva.tripHeadsign}
+					</div>
+					<div class="col-lg-12">
 						<b>Direzione:</b>
 						<% out.write(direction.get(trip.getDirectionId())); %>
 					</div>
-					<div class="col-lg-8">
-						<b>Id blocco:</b> ${corsaSingolaAttiva.blockId}
+					<div class="col-lg-12">
+						<b>Id blocco:</b> ${corsaAFrequenzaAttiva.blockId}
 					</div>
-					<div class="col-lg-8">
-						<b>Calendario:</b> ${corsaSingolaAttiva.calendar.gtfsId}
+					<div class="col-lg-12">
+						<b>Calendario:</b> ${corsaAFrequenzaAttiva.calendar.gtfsId}
 					</div>
-					<div class="col-lg-8">
+					<div class="col-lg-12">
 						<b>Accessibile ai disabili:</b>
 						<% out.write(wheelchairAccessible.get(trip.getWheelchairAccessible())); %>
 					</div>
-					<div class="col-lg-8">
+					<div class="col-lg-12">
 						<b>Bici permesse:</b>
 						<% out.write(bikesAllowed.get(trip.getBikesAllowed())); %>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaCorsaSingolaButton" class="btn btn-primary" href="/_5t/modificaCorsaSingola">Modifica</a>
-						<button id="eliminaCorsaSingolaButton" type="button" class="btn btn-danger">Elimina</button>
+						<%
+						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+						Calendar start = new GregorianCalendar();
+						start.setTime(trip.getStartTime());
+						Calendar end = new GregorianCalendar();
+						end.setTime(trip.getEndTime());
+						%>
+						<b>Ore partenza corse:</b>
+							<%
+							if (start.after(end)) {
+								Calendar endDay = new GregorianCalendar();
+								endDay.setTime(new Time(23, 59, 59));
+								while (start.compareTo(endDay) <= 0) {
+									out.write(dateFormat.format(new Time(start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE), 0)) + "  ");
+									start.add(java.util.Calendar.HOUR_OF_DAY, trip.getHeadwaySecs() / 60);
+									start.add(java.util.Calendar.MINUTE, trip.getHeadwaySecs() % 60);
+								}
+								Calendar startDay = new GregorianCalendar();
+								startDay.setTime(new Time(start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE), 0));
+								while (startDay.compareTo(end) <= 0) {
+									out.write(dateFormat.format(new Time(startDay.get(java.util.Calendar.HOUR_OF_DAY), startDay.get(java.util.Calendar.MINUTE), 0)) + "  ");
+									startDay.add(java.util.Calendar.HOUR_OF_DAY, trip.getHeadwaySecs() / 60);
+									startDay.add(java.util.Calendar.MINUTE, trip.getHeadwaySecs() % 60);
+								}
+							} else {
+								while (start.before(end)) {
+									out.write(dateFormat.format(new Time(start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE), 0)) + "  ");
+									start.add(java.util.Calendar.HOUR_OF_DAY, trip.getHeadwaySecs() / 60);
+									start.add(java.util.Calendar.MINUTE, trip.getHeadwaySecs() % 60);
+								}
+							}
+							%>
+					</div>
+					<div class="col-lg-12">
+						<a id="modificaCorsaAFrequenzaButton" class="btn btn-primary" href="/_5t/modificaCorsaAFrequenza">Modifica</a>
+						<button id="eliminaCorsaAFrequenzaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 <!-- 					<div class="col-lg-12"> -->
-<%-- 						<form id="duplicaCorsaSingolaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsaSingola"> --%>
+<%-- 						<form id="duplicaCorsaAFrequenzaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsaAFrequenza"> --%>
 <!-- 							<div class="form-group"> -->
 <!-- 								<label for="newGtfsId" class="required">Duplica con id</label> -->
 <!-- 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" /> -->
@@ -468,40 +586,71 @@
 			</c:if>
 			
 			<!-- Div with edit tripPattern form -->
-			<div id="modificaCorsaSingola">
-				<form:form id="modificaCorsaSingolaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsaSingola">
-					<% Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva"); %>
+			<div id="modificaCorsaAFrequenza">
+				<form:form id="modificaCorsaAFrequenzaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsaAFrequenza">
+					<% Trip trip = (Trip) session.getAttribute("corsaAFrequenzaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
-				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${corsaSingolaAttiva.gtfsId}" maxlength="50" />
+				    		<form:input path="gtfsId" class="form-control" id="gtfsId" value="${corsaAFrequenzaAttiva.gtfsId}" maxlength="50" />
 				    		<form:errors path="gtfsId" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="start" class="required">Ora partenza</label>
-				    		<input name="start" class="form-control" id="start" type="time" value="${corsaSingolaAttiva.startTime}" />
+							<label for="start" class="required">Ora inizio</label>
+				    		<input name="start" class="form-control" id="start" type="time" required="required" value="${corsaAFrequenzaAttiva.startTime}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="end" class="required">Ora fine</label>
+				    		<input name="end" class="form-control" id="end" type="time" required="required" value="${corsaAFrequenzaAttiva.endTime}" />
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="headwaySecs" class="required">Frequenza</label>
+				    		<form:input path="headwaySecs" class="form-control" id="headwaySecs" type="number" min="1" required="required" value="${corsaAFrequenzaAttiva.headwaySecs}" />
+				    		<form:errors path="headwaySecs" cssClass="error"></form:errors>
+						</div>
+					</div>
+					<div class="row">
+						<div class="form-group col-lg-8">
+							<label for="exactTimes">Corsa programmata esattamente</label>
+				    		<form:select path="exactTimes" class="form-control">
+				    			<c:choose>
+				    				<c:when test="${corsaAFrequenzaAttiva.exactTimes == 0}">
+										<form:option value="0" selected="true">No</form:option>
+										<form:option value="1">Sì</form:option>
+				    				</c:when>
+				    				<c:otherwise>
+										<form:option value="0">No</form:option>
+										<form:option value="1" selected="true">Sì</form:option>
+				    				</c:otherwise>
+				    			</c:choose>
+							</form:select>
+							<form:errors path="exactTimes" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="tripShortName" class="required">Nome abbreviato</label>
-				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaSingolaAttiva.tripShortName}" maxlength="50" />
+				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaAFrequenzaAttiva.tripShortName}" maxlength="50" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="tripHeadsign">Display</label>
-				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${corsaSingolaAttiva.tripHeadsign}" maxlength="50" />
+				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${corsaAFrequenzaAttiva.tripHeadsign}" maxlength="50" />
 				    		<form:errors path="tripHeadsign" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="blockId">Id blocco</label>
-				    		<form:input path="blockId" class="form-control" id="blockId" value="${corsaSingolaAttiva.blockId}" maxlength="50" />
+				    		<form:input path="blockId" class="form-control" id="blockId" value="${corsaAFrequenzaAttiva.blockId}" maxlength="50" />
 				    		<form:errors path="blockId" cssClass="error"></form:errors>
 						</div>
 					</div>
@@ -535,7 +684,7 @@
 								<option value="">Seleziona un calendario</option>
 								<c:forEach var="calendario" items="${listaCalendari}">
 									<c:choose>
-										<c:when test="${corsaSingolaAttiva.calendar.id == calendario.id}">
+										<c:when test="${corsaAFrequenzaAttiva.calendar.id == calendario.id}">
 											<option value="${calendario.id}" selected>${calendario.gtfsId}</option>
 										</c:when>
 										<c:otherwise>
@@ -592,11 +741,11 @@
 							<form:errors path="bikesAllowed" cssClass="error"></form:errors>
 						</div>
 					</div>
-					<form:input path="singleTrip" type="hidden" value="true" />
+					<form:input path="singleTrip" type="hidden" value="false" />
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica corsa" />
-							<a class="btn btn-default" href="/_5t/corseSingole">Annulla</a>
+							<a class="btn btn-default" href="/_5t/corseAFrequenza">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -606,19 +755,18 @@
 				<ul class="timeline">
 					<%
 					class StopTimeRelativeComparator implements Comparator<StopTimeRelative> {
-	
+						
 						@Override
 						public int compare(StopTimeRelative o1, StopTimeRelative o2) {
 							return o1.getStopSequence().compareTo(o2.getStopSequence());
 						}
 						
 					}
-					Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva");
 					List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
 					Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
 					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 					Calendar cal = new GregorianCalendar();
-					cal.setTime(trip.getStartTime());
+					cal.setTime(new Time(0, 0, 0));
 					for (StopTimeRelative str: stopTimeRelatives) {
 					%>
 				        <li class="timeline-inverted">
@@ -657,7 +805,7 @@
 	</div>
 	<div id="delete-trip" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
-	    <p>Vuoi veramente eliminare la corsa ${corsaSingolaAttiva.gtfsId}?</p>
+	    <p>Vuoi veramente eliminare la corsa ${corsaAFrequenzaAttiva.gtfsId}?</p>
 	    <button id="delete-trip-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>

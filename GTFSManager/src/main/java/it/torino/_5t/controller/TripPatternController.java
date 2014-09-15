@@ -54,6 +54,12 @@ public class TripPatternController {
 		}
 		Route r = routeDAO.loadRoute(route.getId());
 		
+		TripPattern tripPattern = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+		if (tripPattern != null) {
+			tripPatternDAO.updateTripPattern(tripPattern);
+			model.addAttribute("listaFermateCorsa", tripPattern.getStopTimeRelatives());
+		}
+		
 		logger.info("Visualizzazione lista schemi corse di " + route.getShortName() + ".");
 		
 		//routeDAO.updateRoute(route);
@@ -92,6 +98,11 @@ public class TripPatternController {
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaSchemiCorse", route.getTripPatterns());
 			model.addAttribute("listaCalendari", agency.getCalendars());
+			TripPattern tripPat = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+			if (tripPat != null) {
+				tripPatternDAO.updateTripPattern(tripPat);
+				model.addAttribute("listaFermateCorsa", tripPat.getStopTimeRelatives());
+			}
 			model.addAttribute("showCreateForm", true);
 			return "tripPattern";
 		}
@@ -104,6 +115,11 @@ public class TripPatternController {
 						logger.error("L'id dello schema corsa è già presente");
 						model.addAttribute("listaSchemiCorse", route.getTripPatterns());
 						model.addAttribute("listaCalendari", a.getCalendars());
+						TripPattern tripPat = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+						if (tripPat != null) {
+							//tripPatternDAO.updateTripPattern(tripPat);
+							model.addAttribute("listaFermateCorsa", tripPat.getStopTimeRelatives());
+						}
 						model.addAttribute("showCreateForm", true);
 						model.addAttribute("showAlertDuplicateTripPattern", true);
 						return "tripPattern";
@@ -140,7 +156,7 @@ public class TripPatternController {
 		
 		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
 
-		session.removeAttribute("servizioAttivo");
+		session.removeAttribute("corsaSingolaAttiva");
 //		session.setAttribute("lineaAttiva", trip.getRoute());
 		session.setAttribute("schemaCorsaAttivo", tripPattern);
 		
@@ -231,6 +247,11 @@ public class TripPatternController {
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaSchemiCorse", route.getTripPatterns());
 			model.addAttribute("listaCalendari", agency.getCalendars());
+			TripPattern tripPat = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+			if (tripPat != null) {
+				tripPatternDAO.updateTripPattern(tripPat);
+				model.addAttribute("listaFermateCorsa", tripPat.getStopTimeRelatives());
+			}
 			model.addAttribute("showEditForm", true);
 			return "tripPattern";
 		}
@@ -250,6 +271,11 @@ public class TripPatternController {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaSchemiCorse", r.getTripPatterns());
 						model.addAttribute("listaCalendari", a.getCalendars());
+						TripPattern tripPat = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+						if (tripPat != null) {
+							//tripPatternDAO.updateTripPattern(tripPat);
+							model.addAttribute("listaFermateCorsa", tripPat.getStopTimeRelatives());
+						}
 						model.addAttribute("showEditForm", true);
 						model.addAttribute("showAlertDuplicateTripPattern", true);
 						return "tripPattern";

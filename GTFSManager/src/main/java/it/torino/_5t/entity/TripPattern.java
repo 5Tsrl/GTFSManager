@@ -74,9 +74,6 @@ public class TripPattern implements Serializable{
 	private Integer bikesAllowed;
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "tripPattern")
-	private Set<Frequency> frequencies = new HashSet<Frequency>();
-	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "tripPattern")
 	private Set<StopTimeRelative> stopTimeRelatives = new HashSet<StopTimeRelative>();
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "tripPattern")
@@ -186,14 +183,6 @@ public class TripPattern implements Serializable{
 	public void setBikesAllowed(Integer bikesAllowed) {
 		this.bikesAllowed = bikesAllowed;
 	}
-
-	public Set<Frequency> getFrequencies() {
-		return frequencies;
-	}
-
-	public void setFrequencies(Set<Frequency> frequencies) {
-		this.frequencies = frequencies;
-	}
 	
 	public Set<StopTimeRelative> getStopTimeRelatives() {
 		return stopTimeRelatives;
@@ -209,11 +198,6 @@ public class TripPattern implements Serializable{
 
 	public void setTrips(Set<Trip> trips) {
 		this.trips = trips;
-	}
-
-	public void addFrequency(Frequency frequency) {
-		frequency.setTripPattern(this);
-		frequencies.add(frequency);
 	}
 	
 	public void addStopTimeRelative(StopTimeRelative stopTimeRelative) {

@@ -38,6 +38,18 @@ public class Trip implements Serializable{
 	@Column(name = "start_time")
 	private Time startTime;
 	
+	@Column(name = "end_time")
+	private Time endTime;
+	
+	@Column(name = "headway_secs")
+	@Min(1)
+	private Integer headwaySecs;
+	
+	@Column(name = "exact_times")
+	@Min(0)
+	@Max(1)
+	private Integer exactTimes;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "trip_pattern_id")
 	private TripPattern tripPattern;
@@ -83,12 +95,6 @@ public class Trip implements Serializable{
 	@Min(0)
 	@Max(2)
 	private Integer bikesAllowed;
-	
-//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "trip")
-//	private Set<Frequency> frequencies = new HashSet<Frequency>();
-	
-//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "trip")
-//	private Set<StopTime> stopTimes = new HashSet<StopTime>();
 
 	@Override
 	public int hashCode() {
@@ -145,6 +151,30 @@ public class Trip implements Serializable{
 
 	public void setStartTime(Time startTime) {
 		this.startTime = startTime;
+	}
+
+	public Time getEndTime() {
+		return endTime;
+	}
+
+	public void setEndTime(Time endTime) {
+		this.endTime = endTime;
+	}
+
+	public Integer getHeadwaySecs() {
+		return headwaySecs;
+	}
+
+	public void setHeadwaySecs(Integer headwaySecs) {
+		this.headwaySecs = headwaySecs;
+	}
+
+	public Integer getExactTimes() {
+		return exactTimes;
+	}
+
+	public void setExactTimes(Integer exactTimes) {
+		this.exactTimes = exactTimes;
 	}
 
 	public String getBlockId() {
@@ -226,30 +256,4 @@ public class Trip implements Serializable{
 	public void setBikesAllowed(Integer bikesAllowed) {
 		this.bikesAllowed = bikesAllowed;
 	}
-
-//	public Set<Frequency> getFrequencies() {
-//		return frequencies;
-//	}
-//	
-//	public void setFrequencies(Set<Frequency> frequencies) {
-//		this.frequencies = frequencies;
-//	}
-
-//	public Set<StopTime> getStopTimes() {
-//		return stopTimes;
-//	}
-//
-//	public void setStopTimes(Set<StopTime> stopTimes) {
-//		this.stopTimes = stopTimes;
-//	}
-	
-//	public void addFrequency(Frequency frequency) {
-//		frequency.setTrip(this);
-//		frequencies.add(frequency);
-//	}
-	
-//	public void addStopTime(StopTime stopTime) {
-//		stopTime.setTrip(this);
-//		stopTimes.add(stopTime);
-//	}
 }

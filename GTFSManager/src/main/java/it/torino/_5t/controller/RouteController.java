@@ -111,8 +111,8 @@ public class RouteController {
 		
 		logger.info("Linea selezionata: " + route.getShortName() + ".");
 		
-		session.removeAttribute("corsaAttiva");
-		session.removeAttribute("servizioAttivo");
+		session.removeAttribute("schemaCorsaAttivo");
+		session.removeAttribute("corsaSingolaAttiva");
 		session.setAttribute("lineaAttiva", route);
 		
 		return "redirect:linee";

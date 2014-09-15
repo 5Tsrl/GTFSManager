@@ -6,11 +6,9 @@ import it.torino._5t.dao.CalendarDateDAO;
 import it.torino._5t.dao.FareAttributeDAO;
 import it.torino._5t.dao.FareRuleDAO;
 import it.torino._5t.dao.FeedInfoDAO;
-import it.torino._5t.dao.FrequencyDAO;
 import it.torino._5t.dao.RouteDAO;
 import it.torino._5t.dao.ShapeDAO;
 import it.torino._5t.dao.StopDAO;
-import it.torino._5t.dao.StopTimeDAO;
 import it.torino._5t.dao.TransferDAO;
 import it.torino._5t.dao.TripDAO;
 import it.torino._5t.dao.TripPatternDAO;
@@ -20,7 +18,6 @@ import it.torino._5t.entity.CalendarDate;
 import it.torino._5t.entity.FareAttribute;
 import it.torino._5t.entity.FareRule;
 import it.torino._5t.entity.FeedInfo;
-import it.torino._5t.entity.Frequency;
 import it.torino._5t.entity.Route;
 import it.torino._5t.entity.Shape;
 import it.torino._5t.entity.Stop;
@@ -143,15 +140,11 @@ public class ExportGTFSController {
 	@Autowired
 	private FeedInfoDAO feedInfoDAO;
 	@Autowired
-	private FrequencyDAO frequencyDAO;
-	@Autowired
 	private RouteDAO routeDAO;
 	@Autowired
 	private ShapeDAO shapeDAO;
 	@Autowired
 	private StopDAO stopDAO;
-	@Autowired
-	private StopTimeDAO stopTimeDAO;
 	@Autowired
 	private TransferDAO transferDAO;
 	@Autowired
@@ -409,20 +402,24 @@ public class ExportGTFSController {
 	
 	private void fillFrequencies() throws IOException {
 		String row = new String();
-		for (Frequency f: frequencyDAO.getAllFrequencies()) {
-//			row += f.getTrip().getGtfsId() + ",";
-			row += formatTime(f.getStartTime()) + ",";
-			String endTime = formatTime(f.getEndTime());
-			if (f.getStartTime().after(f.getEndTime())) {
-				// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
-				String[] end = endTime.split(":");
-				int hh = Integer.parseInt(end[0]) + 24;
-				row += hh + ":" + end[1] + ":" + end[2] + ",";
-			} else {
-				row += endTime + ",";
+		for (TripPattern tp: tripPatternDAO.getAllTripPatterns()) {
+			for (Trip t: tp.getTrips()) {
+				if (!t.isSingleTrip()) {
+					row += t.getGtfsId() + ",";
+					row += formatTime(t.getStartTime()) + ",";
+					String endTime = formatTime(t.getEndTime());
+					if (t.getStartTime().after(t.getEndTime())) {
+						// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
+						String[] end = endTime.split(":");
+						int hh = Integer.parseInt(end[0]) + 24;
+						row += hh + ":" + end[1] + ":" + end[2] + ",";
+					} else {
+						row += endTime + ",";
+					}
+					row += t.getHeadwaySecs() * 60 + ",";
+					row += t.getExactTimes() + "\n";
+				}
 			}
-			row += f.getHeadwaySecs() * 60 + ",";
-			row += f.getExactTimes() + "\n";
 		}
 		frequencyOutput.write(row.getBytes());
 		logger.info("frequencies.txt completato.");
@@ -492,17 +489,37 @@ public class ExportGTFSController {
 				cal.setTime(t.getStartTime());
 				if (t.isSingleTrip()) {
 					// corsa singola
+					java.util.Calendar startT = new GregorianCalendar();
+					startT.setTime(t.getStartTime());
 					for (StopTimeRelative str: stopTimeRelatives) {
 						row += t.getGtfsId() + ",";
 						java.util.Calendar toAdd = new GregorianCalendar();
 						toAdd.setTime(str.getRelativeArrivalTime());
 						cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
-						row += formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0)) + ",";
+						cal.set(1970, java.util.Calendar.JANUARY, 1);
+						String startTime = formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0));
+						if (startT.getTime().after(cal.getTime())) {
+							// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
+							String[] start = startTime.split(":");
+							int hh = Integer.parseInt(start[0]) + 24;
+							row += hh + ":" + start[1] + ":" + start[2] + ",";
+						} else {
+							row += startTime + ",";
+						}
 						toAdd.setTime(str.getRelativeDepartureTime());
 						cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
-						row += formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0)) + ",";
+						cal.set(1970, java.util.Calendar.JANUARY, 1);
+						String endTime = formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0));
+						if (startT.getTime().after(cal.getTime())) {
+							// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
+							String[] end = endTime.split(":");
+							int hh = Integer.parseInt(end[0]) + 24;
+							row += hh + ":" + end[1] + ":" + end[2] + ",";
+						} else {
+							row += endTime + ",";
+						}
 						row += str.getStop().getGtfsId() + ",";
 						row += str.getStopSequence() + ",";
 						row += str.getStopHeadsign() + ",";
