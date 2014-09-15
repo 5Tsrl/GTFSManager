@@ -143,6 +143,8 @@ public class SingleTripController {
 						String[] startT = startTime.split(":");
 						Time start = new Time(Integer.parseInt(startT[0]), Integer.parseInt(startT[1]), 0);
 						trip.setStartTime(start);
+						Calendar calendar = calendarDAO.getCalendar(serviceId);
+						calendar.addTrip(trip);
 						tp.addTrip(trip);
 						session.setAttribute("corsaSingolaAttiva", trip);
 						session.setAttribute("schemaCorsaAttivo", tp);
@@ -217,6 +219,14 @@ public class SingleTripController {
 					}
 				}
 				break;
+			}
+		}
+		
+		// rimuovo lo schema corsa anche dal set associato al calendario corrispondente
+		Calendar calendar = calendarDAO.loadCalendar(trip.getCalendar().getId());
+		for (Calendar c: a.getCalendars()) {
+			if (c.equals(calendar)) {
+				c.getTrips().remove(trip);
 			}
 		}
 		
@@ -321,6 +331,14 @@ public class SingleTripController {
 								String[] startT = startTime.split(":");
 								Time start = new Time(Integer.parseInt(startT[0]), Integer.parseInt(startT[1]), 0);
 								t.setStartTime(start);
+								for (Calendar c: a.getCalendars()) {
+									if (c.equals(calendar)) {
+										c.getTrips().remove(activetrip);
+										c.addTrip(t);
+										session.setAttribute("calendarioAttivo", c);
+										break;
+									}
+								}
 								session.setAttribute("corsaSingolaAttiva", t);
 								session.setAttribute("schemaCorsaAttivo", tp);
 								session.setAttribute("lineaAttiva", r);

@@ -667,22 +667,26 @@
 				<table id="listaCorse" class="table table-striped table-hover sortable">
 					<thead>
 						<tr>
-							<th>Nome</th>
-							<th>Display</th>
-							<th>Direzione</th>
+							<th>Id</th>
+							<th>Ora inizio</th>
+							<th>Ora fine</th>
+							<th>Frequenza (min)</th>
 						</tr>
 					</thead>
 					<tbody>
 						<c:forEach var="corsa" items="${listaCorse}">
 							<tr>
-								<td><a href="/_5t/selezionaCorsa?id=${corsa.id}">${corsa.tripShortName}</a></td>
-								<td>${corsa.tripHeadsign}</td>
-								<td>
-									<c:choose>
-										<c:when test="${corsa.directionId == 0}">Andata</c:when>
-										<c:otherwise>Ritorno</c:otherwise>
-									</c:choose>
-								</td>
+								<c:choose>
+									<c:when test="${corsa.singleTrip}">
+										<td><a href="/_5t/selezionaCorsaSingola?id=${corsa.id}">${corsa.gtfsId}</a></td>
+									</c:when>
+									<c:otherwise>
+										<td><a href="/_5t/selezionaCorsaAFrequenza?id=${corsa.id}">${corsa.gtfsId}</a></td>
+									</c:otherwise>
+								</c:choose>
+								<td>${corsa.startTime}</td>
+								<td>${corsa.endTime}</td>
+								<td>${corsa.headwaySecs}</td>
 							</tr>
 						</c:forEach>
 					</tbody>

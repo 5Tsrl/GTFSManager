@@ -610,7 +610,7 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="headwaySecs" class="required">Frequenza</label>
+							<label for="headwaySecs" class="required">Frequenza (min)</label>
 				    		<form:input path="headwaySecs" class="form-control" id="headwaySecs" type="number" min="1" required="required" value="${corsaAFrequenzaAttiva.headwaySecs}" />
 				    		<form:errors path="headwaySecs" cssClass="error"></form:errors>
 						</div>

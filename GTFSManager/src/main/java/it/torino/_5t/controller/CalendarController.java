@@ -6,6 +6,7 @@ import it.torino._5t.dao.CalendarDateDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
 import it.torino._5t.entity.CalendarDate;
+import it.torino._5t.entity.Trip;
 import it.torino._5t.entity.TripPattern;
 
 import javax.servlet.http.HttpSession;
@@ -48,7 +49,7 @@ public class CalendarController {
 		Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo");
 		if (calendar != null) {
 			calendarDAO.updateCalendar(calendar);
-			model.addAttribute("listaCorse", calendar.getTripPatterns());
+			model.addAttribute("listaCorse", calendar.getTrips());
 			model.addAttribute("listaEccezioni", calendar.getCalendarDates());
 		}
 		
@@ -92,7 +93,7 @@ public class CalendarController {
 			Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
 			if (cal != null) {
 				calendarDAO.updateCalendar(cal);
-				model.addAttribute("listaCorse", cal.getTripPatterns());
+				model.addAttribute("listaCorse", cal.getTrips());
 				model.addAttribute("listaEccezioni", cal.getCalendarDates());
 			}
 			if (calendar.getStartDate().after(calendar.getEndDate()))
@@ -110,7 +111,7 @@ public class CalendarController {
 				Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
 				if (cal != null) {
 					//calendarDAO.updateCalendar(cal);
-					model.addAttribute("listaCorse", cal.getTripPatterns());
+					model.addAttribute("listaCorse", cal.getTrips());
 					model.addAttribute("listaEccezioni", cal.getCalendarDates());
 				}
 				if (calendar.getStartDate().after(calendar.getEndDate()))
@@ -161,6 +162,9 @@ public class CalendarController {
 		for (TripPattern tp: c.getTripPatterns()) {
 			tp.setCalendar(null);
 		}
+		for (Trip t: c.getTrips()) {
+			t.setCalendar(null);
+		}
 		
 		a.getCalendars().remove(c);
 		
@@ -205,7 +209,7 @@ public class CalendarController {
 			Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
 			if (cal != null) {
 				calendarDAO.updateCalendar(cal);
-				model.addAttribute("listaCorse", cal.getTripPatterns());
+				model.addAttribute("listaCorse", cal.getTrips());
 				model.addAttribute("listaEccezioni", cal.getCalendarDates());
 			}
 			if (calendar.getStartDate().after(calendar.getEndDate()))
@@ -228,7 +232,7 @@ public class CalendarController {
 				Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
 				if (cal != null) {
 					//calendarDAO.updateCalendar(cal);
-					model.addAttribute("listaCorse", cal.getTripPatterns());
+					model.addAttribute("listaCorse", cal.getTrips());
 					model.addAttribute("listaEccezioni", cal.getCalendarDates());
 				}
 				if (calendar.getStartDate().after(calendar.getEndDate()))
@@ -290,7 +294,7 @@ public class CalendarController {
 			model.addAttribute("listaCalendari", a.getCalendars());
 			model.addAttribute("showCreateCalendarDateForm", true);
 			model.addAttribute("calendar", new Calendar());
-			model.addAttribute("listaCorse", cal.getTripPatterns());
+			model.addAttribute("listaCorse", cal.getTrips());
 			model.addAttribute("listaEccezioni", cal.getCalendarDates());
 			model.addAttribute("showAlertWrongExceptionDate", true);
 			return "calendar";
@@ -390,7 +394,7 @@ public class CalendarController {
 			model.addAttribute("listaCalendari", a.getCalendars());
 			model.addAttribute("showCreateCalendarDateForm", true);
 			model.addAttribute("calendar", new Calendar());
-			model.addAttribute("listaCorse", activeCalendar.getTripPatterns());
+			model.addAttribute("listaCorse", activeCalendar.getTrips());
 			model.addAttribute("listaEccezioni", activeCalendar.getCalendarDates());
 			model.addAttribute("showAlertWrongExceptionDate", true);
 			return "calendar";

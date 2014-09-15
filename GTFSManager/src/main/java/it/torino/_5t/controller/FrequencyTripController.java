@@ -138,7 +138,6 @@ public class FrequencyTripController {
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (tp.equals(tripPattern)) {
 						trip.setRoute(tripPattern.getRoute());
-						trip.setCalendar(tripPattern.getCalendar());
 						trip.setShape(tripPattern.getShape());
 						String[] startT = startTime.split(":");
 						Time start = new Time(Integer.parseInt(startT[0]), Integer.parseInt(startT[1]), 0);
@@ -146,6 +145,8 @@ public class FrequencyTripController {
 						String[] endT = endTime.split(":");
 						Time end = new Time(Integer.parseInt(endT[0]), Integer.parseInt(endT[1]), 0);
 						trip.setEndTime(end);
+						Calendar calendar = calendarDAO.getCalendar(serviceId);
+						calendar.addTrip(trip);
 						tp.addTrip(trip);
 						session.setAttribute("corsaAFrequenzaAttiva", trip);
 						session.setAttribute("schemaCorsaAttivo", tp);
@@ -220,6 +221,14 @@ public class FrequencyTripController {
 					}
 				}
 				break;
+			}
+		}
+		
+		// rimuovo lo schema corsa anche dal set associato al calendario corrispondente
+		Calendar calendar = calendarDAO.loadCalendar(trip.getCalendar().getId());
+		for (Calendar c: a.getCalendars()) {
+			if (c.equals(calendar)) {
+				c.getTrips().remove(trip);
 			}
 		}
 		
@@ -316,7 +325,6 @@ public class FrequencyTripController {
 								t.setGtfsId(trip.getGtfsId());
 								t.setTripHeadsign(trip.getTripHeadsign());
 								t.setTripShortName(trip.getTripShortName());
-								t.setCalendar(calendar);
 								t.setDirectionId(trip.getDirectionId());
 								t.setBlockId(trip.getBlockId());
 								t.setWheelchairAccessible(trip.getWheelchairAccessible());
@@ -329,6 +337,14 @@ public class FrequencyTripController {
 								t.setEndTime(end);
 								t.setHeadwaySecs(trip.getHeadwaySecs());
 								t.setExactTimes(trip.getExactTimes());
+								for (Calendar c: a.getCalendars()) {
+									if (c.equals(calendar)) {
+										c.getTrips().remove(activetrip);
+										c.addTrip(t);
+										session.setAttribute("calendarioAttivo", c);
+										break;
+									}
+								}
 								session.setAttribute("corsaAFrequenzaAttiva", t);
 								session.setAttribute("schemaCorsaAttivo", tp);
 								session.setAttribute("lineaAttiva", r);
