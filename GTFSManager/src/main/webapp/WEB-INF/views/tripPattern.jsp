@@ -173,24 +173,24 @@
 		});
 		
 		// Duplicate tripPattern form validation
-// 		$("#duplicaSchemaCorsaForm").validate({
-// 			rules: {
-// 				newGtfsId: {
-// 					required: true
-// 				}
-// 			},
-// 			messages: {
-// 				newGtfsId: {
-// 					required: "Il campo id è obbligatorio"
-// 				}
-// 			},
-// 			highlight: function(label) {
-// 				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
-// 			},
-// 			success: function(label) {
-// 				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
-// 			}
-// 		});
+		$("#duplicaSchemaCorsaForm").validate({
+			rules: {
+				newGtfsId: {
+					required: true
+				}
+			},
+			messages: {
+				newGtfsId: {
+					required: "Il campo id è obbligatorio"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
 		
 		// table initialization to have sortable columns
 		$('.sortable').dataTable({
@@ -455,15 +455,15 @@
 						<a id="modificaSchemaCorsaButton" class="btn btn-primary" href="/_5t/modificaSchemaCorsa">Modifica</a>
 						<button id="eliminaSchemaCorsaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
-<!-- 					<div class="col-lg-12"> -->
-<%-- 						<form id="duplicaSchemaCorsaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaSchemaCorsa"> --%>
-<!-- 							<div class="form-group"> -->
-<!-- 								<label for="newGtfsId" class="required">Duplica con id</label> -->
-<!-- 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" /> -->
-<!-- 							</div> -->
-<!-- 							<input class="btn btn-info" type="submit" value="Duplica" /> -->
-<%-- 						</form> --%>
-<!-- 					</div> -->
+					<div class="col-lg-12">
+						<form id="duplicaSchemaCorsaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaSchemaCorsa">
+							<div class="form-group">
+								<label for="newGtfsId" class="required">Duplica con id</label>
+					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuovo schema corsa" maxlength="50" />
+							</div>
+							<input class="btn btn-info" type="submit" value="Duplica" />
+						</form>
+					</div>
 				</div>
 			</c:if>
 			
@@ -599,12 +599,13 @@
 						}
 						
 					}
-					List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
-					Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
-					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-					Calendar cal = new GregorianCalendar();
-					cal.setTime(new Time(0, 0, 0));
-					for (StopTimeRelative str: stopTimeRelatives) {
+					if (((TripPattern) session.getAttribute("schemaCorsaAttivo")) != null) {
+						List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
+						Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
+						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+						Calendar cal = new GregorianCalendar();
+						cal.setTime(new Time(0, 0, 0));
+						for (StopTimeRelative str: stopTimeRelatives) {
 					%>
 				        <li class="timeline-inverted">
 					        <div class="timeline-badge"></div>
@@ -629,7 +630,10 @@
 					            </div>
 				          	</div>
 				        </li>
-					<% } %>
+					<% 
+						}
+					}
+					%>
 			    </ul>
 			</div>
 		</div>

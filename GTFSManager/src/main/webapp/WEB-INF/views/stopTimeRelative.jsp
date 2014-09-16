@@ -117,14 +117,14 @@
 									"<b>Fermata: </b> ${fermata.name}" +
 									'<input name="stopId" type="hidden" value="${fermata.id}" />' +
 									'<div class="row">' +
-										'<div class="form-group col-lg-6">' +
-											'<label for="arrival" class="required">Ora arrivo</label>' +
+										'<div class="form-group col-lg-8">' +
+											'<label for="arrival" class="required">Tempo di arrivo dall\'ultima fermata</label>' +
 											'<input type="time" name="arrival" class="form-control" id="arrivalTime" required="true" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
-										'<div class="form-group col-lg-6">' +
-											'<label for="departure" class="required">Ora partenza</label>' +
+										'<div class="form-group col-lg-8">' +
+											'<label for="departure" class="required">Tempo durante cui il mezzo rimane in fermata</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
 										'</div>' +
 									'</div>' +
@@ -187,14 +187,14 @@
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
-										'<div class="form-group col-lg-6">' +
-											'<label for="arrival" class="required">Ora arrivo</label>' +
+										'<div class="form-group col-lg-8">' +
+											'<label for="arrival" class="required">Tempo di arrivo dall\'ultima fermata</label>' +
 											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.relativeArrivalTime}" required="true" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
-										'<div class="form-group col-lg-6">' +
-											'<label for="departure" class="required">Ora partenza</label>' +
+										'<div class="form-group col-lg-8">' +
+											'<label for="departure" class="required">Tempo durante cui il mezzo rimane in fermata</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.relativeDepartureTime}" required="true" />' +
 										'</div>' +
 									'</div>' +
@@ -312,9 +312,10 @@
 		map.on('draw:edited', function (e) {
 			var layers = e.layers;
 		    layers.eachLayer(function (layer) {
+		    	//window.location.href = "/_5t/salvaShape?encodedPolyline=" + layer.encodePath();
 				$("#encodedPolyline").val(layer.encodePath());
+				$("#creaShapeForm").submit();
 		    });
-			
 		});
 	});
 	
@@ -328,12 +329,12 @@
 		}*/
 		
 		// non si può salvare uno shape se non è ancora stato creato
-		$("#creaShapeForm").submit(function(e) {
+		/*$("#creaShapeForm").submit(function(e) {
 			if (!$("#encodedPolyline").val()) {
 				$("#no-shape-to-save").alert();
 				e.preventDefault();
 			}
-		});
+		});*/
 		
 		// when alert are closed, they are hidden
 		$('.close').click(function() {
@@ -359,7 +360,12 @@
 	<h3>Assegnazione fermate alla corsa ${corsaAttiva.tripShortName}</h3>
 	
 	<p>Cliccare su una fermata per aggiungerla alla corsa. Le fermate verdi appartengono alla corsa.<br>
-	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom. Una volta modificato deve essere salvato cliccando su "Salva shape".</p>
+	I tempi da inserire sono relativi a quello precedente:
+	<ul>
+		<li>Tempo di arrivo dall'ultima fermata: lasso di tempo tra la partenza dalla fermata precedente all'arrivo alla fermata attuale
+		<li>Tempo durante cui il mezzo rimane in fermata: lasso di tempo tra l'arrivo e la partenza dalla fermata attuale (quanto tempo il mezzo rimane in fermata)
+	</ul>
+	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom.</p>
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
@@ -380,13 +386,8 @@
 					</c:choose>
 				</div>
 			</div>
-			<div class="row col-lg-12">
-				<div class="form-group">
-					<input class="btn btn-success" type="submit" value="Salva shape" />
-				</div>
-			</div>
 		</form:form>
-		<br><br><br><br><br><br>
+		
 		<div class="row col-lg-12">
 			<a type="button" class="btn btn-default" href="/_5t/fermate">Aggiungi altre fermate all'agenzia</a>
 		</div>

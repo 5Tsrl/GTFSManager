@@ -11,6 +11,10 @@ import it.torino._5t.dao.TripPatternDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
 import it.torino._5t.entity.Route;
+import it.torino._5t.entity.Shape;
+import it.torino._5t.entity.Stop;
+import it.torino._5t.entity.StopTimeRelative;
+import it.torino._5t.entity.Trip;
 import it.torino._5t.entity.TripPattern;
 
 import org.slf4j.Logger;
@@ -230,7 +234,7 @@ public class TripPatternController {
 	
 	// chiamata al submit del form per la modifica di uno schema corsa
 	@RequestMapping(value = "/modificaSchemaCorsa", method = RequestMethod.POST)
-	public String editTrip(@ModelAttribute @Valid TripPattern tripPattern, BindingResult bindingResult, @RequestParam("serviceId") Integer serviceId, Model model, HttpSession session) {
+	public String editTripPattern(@ModelAttribute @Valid TripPattern tripPattern, BindingResult bindingResult, @RequestParam("serviceId") Integer serviceId, Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -268,16 +272,13 @@ public class TripPatternController {
 			if (r.equals(route)) {
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (!activetrippattern.getGtfsId().equals(tripPattern.getGtfsId()) && tp.getGtfsId().equals(tripPattern.getGtfsId())) {
-						logger.error("L'id della corsa è già presente");
+						logger.error("L'id dello schema corsa è già presente");
 						model.addAttribute("listaSchemiCorse", r.getTripPatterns());
 						model.addAttribute("listaCalendari", a.getCalendars());
-						TripPattern tripPat = (TripPattern) session.getAttribute("schemaCorsaAttivo");
-						if (tripPat != null) {
-							//tripPatternDAO.updateTripPattern(tripPat);
-							model.addAttribute("listaFermateCorsa", tripPat.getStopTimeRelatives());
-						}
+						model.addAttribute("listaFermateCorsa", tripPattern.getStopTimeRelatives());
 						model.addAttribute("showEditForm", true);
 						model.addAttribute("showAlertDuplicateTripPattern", true);
+						model.addAttribute("tripPattern", new TripPattern());
 						return "tripPattern";
 					}
 				}
@@ -312,105 +313,102 @@ public class TripPatternController {
 		return "redirect:schemiCorse";
 	}
 	
-//	// chiamata al submit del form per la duplicazione di una corsa
-//	@RequestMapping(value = "/duplicaCorsa", method = RequestMethod.POST)
-//	public String duplicateTrip(@RequestParam("newGtfsId") String newGtfsId, Model model, HttpSession session) {
-//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-//		if (agency == null) {
-//			return "redirect:agenzie";
-//		}
-//		Agency a = agencyDAO.loadAgency(agency.getId());
-//		
-//		Route route = (Route) session.getAttribute("lineaAttiva");
-//		if (route == null) {
-//			return "redirect:linee";
-//		}
-//		
-//		Trip trip = (Trip) session.getAttribute("corsaAttiva");
-//		if (trip == null) {
-//			return "redirect:corse";
-//		}
-//		
-//		if (newGtfsId == null) {
-//			logger.error("Nessun id inserito per la corsa duplicata");
-//			model.addAttribute("listaCorse", route.getTrips());
-//			model.addAttribute("listaCalendari", a.getCalendars());
-//			model.addAttribute("showCreateForm", true);
-//			return "trip";
-//		}
-//		
-//		Trip duplicatedTrip = new Trip();
-//		duplicatedTrip.setGtfsId(newGtfsId);
-//		duplicatedTrip.setTripHeadsign(trip.getTripHeadsign());
-//		duplicatedTrip.setTripShortName(trip.getTripShortName());
-//		duplicatedTrip.setDirectionId(trip.getDirectionId());
-//		duplicatedTrip.setWheelchairAccessible(trip.getWheelchairAccessible());
-//		duplicatedTrip.setBikesAllowed(trip.getBikesAllowed());
-//		for (Frequency f: trip.getFrequencies()) {
-//			duplicatedTrip.addFrequency(new Frequency(f.getTrip(), f.getStartTime(), f.getEndTime(), f.getHeadwaySecs(), f.getExactTimes()));
-//		}
-//		// cerco tra le linee dell'agenzia quella attiva
-//		for (Route r: a.getRoutes()) {
-//			if (r.equals(route)) {
-//				for (Trip t: tripDAO.getTripsFromRoute(r)) {
-//					if (t.getGtfsId().equals(newGtfsId)) {
-//						logger.error("L'id della corsa è già presente");
-//						model.addAttribute("listaCorse", r.getTrips());
-//						model.addAttribute("listaCalendari", a.getCalendars());
-//						model.addAttribute("showAlertDuplicateTripPattern", true);
-//						model.addAttribute("trip", new Trip());
-//						return "trip";
-//					}
-//				}
-//				// tra le corse della linea quella attiva e le modifico l'associazione
-//				for (Trip t: r.getTrips()) {
-//					if (t.equals(trip)) {
-//						for (StopTime st: t.getStopTimes()) {
-//							StopTime stopTime = new StopTime(st.getArrivalTime(), st.getDepartureTime(), st.getStopSequence(), st.getStopHeadsign(), st.getPickupType(), st.getDropOffType(), st.getShapeDistTraveled());
-//							for (Stop s: a.getStops()) {
-//								if (s.getId().equals(st.getStop().getId())) {
-//									s.addStopTime(stopTime);
-//									break;
-//								}
-//							}
-//							duplicatedTrip.addStopTime(stopTime);
-//						}
-//						if (t.getShape() != null) {
-//							for (Shape s: a.getShapes()) {
-//								if (s.getId().equals(t.getShape().getId())) {
-//									Shape shape = new Shape();
-//									shape.setEncodedPolyline(s.getEncodedPolyline());
-//									shape.addTrip(duplicatedTrip);
-//									a.addShape(shape);
-//									break;
-//								}
-//							}
-//						}
-//						break;
-//					}
-//				}
-//				break;
-//			}
-//		}
-//		
-//		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
-//		for (Route r: a.getRoutes()) {
-//			if (r.equals(route)) {
-//				r.addTrip(duplicatedTrip);
-//				session.setAttribute("lineaAttiva", r);
-//				break;
-//			}
-//		}
-//		
-//		Calendar calendar = calendarDAO.getCalendar(trip.getCalendar().getId());
-//		calendar.addTrip(duplicatedTrip);
-//		
-//		logger.info("Corsa creata: " + duplicatedTrip.getTripShortName() + ".");
-//		
-//		session.removeAttribute("servizioAttivo");
-//		session.setAttribute("agenziaAttiva", a);
-//		session.setAttribute("corsaAttiva", duplicatedTrip);
-//		
-//		return "redirect:corse";
-//	}
+	// chiamata al submit del form per la duplicazione di una corsa
+	@RequestMapping(value = "/duplicaSchemaCorsa", method = RequestMethod.POST)
+	public String duplicateTripPattern(@RequestParam("newGtfsId") String newGtfsId, Model model, HttpSession session, RedirectAttributes redirectAttributes) {
+		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+		if (agency == null) {
+			return "redirect:agenzie";
+		}
+		Agency a = agencyDAO.loadAgency(agency.getId());
+		
+		Route route = (Route) session.getAttribute("lineaAttiva");
+		if (route == null) {
+			return "redirect:linee";
+		}
+		
+		TripPattern tripPattern = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+		if (tripPattern == null) {
+			return "redirect:schemiCorse";
+		}
+		
+		if (newGtfsId == null) {
+			redirectAttributes.addFlashAttribute("showAlertDuplicateTripPattern", true);
+			return "redirect:schemiCorse";
+		}
+		
+		TripPattern duplicatedTripPattern = new TripPattern();
+		duplicatedTripPattern.setGtfsId(newGtfsId);
+		duplicatedTripPattern.setTripHeadsign(tripPattern.getTripHeadsign());
+		duplicatedTripPattern.setTripShortName(tripPattern.getTripShortName());
+		duplicatedTripPattern.setDirectionId(tripPattern.getDirectionId());
+		duplicatedTripPattern.setWheelchairAccessible(tripPattern.getWheelchairAccessible());
+		duplicatedTripPattern.setBikesAllowed(tripPattern.getBikesAllowed());
+		
+		// cerco tra le linee dell'agenzia quella attiva
+		for (Route r: a.getRoutes()) {
+			if (r.equals(route)) {
+				// controllo che l'id inserito non esista già
+				for (TripPattern tp: r.getTripPatterns()) {
+					if (tp.getGtfsId().equals(newGtfsId)) {
+						logger.error("L'id dello schema corsa è già presente");
+						redirectAttributes.addFlashAttribute("showAlertDuplicateTripPattern", true);
+						return "redirect:schemiCorse";
+					}
+				}
+				// cerco tra gli schemi corsa della linea quello attivo
+				for (TripPattern tp: r.getTripPatterns()) {
+					if (tp.equals(tripPattern)) {
+						// associo il calendario
+						Calendar calendar = calendarDAO.getCalendar(tp.getCalendar().getId());
+						calendar.addTripPattern(duplicatedTripPattern);
+						// copio tutte le fermate associate allo schema corsa
+						for (StopTimeRelative str: tp.getStopTimeRelatives()) {
+							StopTimeRelative stopTimeRelative = new StopTimeRelative(str.getRelativeArrivalTime(), str.getRelativeDepartureTime(), str.getStopSequence(), str.getStopHeadsign(), str.getPickupType(), str.getDropOffType(), str.getShapeDistTraveled());
+							for (Stop s: a.getStops()) {
+								if (s.getId().equals(str.getStop().getId())) {
+									s.addStopTimeRelative(stopTimeRelative);
+									break;
+								}
+							}
+							duplicatedTripPattern.addStopTimeRelative(stopTimeRelative);
+						}
+						// se lo schema corsa ha uno shape associato, lo duplico
+						Shape shape = new Shape();
+						if (tp.getShape() != null) {
+							for (Shape s: a.getShapes()) {
+								if (s.getId().equals(tp.getShape().getId())) {
+									shape.setEncodedPolyline(s.getEncodedPolyline());
+									shape.addTripPattern(duplicatedTripPattern);
+									a.addShape(shape);
+									break;
+								}
+							}
+						}
+						// copio tutte le corse associate allo schema corsa
+						/*for (Trip t: tp.getTrips()) {
+							Trip trip = new Trip(t.getGtfsId(), t.getStartTime(), t.getEndTime(), t.getHeadwaySecs(), t.getExactTimes(), t.getRoute(), t.getTripHeadsign(), t.getTripShortName(), t.getDirectionId(), t.getBlockId(), t.isSingleTrip(), shape, t.getWheelchairAccessible(), t.getBikesAllowed());
+							calendar.addTrip(trip);
+							duplicatedTripPattern.addTrip(trip);
+							logger.info("----> Added trip: " + trip.getGtfsId());
+						}
+						logger.info("----> Trips: " + duplicatedTripPattern.getTrips().size());
+						break;*/
+					}
+				}
+				r.addTripPattern(duplicatedTripPattern);
+				session.setAttribute("lineaAttiva", r);
+				break;
+			}
+		}
+		
+		logger.info("Schema corsa creato: " + duplicatedTripPattern.getGtfsId() + ".");
+		
+		session.removeAttribute("corsaSingolaAttiva");
+		session.removeAttribute("corsaAFrequenzaAttiva");
+		session.setAttribute("agenziaAttiva", a);
+		session.setAttribute("schemaCorsaAttivo", duplicatedTripPattern);
+		
+		return "redirect:schemiCorse";
+	}
 }

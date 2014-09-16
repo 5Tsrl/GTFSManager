@@ -210,7 +210,7 @@
 					// if the stop has some trips associated or it is a station with some children stops, it is green and can't be deleted; a list of all trips associated and children stops is displayed
 					popupContent +=	'<p>Non puoi eliminare questa fermata.<br>Le seguenti corse sono associate ad essa:</p><ul>';
 					<c:forEach var="stopTimeRelative" items="${fermata.stopTimeRelatives}">
-						popupContent +=	'<li>${stopTimeRelative.tripPattern.route.shortName} - <a href="/_5t/selezionaSchemaCorsa?id=${stopTimeRelative.tripPattern.id}">${stopTimeRelative.tripPattern.tripShortName}</a></li>';
+						popupContent +=	'<li>${stopTimeRelative.tripPattern.route.shortName} - <a href="/_5t/selezionaSchemaCorsa?id=${stopTimeRelative.tripPattern.id}">${stopTimeRelative.tripPattern.gtfsId}</a></li>';
 					</c:forEach>
 					popupContent +=	'</ul>';
 					popupContent +=	'<p>Le seguenti fermate sono all\'interno della stazione:</p><ul>';

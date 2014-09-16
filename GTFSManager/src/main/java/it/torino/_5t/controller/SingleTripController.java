@@ -112,7 +112,7 @@ public class SingleTripController {
 				singleTrips.add(t);
 		}
 		
-		for (Trip t: tripPattern.getTrips()) {
+		for (Trip t: tripDAO.getAllTrips()) {
 			if (t.getGtfsId().equals(trip.getGtfsId())) {
 				logger.error("L'id della corsa singola è già presente");
 				model.addAttribute("listaCorseSingole", singleTrips);
@@ -290,7 +290,7 @@ public class SingleTripController {
 				singleTrips.add(t);
 		}
 		
-		for (Trip t: tripPattern.getTrips()) {
+		for (Trip t: tripDAO.getAllTrips()) {
 			if (!activetrip.getGtfsId().equals(trip.getGtfsId()) && t.getGtfsId().equals(trip.getGtfsId())) {
 				logger.error("L'id della corsa singola è già presente");
 				model.addAttribute("listaCorseSingole", singleTrips);

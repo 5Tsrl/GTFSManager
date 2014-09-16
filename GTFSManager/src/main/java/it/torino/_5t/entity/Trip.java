@@ -96,6 +96,30 @@ public class Trip implements Serializable{
 	@Max(2)
 	private Integer bikesAllowed;
 
+	public Trip() {}
+	
+	public Trip(String gtfsId, Time startTime, Time endTime,
+			Integer headwaySecs, Integer exactTimes, Route route,
+			String tripHeadsign, String tripShortName, Integer directionId,
+			String blockId, boolean singleTrip, Shape shape,
+			Integer wheelchairAccessible, Integer bikesAllowed) {
+		super();
+		this.gtfsId = gtfsId;
+		this.startTime = startTime;
+		this.endTime = endTime;
+		this.headwaySecs = headwaySecs;
+		this.exactTimes = exactTimes;
+		this.route = route;
+		this.tripHeadsign = tripHeadsign;
+		this.tripShortName = tripShortName;
+		this.directionId = directionId;
+		this.blockId = blockId;
+		this.singleTrip = singleTrip;
+		this.shape = shape;
+		this.wheelchairAccessible = wheelchairAccessible;
+		this.bikesAllowed = bikesAllowed;
+	}
+
 	@Override
 	public int hashCode() {
 		final int prime = 31;
