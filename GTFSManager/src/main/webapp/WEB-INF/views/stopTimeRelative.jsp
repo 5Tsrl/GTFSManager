@@ -26,7 +26,6 @@
 	<link href="<c:url value='/resources/css/leaflet.label.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.markcluster.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
-	<link href="<c:url value='/resources/css/timeline.css' />" type="text/css" rel="stylesheet">
 	<link href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css" type="text/css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
@@ -124,7 +123,7 @@
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
-											'<label for="departure" class="required">Tempo durante cui il mezzo rimane in fermata</label>' +
+											'<label for="departure" class="required">Tempo di permanenza in fermata</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
 										'</div>' +
 									'</div>' +
@@ -194,7 +193,7 @@
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
-											'<label for="departure" class="required">Tempo durante cui il mezzo rimane in fermata</label>' +
+											'<label for="departure" class="required">Tempo di permanenza in fermata</label>' +
 											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.relativeDepartureTime}" required="true" />' +
 										'</div>' +
 									'</div>' +
@@ -309,6 +308,22 @@
 			$("#encodedPolyline").val(polyline.encodePath());
 		});
 		
+		$("#calcolaPercorsoOTPButton").click(function() {
+			for (var i=2; i<fermateCorsaCoordinates.length; i++) {
+				$.ajax({
+					url: "http://172.21.30.5:8080/otp/ws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR"
+				}).done(function(data) {
+					console.log("Dati: " + data);
+				});
+			}
+// 			$.ajax({
+// 				url: "http://supremo:8080/otp/ws/routers/default/plan?fromPlace=45.075676%2C7.684023&toPlace=45.071156629990796%2C7.655925750732422&mode=CAR",
+// 				dataType: "jsonp"
+// 			}).done(function(data) {
+// 				console.log(data);
+// 			});
+		});
+		
 		map.on('draw:edited', function (e) {
 			var layers = e.layers;
 		    layers.eachLayer(function (layer) {
@@ -351,9 +366,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
-		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-		<li><a href="/_5t/schemiCorse">Schema corsa ${schemaCorsaAttivo.gtfsId}</a></li>
+		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/linee">Linea <b>${lineaAttiva.shortName}</b></a></li>
+		<li><a href="/_5t/schemiCorse">Schema corsa <b>${schemaCorsaAttivo.gtfsId}</b></a></li>
 		<li class="active">Fermate</li>
 	</ol>
 	
@@ -363,13 +378,14 @@
 	I tempi da inserire sono relativi a quello precedente:
 	<ul>
 		<li>Tempo di arrivo dall'ultima fermata: lasso di tempo tra la partenza dalla fermata precedente all'arrivo alla fermata attuale
-		<li>Tempo durante cui il mezzo rimane in fermata: lasso di tempo tra l'arrivo e la partenza dalla fermata attuale (quanto tempo il mezzo rimane in fermata)
+		<li>Tempo di permanenza in fermata: lasso di tempo tra l'arrivo e la partenza dalla fermata attuale
 	</ul>
 	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom.</p>
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
 		<button id="unisciFermateButton" class="btn btn-primary">Unisci fermate</button>
+		<button id="calcolaPercorsoOTPButton" class="btn btn-primary">Calcola percorso con OTP</button>
 		<form:form id="creaShapeForm" commandName="shape" role="form" method="post" action="/_5t/creaShape">
 			<div class="row">
 				<div class="form-group">
@@ -392,50 +408,57 @@
 			<a type="button" class="btn btn-default" href="/_5t/fermate">Aggiungi altre fermate all'agenzia</a>
 		</div>
 		<br><br><br>
-		<div class="row col-lg-12">
-			<ul class="timeline">
-				<%
-				class StopTimeRelativeComparator implements Comparator<StopTimeRelative> {
-
-					@Override
-					public int compare(StopTimeRelative o1, StopTimeRelative o2) {
-						return o1.getStopSequence().compareTo(o2.getStopSequence());
-					}
-					
-				}
-				List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
-				Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
-				SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
-				Calendar cal = new GregorianCalendar();
-				cal.setTime(new Time(0, 0, 0));
-				for (StopTimeRelative str: stopTimeRelatives) {
-				%>
-			        <li class="timeline-inverted">
-				        <div class="timeline-badge"></div>
-				        <div class="timeline-panel">
-			            	<div class="timeline-heading">
-			              		<h4 class="timeline-title"><% out.write(str.getStop().getName()); %></h4>
-			            	</div>
-				            <div class="timeline-body">
-				            	<%
-				            	Calendar toAdd = new GregorianCalendar();
-				            	toAdd.setTime(str.getRelativeArrivalTime());
-				            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
-								cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
-				            	%>
-				              	<p>Arrivo: <% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></p>
-				            	<%
-				            	toAdd.setTime(str.getRelativeDepartureTime());
-				            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
-								cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
-				            	%>
-				              	<p>Partenza: <% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></p>
-				            </div>
-			          	</div>
-			        </li>
-				<% } %>
-		    </ul>
-		</div>
+		<c:if test="${not empty listaFermateCorsa}">
+			<div class="row col-lg-12">
+				<table class="stopSequence">
+					<thead>
+						<tr>
+							<th>N°</th>
+							<th>Fermata</th>
+							<th>Arrivo</th>
+							<th>Partenza</th>
+						</tr>
+					</thead>
+					<tbody>
+						<%
+						class StopTimeRelativeComparator implements Comparator<StopTimeRelative> {
+		
+							@Override
+							public int compare(StopTimeRelative o1, StopTimeRelative o2) {
+								return o1.getStopSequence().compareTo(o2.getStopSequence());
+							}
+							
+						}
+						List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
+						Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
+						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+						Calendar cal = new GregorianCalendar();
+						cal.setTime(new Time(0, 0, 0));
+						int i = 1;
+						for (StopTimeRelative str: stopTimeRelatives) {
+						%>
+						<tr>
+							<td><%= i++ %></td>
+							<td><% out.write(str.getStop().getName()); %></td>
+			            	<%
+			            	Calendar toAdd = new GregorianCalendar();
+			            	toAdd.setTime(str.getRelativeArrivalTime());
+			            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+							cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+			            	%>
+			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+			            	<%
+			            	toAdd.setTime(str.getRelativeDepartureTime());
+			            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+							cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+			            	%>
+			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+						</tr>
+						<% } %>
+					</tbody>
+			    </table>
+			</div>
+		</c:if>
 	</div>
 	
 	<!-- Alerts -->

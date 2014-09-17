@@ -447,12 +447,19 @@ public class ExportGTFSController {
 		for (Shape s: shapeDAO.getAllShapes()) {
 			List<Point2D.Double> points = decodePolyline(s.getEncodedPolyline());
 			int sequence = 0;
+			double totDistance = 0.0;
 			for (Point2D.Double p: points) {
 				row += s.getId() + ",";
 				row += String.format(Locale.ENGLISH, "%.5f", p.getX()) + ",";
 				row += String.format(Locale.ENGLISH, "%.5f", p.getY()) + ",";
-				row += sequence++ + ",";
-				row += String.format(Locale.ENGLISH, "%.4f", computeDistance(p.getX(), p.getY(), points.get(0).getX(), points.get(0).getY())) + "\n";
+				row += sequence + ",";
+				if (sequence == 0) {
+					row += "0.0000\n";
+				} else {
+					totDistance += computeDistance(p.getX(), p.getY(), points.get(sequence-1).getX(), points.get(sequence-1).getY());
+					row += String.format(Locale.ENGLISH, "%.4f", totDistance) + "\n";
+				}
+				sequence++;
 			}
 		}
 		shapeOutput.write(row.getBytes());

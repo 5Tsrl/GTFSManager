@@ -22,7 +22,6 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<title>GTFS Manager - Corse singole</title>
 	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
-	<link href="<c:url value='/resources/css/timeline.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
@@ -195,8 +194,8 @@
 		$('.sortable').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
-	    	// default sorting on the first column ("Nome")
-	    	"order": [[0, "asc"]],
+	    	// default sorting on the fifth column ("Ora partenza")
+	    	"order": [[4, "asc"]],
 	    	"language": {
 	    		"search": "Cerca:",
 	    		"zeroRecords": "Nessuna corsa singola"
@@ -210,9 +209,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
-		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-		<li><a href="/_5t/schemiCorse">Schema corsa ${schemaCorsaAttivo.gtfsId}</a></li>
+		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/linee">Linea <b>${lineaAttiva.shortName}</b></a></li>
+		<li><a href="/_5t/schemiCorse">Schema corsa <b>${schemaCorsaAttivo.gtfsId}</b></a></li>
 		<li class="active">Corse singole</li>
 	</ol>
 	
@@ -603,7 +602,16 @@
 			</div>
 			
 			<div class="row col-lg-12">
-				<ul class="timeline">
+				<table class="stopSequence">
+					<thead>
+						<tr>
+							<th>N°</th>
+							<th>Fermata</th>
+							<th>Arrivo</th>
+							<th>Partenza</th>
+						</tr>
+					</thead>
+					<tbody>
 					<%
 					class StopTimeRelativeComparator implements Comparator<StopTimeRelative> {
 	
@@ -619,34 +627,29 @@
 					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
 					Calendar cal = new GregorianCalendar();
 					cal.setTime(trip.getStartTime());
+					int i = 1;
 					for (StopTimeRelative str: stopTimeRelatives) {
 					%>
-				        <li class="timeline-inverted">
-					        <div class="timeline-badge"></div>
-					        <div class="timeline-panel">
-				            	<div class="timeline-heading">
-				              		<h4 class="timeline-title"><% out.write(str.getStop().getName()); %></h4>
-				            	</div>
-					            <div class="timeline-body">
-					            	<%
-					            	Calendar toAdd = new GregorianCalendar();
-					            	toAdd.setTime(str.getRelativeArrivalTime());
-					            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
-									cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
-					            	%>
-					              	<p>Arrivo: <% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></p>
-					            	<%
-					            	toAdd.setTime(str.getRelativeDepartureTime());
-					            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
-									cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
-					            	%>
-					              	<p>Partenza: <% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></p>
-					            </div>
-				          	</div>
-				        </li>
+					<tr>
+						<td><%= i++ %></td>
+						<td><% out.write(str.getStop().getName()); %></td>
+		            	<%
+		            	Calendar toAdd = new GregorianCalendar();
+		            	toAdd.setTime(str.getRelativeArrivalTime());
+		            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+		            	%>
+		              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+		            	<%
+		            	toAdd.setTime(str.getRelativeDepartureTime());
+		            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
+						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+		            	%>
+		              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+					</tr>
 					<% } %>
-			    </ul>
-			</div>
+				</tbody>
+		    </table>
 		</div>
 	</div>
 	

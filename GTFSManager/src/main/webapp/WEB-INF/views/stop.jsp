@@ -455,11 +455,7 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
-		<c:if test="${not empty lineaAttiva.shortName && not empty corsaAttiva.tripShortName}">
-			<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-			<li><a href="/_5t/schemiCorse">Schema corsa ${schemaCorsaAttivo.gtfsId}</a></li>
-		</c:if>
+		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
 		<li class="active">Fermate</li>
 	</ol>
 	
@@ -470,8 +466,8 @@
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
-		<c:if test="${not empty lineaAttiva.shortName && not empty corsaAttiva.tripShortName}">
-			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate alla corsa ${corsaAttiva.tripShortName}</a>
+		<c:if test="${not empty lineaAttiva.shortName && not empty schemaCorsaAttivo.gtfsId}">
+			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate allo schema corsa ${schemaCorsaAttivo.gtfsId}</a>
 		</c:if>
 	</div>
 	
