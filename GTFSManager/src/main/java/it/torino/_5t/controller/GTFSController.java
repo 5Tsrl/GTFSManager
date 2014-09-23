@@ -28,41 +28,49 @@ import it.torino._5t.entity.Transfer;
 import it.torino._5t.entity.Trip;
 
 import java.awt.geom.Point2D;
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.sql.Date;
 import java.sql.Time;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 import java.util.zip.ZipEntry;
+import java.util.zip.ZipFile;
 import java.util.zip.ZipOutputStream;
 
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 
+import org.apache.commons.io.FilenameUtils;
 import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.ModelAttribute;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.multipart.MultipartFile;
 
 @Controller
-public class ExportGTFSController {
-	private static final Logger logger = LoggerFactory.getLogger(ExportGTFSController.class);
+public class GTFSController {
+	private static final Logger logger = LoggerFactory.getLogger(GTFSController.class);
 	
 	private static final String AGENCY_FILE_NAME = "agency.txt";
 	private static final String CALENDAR_FILE_NAME = "calendar.txt";
@@ -243,7 +251,7 @@ public class ExportGTFSController {
 		
 		return "redirect:esportaGTFS";
 	}
-
+	
 	private void initializeOutputStreams() throws IOException {
 		agencyOutputFile = File.createTempFile("agency", ".txt");
 		calendarOutputFile = File.createTempFile("calendar", ".txt");
@@ -320,13 +328,13 @@ public class ExportGTFSController {
 	private void fillAgency() throws IOException {
 		String row = new String();
 		for (Agency a: agencyDAO.getAllAgencies()) {
-			row += a.getGtfsId() + ",";
+			row += formatOptionalString(a.getGtfsId()) + ",";
 			row += a.getName() + ",";
 			row += a.getUrl() + ",";
 			row += a.getTimezone() + ",";
-			row += a.getLanguage() + ",";
-			row += a.getPhone() + ",";
-			row += a.getFareUrl() + "\n";
+			row += formatOptionalString(a.getLanguage()) + ",";
+			row += formatOptionalString(a.getPhone()) + ",";
+			row += formatOptionalString(a.getFareUrl()) + "\n";
 		}
 		agencyOutput.write(row.getBytes());
 		logger.info("agency.txt completato.");
@@ -395,7 +403,7 @@ public class ExportGTFSController {
 		row += currentFeedInfo.getLanguage() + ",";
 		row += (currentFeedInfo.getStartDate() != null ? formatDate(currentFeedInfo.getStartDate()) : "") + ",";
 		row += (currentFeedInfo.getEndDate() != null ? formatDate(currentFeedInfo.getEndDate()) : "") + ",";
-		row += currentFeedInfo.getVersion() + "\n";
+		row += formatOptionalString(currentFeedInfo.getVersion()) + "\n";
 		feedInfoOutput.write(row.getBytes());
 		logger.info("feed_info.txt completato.");
 	}
@@ -428,11 +436,11 @@ public class ExportGTFSController {
 			row += (r.getAgency()  != null ? r.getAgency().getGtfsId() : "") + ",";
 			row += r.getShortName() + ",";
 			row += r.getLongName() + ",";
-			row += r.getDescription() + ",";
+			row += formatOptionalString(r.getDescription()) + ",";
 			row += r.getType() + ",";
-			row += r.getUrl() + ",";
-			row += r.getColor().substring(1).toUpperCase() + ",";
-			row += r.getTextColor().substring(1).toUpperCase() + "\n";
+			row += formatOptionalString(r.getUrl()) + ",";
+			row += formatOptionalString(r.getColor().substring(1).toUpperCase()) + ",";
+			row += formatOptionalString(r.getTextColor().substring(1).toUpperCase()) + "\n";
 		}
 		routeOutput.write(row.getBytes());
 		logger.info("routes.txt completato.");
@@ -459,16 +467,16 @@ public class ExportGTFSController {
 		String row = new String();
 		for (Stop s: stopDAO.getAllStops()) {
 			row += s.getGtfsId() + ",";
-			row += s.getCode() + ",";
+			row += formatOptionalString(s.getCode()) + ",";
 			row += s.getName() + ",";
-			row += s.getDesc() + ",";
+			row += formatOptionalString(s.getDesc()) + ",";
 			row += s.getLat() + ",";
 			row += s.getLon() + ",";
 			row += (s.getZone()  != null ? s.getZone().getGtfsId() : "") + ",";
-			row += s.getUrl() + ",";
+			row += formatOptionalString(s.getUrl()) + ",";
 			row += formatOptionalInteger(s.getLocationType()) + ",";
 			row += (s.getParentStation()  != null ? s.getParentStation().getId() : "") + ",";
-			row += s.getTimezone() + ",";
+			row += formatOptionalString(s.getTimezone()) + ",";
 			row += formatOptionalInteger(s.getWheelchairBoarding()) + "\n";
 		}
 		stopOutput.write(row.getBytes());
@@ -499,7 +507,7 @@ public class ExportGTFSController {
 			}
 			row += st.getStop().getGtfsId() + ",";
 			row += st.getStopSequence() + ",";
-			row += st.getStopHeadsign() + ",";
+			row += formatOptionalString(st.getStopHeadsign()) + ",";
 			row += formatOptionalInteger(st.getPickupType()) + ",";
 			row += formatOptionalInteger(st.getDropOffType()) + ",";
 			row += formatOptionalDouble(st.getShapeDistTraveled()) + "\n";
@@ -526,10 +534,10 @@ public class ExportGTFSController {
 			row += t.getRoute().getGtfsId() + ",";
 			row += t.getCalendar().getGtfsId() + ",";
 			row += t.getGtfsId() + ",";
-			row += t.getTripHeadsign() + ",";
-			row += t.getTripShortName() + ",";
+			row += formatOptionalString(t.getTripHeadsign()) + ",";
+			row += formatOptionalString(t.getTripShortName()) + ",";
 			row += formatOptionalInteger(t.getDirectionId()) + ",";
-			//TODO: row += (t.getBlock()  != null ? t.getBlock().getId() : "") + ",";
+			row += formatOptionalString(t.getBlockId()) + ",";
 			row += (t.getShape()  != null ? t.getShape().getId() : "") + ",";
 			row += formatOptionalInteger(t.getWheelchairAccessible()) + ",";
 			row += formatOptionalInteger(t.getBikesAllowed()) + "\n";
@@ -619,6 +627,13 @@ public class ExportGTFSController {
 			return "";
 	}
 	
+	private String formatOptionalString(String s) {
+		if (s != null)
+			return s;
+		else
+			return "";
+	}
+	
 	private String formatDate(Date date) {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		return dateFormat.format(date);
@@ -677,5 +692,74 @@ public class ExportGTFSController {
 	    double dist = (double) (earthRadius * c);
 
 	    return dist;
+	}
+	
+	@RequestMapping(value = "/importaGTFS", method = RequestMethod.POST)
+	public String uploadGTFS(Model model, @RequestParam("file") MultipartFile uploadedFile, HttpSession session) {
+		try {
+			String fileName = FilenameUtils.removeExtension(uploadedFile.getOriginalFilename());
+			uploadedFile.transferTo(new File(GTFS_HISTORY_DIR_NAME + "\\" + uploadedFile.getOriginalFilename()));
+			fillDatabase(GTFS_HISTORY_DIR_NAME + "\\" + uploadedFile.getOriginalFilename());
+			FeedInfo feedInfo = new FeedInfo();
+			feedInfo.setName(fileName);
+			feedInfoDAO.addFeedInfo(feedInfo);
+		} catch (IllegalStateException e) {
+			logger.error("Errore nel caricamento del feed");
+			e.printStackTrace();
+		} catch (IOException e) {
+			logger.error("Errore nel caricamento del feed");
+			e.printStackTrace();
+		}
+		
+		return "redirect:esportaGTFS";
+	}
+
+	private void fillDatabase(String uploadedFile) {
+		try {
+			ZipFile zipFile = new ZipFile(uploadedFile);
+			
+		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
+	
+		    while(entries.hasMoreElements()) {
+		        ZipEntry entry = entries.nextElement();
+		        InputStream stream = zipFile.getInputStream(entry);
+		        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
+		        String line = br.readLine();
+		        String[] header = line.split(",");
+		        if (entry.getName().equals("agency.txt")) {
+		        	while ((line = br.readLine()) != null) {
+		        		String[] elements = line.split(",");
+		        		Agency agency = new Agency();
+		        		for (int i=0; i<header.length; i++) {
+		        			if (!elements[i].isEmpty() && !StringUtils.containsWhitespace(elements[i])) {
+		        				logger.info("---> " + elements[i]);
+			        			if (header[i].equals("agency_id")) {
+			        				agency.setGtfsId(elements[i]);
+			        			} else if (header[i].equals("agency_name")) {
+			        				agency.setName(elements[i]);
+			        			} else if (header[i].equals("agency_url")) {
+			        				agency.setUrl(elements[i]);
+			        			} else if (header[i].equals("agency_timezone")) {
+			        				agency.setTimezone(elements[i]);
+			        			} else if (header[i].equals("agency_lang")) {
+			        				agency.setLanguage(elements[i]);
+			        			} else if (header[i].equals("agency_phone")) {
+			        				agency.setPhone(elements[i]);
+			        			} else if (header[i].equals("agency_fare_url")) {
+			        				agency.setFareUrl(elements[i]);
+			        			}
+		        			}
+		        		}
+		        		agencyDAO.addAgency(agency);
+		        	}
+		        	logger.info(entry.getName() + " letto.");
+		        } else if (entry.getName().equals("calendar.txt")) {
+		        	
+		        }
+		    }
+		} catch (IOException e) {
+			logger.error("Errore nella lettura del feed");
+			e.printStackTrace();
+		}
 	}
 }

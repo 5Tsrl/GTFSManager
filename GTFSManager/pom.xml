@@ -130,7 +130,12 @@
 			<version>5.1.0.Final</version>
 		</dependency>
 		
-		<!-- Apache Commons IO -->  
+		<!-- Apache Commons Upload and IO -->  
+		<dependency>  
+			<groupId>commons-fileupload</groupId>  
+			<artifactId>commons-fileupload</artifactId>  
+			<version>1.2.2</version>  
+		</dependency>  
 		<dependency>  
 			<groupId>commons-io</groupId>  
 			<artifactId>commons-io</artifactId>  

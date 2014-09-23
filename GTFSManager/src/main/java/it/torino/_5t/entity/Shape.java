@@ -33,19 +33,7 @@ public class Shape implements Serializable {
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
-	/*
-	@Column(name = "shape_pt_lat")
-	private double lat;
 	
-	@Column(name = "shape_pt_lon")
-	private double lon;
-	
-	@Column(name = "shape_pt_sequence")
-	private int sequence;
-	
-	@Column(name = "shape_dist_traveled")
-	private Double shapeDistTraveled;
-	*/
 	@Column(name = "shape_encoded_polyline")
 	private String encodedPolyline;
 	
@@ -92,39 +80,7 @@ public class Shape implements Serializable {
 	public void setAgency(Agency agency) {
 		this.agency = agency;
 	}
-	/*
-	public double getLat() {
-		return lat;
-	}
-
-	public void setLat(double lat) {
-		this.lat = lat;
-	}
-
-	public double getLon() {
-		return lon;
-	}
-
-	public void setLon(double lon) {
-		this.lon = lon;
-	}
-
-	public int getSequence() {
-		return sequence;
-	}
-
-	public void setSequence(int sequence) {
-		this.sequence = sequence;
-	}
-
-	public Double getShapeDistTraveled() {
-		return shapeDistTraveled;
-	}
-
-	public void setShapeDistTraveled(Double shapeDistTraveled) {
-		this.shapeDistTraveled = shapeDistTraveled;
-	}
-*/
+	
 	public String getEncodedPolyline() {
 		return encodedPolyline;
 	}

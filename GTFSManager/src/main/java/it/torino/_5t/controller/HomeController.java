@@ -16,7 +16,7 @@ public class HomeController {
 	public String home(Model model) {
 		logger.info("Accesso a home.");
 		
-		return "home";
+		return "redirect:agenzie";
 	}
 	
 }

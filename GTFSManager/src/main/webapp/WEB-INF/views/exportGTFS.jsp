@@ -15,6 +15,7 @@
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
+	<script src="http://jqueryvalidation.org/files/dist/additional-methods.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
 	// load the navigation bar
@@ -158,6 +159,28 @@
 				}
 			}
 		});
+		
+		// Upload feed form validation
+		$("#importaGTFSForm").validate({
+			rules: {
+				file: {
+					required: true,
+					extension: "zip"
+				}
+			},
+			messages: {
+				file: {
+					required: "Selezionare un file",
+					extension: "Il file deve avere estensione .zip"
+				}
+			},
+			highlight: function(label) {
+				$(label).closest('.form-group').removeClass('has-success').addClass('has-error');
+			},
+			success: function(label) {
+				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			}
+		});
 	});
     </script>
 </head>
@@ -283,6 +306,17 @@
 					</div>
 				</div>
 			</form:form>
+		</div>
+		
+		<div id="importaGTFS" class="row">
+			<form id="importaGTFSForm" class="form-inline" role="form" enctype="multipart/form-data" action="importaGTFS" method="post">
+				<div class="form-group">
+					<input name="file" type="file" class="form-control" id="file" required="true" />
+				</div>
+				<div class="form-group">
+					<input class="btn btn-success" type="submit" value="Importa GTFS" />
+				</div>
+			</form>
 		</div>
 							
 		<div class="row">

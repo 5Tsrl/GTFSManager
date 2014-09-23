@@ -59,10 +59,9 @@ public class Trip implements Serializable{
 	@Max(1)
 	private Integer directionId;
 	
-	// TODO
-//	@ManyToOne(fetch = FetchType.LAZY)
-//	@JoinColumn(name = "block_id")
-//	private Block block;
+	@JoinColumn(name = "block_id")
+	@Size(max = 50)
+	private String blockId;
 	
 	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
 	@JoinColumn(name = "shape_id")
@@ -163,6 +162,14 @@ public class Trip implements Serializable{
 
 	public void setDirectionId(Integer directionId) {
 		this.directionId = directionId;
+	}
+
+	public String getBlockId() {
+		return blockId;
+	}
+
+	public void setBlockId(String blockId) {
+		this.blockId = blockId;
 	}
 
 	public Shape getShape() {
