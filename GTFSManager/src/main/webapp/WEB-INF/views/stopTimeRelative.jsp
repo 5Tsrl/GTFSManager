@@ -315,11 +315,11 @@
 			for (var i=2; i<fermateCorsaCoordinates.length; i++) {
 				// call to the otp web service to calculate trip
 				$.ajax({
-					url: "http://supremo:8080/otp/ws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=BICYCLE",
+					url: "http://bunet/otp-rest-servlet/ws/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=BICYCLE",
 					dataType: "json",
 					async: false
 				}).done(function(data) {
-					//console.log("Points: " + data.plan.itineraries[0].legs[0].legGeometry.points);
+					//console.log(data.plan.date);
 					// the returned data is a JSON object, in points there is the encoded polyline
 					var latLngs = L.Polyline.fromEncoded(data.plan.itineraries[0].legs[0].legGeometry.points).getLatLngs();
 					// each point in the encoded polyline is added to an array of points, that at the end will contain all points from the first to the last stop
