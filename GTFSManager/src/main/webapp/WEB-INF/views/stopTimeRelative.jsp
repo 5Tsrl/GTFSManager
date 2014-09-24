@@ -289,6 +289,8 @@
 		map.addLayer(markers);
 		
 		if ("${not empty shapeAttivo}") {
+			// NON ho più i backslash su encodedPolyline!! (nel controllore ci sono ancora!)
+			console.log("${shapeAttivo.encodedPolyline}");
 			drawnItems.addLayer(L.Polyline.fromEncoded("${shapeAttivo.encodedPolyline}"));
 			
 			$("#encodedPolyline").val("${shapeAttivo.encodedPolyline}");
@@ -302,33 +304,44 @@
 			}
 
 			drawnItems.clearLayers();
-			
 			drawnItems.addLayer(polyline);
 			
-			$("#encodedPolyline").val(polyline.encodePath());
+			$("#encodedPolyline").val(polyline.encodePath().replace(/\\/g, "\\\\"));
+			$("#creaShapeForm").submit();
 		});
 		
 		$("#calcolaPercorsoOTPButton").click(function() {
+			var polyline = new L.Polyline([]);
+			// for each couple of stops
 			for (var i=2; i<fermateCorsaCoordinates.length; i++) {
+				// call to the otp web service to calculate trip
 				$.ajax({
-					url: "http://172.21.30.5:8080/otp/ws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR"
+					url: "http://supremo:8080/otp/ws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=BICYCLE",
+					dataType: "json",
+					async: false
 				}).done(function(data) {
-					console.log("Dati: " + data);
+					//console.log("Points: " + data.plan.itineraries[0].legs[0].legGeometry.points);
+					// the returned data is a JSON object, in points there is the encoded polyline
+					var latLngs = L.Polyline.fromEncoded(data.plan.itineraries[0].legs[0].legGeometry.points).getLatLngs();
+					// each point in the encoded polyline is added to an array of points, that at the end will contain all points from the first to the last stop
+					for (var j=0; j<latLngs.length; j++) {
+						polyline.addLatLng(latLngs[j]);
+					}
 				});
 			}
-// 			$.ajax({
-// 				url: "http://supremo:8080/otp/ws/routers/default/plan?fromPlace=45.075676%2C7.684023&toPlace=45.071156629990796%2C7.655925750732422&mode=CAR",
-// 				dataType: "jsonp"
-// 			}).done(function(data) {
-// 				console.log(data);
-// 			});
+			console.log("Shape: " + polyline.encodePath());
+			drawnItems.clearLayers();
+			drawnItems.addLayer(polyline);
+			// the encoded polyline is saved into the database, after escaping backslashes
+			$("#encodedPolyline").val(polyline.encodePath().replace(/\\/g, "\\\\"));
+			$("#creaShapeForm").submit();
 		});
 		
 		map.on('draw:edited', function (e) {
 			var layers = e.layers;
 		    layers.eachLayer(function (layer) {
 		    	//window.location.href = "/_5t/salvaShape?encodedPolyline=" + layer.encodePath();
-				$("#encodedPolyline").val(layer.encodePath());
+				$("#encodedPolyline").val(layer.encodePath().replace(/\\/g, "\\\\"));
 				$("#creaShapeForm").submit();
 		    });
 		});

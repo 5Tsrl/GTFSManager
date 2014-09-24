@@ -466,8 +466,8 @@
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
-		<c:if test="${not empty lineaAttiva.shortName && not empty schemaCorsaAttivo.gtfsId}">
-			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate allo schema corsa ${schemaCorsaAttivo.gtfsId}</a>
+		<c:if test="${not empty lineaAttiva.gtfsId && not empty schemaCorsaAttivo.gtfsId}">
+			<a class="btn btn-default" href="/_5t/fermateSchemaCorsa">Assegna fermate allo schema corsa ${schemaCorsaAttivo.gtfsId}</a>
 		</c:if>
 	</div>
 	
