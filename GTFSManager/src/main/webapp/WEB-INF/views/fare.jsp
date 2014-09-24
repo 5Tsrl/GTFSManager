@@ -24,7 +24,7 @@
 	$(function(){
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liTariffe").addClass("active");
-    	}); 
+    	});
     });
 	
 	function validateCreaRegolaLineaForm() {

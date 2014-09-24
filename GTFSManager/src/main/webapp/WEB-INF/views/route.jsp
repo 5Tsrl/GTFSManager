@@ -22,8 +22,8 @@
 	// load the navigation bar
 	$(function(){
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
-    		$("#liAgenzie").addClass("active");
-    	}); 
+    		$("#liLinee").addClass("active");
+    	});
     });
 	
 	$(document).ready(function() {

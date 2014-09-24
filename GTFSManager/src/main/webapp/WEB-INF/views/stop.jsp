@@ -29,7 +29,7 @@
 	$(function() {
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liFermate").addClass("active");
-    	}); 
+    	});
     });
 	
 	$(function() {

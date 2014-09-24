@@ -21,7 +21,7 @@
 	$(function(){
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liZone").addClass("active");
-    	}); 
+    	});
     });
 	
 	$(document).ready(function() {
