@@ -45,4 +45,10 @@ public class FareAttributeDAOImpl implements FareAttributeDAO {
 		query.setEntity("agency", agency);
 		return query.list();
 	}
+
+	@Override
+	public void addFareAttribute(FareAttribute fareAttribute) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.save(fareAttribute);
+	}
 }

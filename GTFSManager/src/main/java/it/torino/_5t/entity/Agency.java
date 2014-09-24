@@ -246,7 +246,7 @@ public class Agency implements Serializable {
 	
 	public void addStop(Stop stop) {
 		stop.setAgency(this);
-		stops.add(stop);
+		//stops.add(stop);
 	}
 	
 	public void addShape(Shape shape) {

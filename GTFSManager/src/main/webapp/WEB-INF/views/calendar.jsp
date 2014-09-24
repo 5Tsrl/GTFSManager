@@ -451,7 +451,7 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
+		<li class="active">Calendari</li>
 	</ol>
 	
 	<p>Cliccare su una riga della tabella per selezionare il calendario corrispondente.</p>

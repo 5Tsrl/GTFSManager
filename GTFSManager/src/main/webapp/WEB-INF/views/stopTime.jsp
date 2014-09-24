@@ -347,16 +347,44 @@
 			}
 
 			drawnItems.clearLayers();
-			
 			drawnItems.addLayer(polyline);
 			
-			$("#encodedPolyline").val(polyline.encodePath());
+			$("#encodedPolyline").val(polyline.encodePath().replace(/\\/g, "\\\\"));
+			$("#creaShapeForm").submit();
+		});
+		
+		$("#calcolaPercorsoOTPButton").click(function() {
+			var polyline = new L.Polyline([]);
+			// for each couple of stops
+			for (var i=2; i<fermateCorsaCoordinates.length; i++) {
+				// call to the otp web service to calculate trip
+				$.ajax({
+					url: "http://bunet/otp-rest-servlet/ws/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=BICYCLE",
+					dataType: "json",
+					async: false
+				}).done(function(data) {
+					//console.log("Points: " + data.plan.itineraries[0].legs[0].legGeometry.points);
+					// the returned data is a JSON object, in points there is the encoded polyline
+					var latLngs = L.Polyline.fromEncoded(data.plan.itineraries[0].legs[0].legGeometry.points).getLatLngs();
+					// each point in the encoded polyline is added to an array of points, that at the end will contain all points from the first to the last stop
+					for (var j=0; j<latLngs.length; j++) {
+						polyline.addLatLng(latLngs[j]);
+					}
+				});
+			}
+			console.log("Shape: " + polyline.encodePath());
+			drawnItems.clearLayers();
+			drawnItems.addLayer(polyline);
+			// the encoded polyline is saved into the database, after escaping backslashes
+			$("#encodedPolyline").val(polyline.encodePath().replace(/\\/g, "\\\\"));
+			$("#creaShapeForm").submit();
 		});
 		
 		map.on('draw:edited', function (e) {
 			var layers = e.layers;
 		    layers.eachLayer(function (layer) {
-				$("#encodedPolyline").val(layer.encodePath());
+				$("#encodedPolyline").val(layer.encodePath().replace(/\\/g, "\\\\"));
+				$("#creaShapeForm").submit();
 		    });
 			
 		});
@@ -394,20 +422,21 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
-		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-		<li><a href="/_5t/corse">Corsa ${corsaAttiva.tripShortName}</a></li>
+		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/linee">Linea <b>${lineaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/corse">Corsa <b>${corsaAttiva.gtfsId}</b></a></li>
 		<li class="active">Fermate</li>
 	</ol>
 	
 	<h3>Assegnazione fermate alla corsa ${corsaAttiva.tripShortName}</h3>
 	
 	<p>Cliccare su una fermata per aggiungerla alla corsa. Le fermate verdi appartengono alla corsa.<br>
-	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom. Una volta modificato deve essere salvato cliccando su "Salva shape".</p>
+	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom.</p>
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
 		<button id="unisciFermateButton" class="btn btn-primary">Unisci fermate</button>
+		<button id="calcolaPercorsoOTPButton" class="btn btn-primary">Calcola percorso con OTP</button>
 		<form:form id="creaShapeForm" commandName="shape" role="form" method="post" action="/_5t/creaShape">
 			<div class="row">
 				<div class="form-group">
@@ -424,13 +453,8 @@
 					</c:choose>
 				</div>
 			</div>
-			<div class="row col-lg-12">
-				<div class="form-group">
-					<input class="btn btn-success" type="submit" value="Salva shape" />
-				</div>
-			</div>
 		</form:form>
-		<br><br><br><br><br><br>
+		
 		<div class="row col-lg-12">
 			<a type="button" class="btn btn-default" href="/_5t/fermate">Aggiungi altre fermate all'agenzia</a>
 		</div>

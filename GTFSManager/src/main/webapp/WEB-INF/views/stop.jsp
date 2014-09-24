@@ -210,7 +210,7 @@
 					// if the stop has some trips associated or it is a station with some children stops, it is green and can't be deleted; a list of all trips associated and children stops is displayed
 					popupContent +=	'<p>Non puoi eliminare questa fermata.<br>Le seguenti corse sono associate ad essa:</p><ul>';
 					<c:forEach var="stopTime" items="${fermata.stopTimes}">
-						popupContent +=	'<li>${stopTime.trip.route.shortName} - <a href="/_5t/selezionaCorsa?id=${stopTime.trip.id}">${stopTime.trip.tripShortName}</a></li>';
+						popupContent +=	'<li>${stopTime.trip.route.gtfsId} - ${stopTime.trip.gtfsId}</li>';
 					</c:forEach>
 					popupContent +=	'</ul>';
 					popupContent +=	'<p>Le seguenti fermate sono all\'interno della stazione:</p><ul>';
@@ -455,10 +455,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
 		<c:if test="${not empty lineaAttiva.shortName && not empty corsaAttiva.tripShortName}">
-			<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-			<li><a href="/_5t/corse">Corsa ${corsaAttiva.tripShortName}</a></li>
+			<li><a href="/_5t/linee">Linea <b>${lineaAttiva.gtfsId}</b></a></li>
+			<li><a href="/_5t/corse">Corsa <b>${corsaAttiva.gtfsId}</b></a></li>
 		</c:if>
 		<li class="active">Fermate</li>
 	</ol>
@@ -470,8 +469,8 @@
 	
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
-		<c:if test="${not empty lineaAttiva.shortName && not empty corsaAttiva.tripShortName}">
-			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate alla corsa ${corsaAttiva.tripShortName}</a>
+		<c:if test="${not empty lineaAttiva.gtfsId && not empty corsaAttiva.gtfsId}">
+			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate alla corsa ${corsaAttiva.gtfsId}</a>
 		</c:if>
 	</div>
 	

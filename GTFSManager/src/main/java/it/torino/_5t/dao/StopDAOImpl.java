@@ -40,4 +40,16 @@ public class StopDAOImpl implements StopDAO {
 		return query.list();
 	}
 
+	@Override
+	public void addStop(Stop stop) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.save(stop);
+	}
+
+	@Override
+	public void deleteStop(Stop stop) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.delete(stop);
+	}
+
 }

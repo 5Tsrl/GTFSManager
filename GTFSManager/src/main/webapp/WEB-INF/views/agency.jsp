@@ -23,17 +23,6 @@
 	$(function() {
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liAgenzie").addClass("active");
-    		
-			// if no agency has been selected, links of the navigation bar are disabled
-			if (!"${agenziaAttiva}") {
-				$("#navigationBar").find("li").each(function () {
-					if ($(this).attr("id") != "liAgenzie" && $(this).attr("id") != "liGestioneGTFS") {
-						$(this).find("a").each(function() {
-						    $(this).addClass("disabled");
-						});
-					}
-				});
-			}
     	}); 
     });
 	

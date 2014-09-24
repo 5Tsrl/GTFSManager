@@ -19,7 +19,7 @@
 	// load the navigation bar
 	$(function(){
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
-    		$("#liAgenzie").addClass("active");
+    		$("#liCorse").addClass("active");
     	}); 
     });
 	
@@ -205,9 +205,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia ${agenziaAttiva.gtfsId}</a></li>
-		<li><a href="/_5t/linee">Linea ${lineaAttiva.shortName}</a></li>
-		<li><a href="/_5t/corse">Corsa ${corsaAttiva.tripShortName}</a></li>
+		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/linee">Linea <b>${lineaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/corse">Corsa <b>${corsaAttiva.gtfsId}</b></a></li>
 		<li class="active">Servizi</li>
 	</ol>
 	

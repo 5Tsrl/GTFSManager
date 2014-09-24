@@ -38,11 +38,11 @@ public class CalendarController {
 	
 	@RequestMapping(value = "/calendari", method = RequestMethod.GET)
 	public String showCalendars(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		// se c'è un calendario attivo, lo rendo persistent per poter accedere alla lista delle corse
 		Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo");
@@ -52,11 +52,11 @@ public class CalendarController {
 			model.addAttribute("listaEccezioni", calendar.getCalendarDates());
 		}
 		
-		logger.info("Visualizzazione calendari di " + agency.getName() + ".");
+//		logger.info("Visualizzazione calendari di " + agency.getName() + ".");
+//		
+//		session.setAttribute("agenziaAttiva", a);
 		
-		session.setAttribute("agenziaAttiva", a);
-		
-		model.addAttribute("listaCalendari", a.getCalendars());
+		model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 		if (!modify)
 			model.addAttribute("calendar", new Calendar());
 		else
@@ -78,15 +78,15 @@ public class CalendarController {
 	// chiamata al submit del form per la creazione di un nuovo calendario
 	@RequestMapping(value = "/calendari", method = RequestMethod.POST)
 	public String submitCalendarForm(@ModelAttribute @Valid Calendar calendar, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors() || calendar.getStartDate().after(calendar.getEndDate())) {
 			logger.error("Errore nella creazione del calendario");
-			model.addAttribute("listaCalendari", a.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showCreateForm", true);
 			model.addAttribute("calendarDate", new CalendarDate());
 			Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
@@ -100,10 +100,10 @@ public class CalendarController {
 			return "calendar";
 		}
 		
-		for (Calendar c: calendarDAO.getCalendarsFromAgency(a)) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			if (c.getGtfsId().equals(calendar.getGtfsId())) {
 				logger.error("L'id del calendario è già presente");
-				model.addAttribute("listaCalendari", a.getCalendars());
+				model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 				model.addAttribute("showCreateForm", true);
 				model.addAttribute("showAlertDuplicateCalendar", true);
 				model.addAttribute("calendarDate", new CalendarDate());
@@ -119,11 +119,11 @@ public class CalendarController {
 			}
 		}
 		
-		a.addCalendar(calendar);
+//		a.addCalendar(calendar);
 		
 		logger.info("Calendario creato: " + calendar.getGtfsId() + ".");
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("calendarioAttivo", calendar);
 		
 		return "redirect:calendari";
@@ -145,11 +145,11 @@ public class CalendarController {
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaCalendario", method = RequestMethod.GET)
 	public String deleteCalendar(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo");
 		if (calendar == null) {
@@ -162,7 +162,7 @@ public class CalendarController {
 			t.setCalendar(null);
 		}
 		
-		a.getCalendars().remove(c);
+		calendarDAO.deleteCalendar(calendar);
 		
 		logger.info("Calendario eliminato: " + calendar.getGtfsId() + ".");
 		
@@ -191,15 +191,15 @@ public class CalendarController {
 	// chiamata al submit del form per la modifica di un calendario
 	@RequestMapping(value = "/modificaCalendario", method = RequestMethod.POST)
 	public String editCalendar(@ModelAttribute @Valid Calendar calendar, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors() || calendar.getStartDate().after(calendar.getEndDate())) {
 			logger.error("Errore nella modifica del calendario");
-			model.addAttribute("listaCalendari", a.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showEditForm", true);
 			model.addAttribute("calendarDate", new CalendarDate());
 			Calendar cal = (Calendar) session.getAttribute("calendarioAttivo");
@@ -218,10 +218,10 @@ public class CalendarController {
 			return "redirect:calendari";
 		}
 		
-		for (Calendar c: calendarDAO.getCalendarsFromAgency(a)) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			if (!activeCalendar.getGtfsId().equals(calendar.getGtfsId()) && c.getGtfsId().equals(calendar.getGtfsId())) {
 				logger.error("L'id del calendario è già presente");
-				model.addAttribute("listaCalendari", a.getCalendars());
+				model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 				model.addAttribute("showEditForm", true);
 				model.addAttribute("showAlertDuplicateCalendar", true);
 				model.addAttribute("calendarDate", new CalendarDate());
@@ -238,7 +238,7 @@ public class CalendarController {
 		}
 		
 		// cerco il calendario attivo tra quelli dell'agenzia e lo aggiorno
-		for (Calendar c: a.getCalendars()) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			if (c.equals(activeCalendar)) {
 				c.setGtfsId(calendar.getGtfsId());
 				c.setStartDate(calendar.getStartDate());
@@ -256,7 +256,7 @@ public class CalendarController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:calendari";
 	}
@@ -273,11 +273,11 @@ public class CalendarController {
 	// chiamata al submit del form per la creazione di una nuova eccezione
 	@RequestMapping(value = "/creaEccezione", method = RequestMethod.POST)
 	public String submitCalendarDateForm(@ModelAttribute @Valid CalendarDate calendarDate, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo");
 		if (calendar == null) {
@@ -287,7 +287,7 @@ public class CalendarController {
 		
 		if (bindingResult.hasErrors() || calendarDate.getDate().before(cal.getStartDate()) || calendarDate.getDate().after(cal.getEndDate())) {
 			logger.error("Errore nella creazione dell'eccezione");
-			model.addAttribute("listaCalendari", a.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showCreateCalendarDateForm", true);
 			model.addAttribute("calendar", new Calendar());
 			model.addAttribute("listaCorse", cal.getTrips());
@@ -296,7 +296,7 @@ public class CalendarController {
 			return "calendar";
 		}
 		
-		for (Calendar c: a.getCalendars()) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			if (c.equals(calendar)){
 				c.addCalendarDate(calendarDate);
 				session.setAttribute("calendarioAttivo", c);
@@ -306,7 +306,7 @@ public class CalendarController {
 		
 		logger.info("Eccezione creata: " + calendarDate.getDate() + ".");
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("eccezioneAttiva", calendarDate);
 		
 		return "redirect:calendari";
@@ -327,11 +327,11 @@ public class CalendarController {
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaEccezione", method = RequestMethod.GET)
 	public String deleteCalendarDate(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo");
 		CalendarDate calendarDate = (CalendarDate) session.getAttribute("eccezioneAttiva");
@@ -340,7 +340,7 @@ public class CalendarController {
 		}
 		
 		// cerco tra i calendari dell'agenzia quello attivo e gli tolgo l'eccezione selezionata
-		for (Calendar c: a.getCalendars()) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			if (c.equals(calendar)){
 				c.getCalendarDates().remove(calendarDate);
 				session.setAttribute("calendarioAttivo", c);
@@ -351,7 +351,7 @@ public class CalendarController {
 		logger.info("Eccezione eliminata: " + calendarDate.getDate() + ".");
 		
 		session.removeAttribute("eccezioneAttiva");
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:calendari";
 	}
@@ -373,11 +373,11 @@ public class CalendarController {
 	// chiamata al submit del form per la modifica di un'eccezione
 	@RequestMapping(value = "/modificaEccezione", method = RequestMethod.POST)
 	public String editCalendarDate(@ModelAttribute @Valid CalendarDate calendarDate, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Calendar activeCalendar = (Calendar) session.getAttribute("calendarioAttivo");
 		CalendarDate activeCalendarDate = (CalendarDate) session.getAttribute("eccezioneAttiva");
@@ -387,7 +387,7 @@ public class CalendarController {
 		
 		if (bindingResult.hasErrors() || calendarDate.getDate().before(activeCalendar.getStartDate()) || calendarDate.getDate().after(activeCalendar.getEndDate())) {
 			logger.error("Errore nella modifica dell'eccezione");
-			model.addAttribute("listaCalendari", a.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showCreateCalendarDateForm", true);
 			model.addAttribute("calendar", new Calendar());
 			model.addAttribute("listaCorse", activeCalendar.getTrips());
@@ -398,7 +398,7 @@ public class CalendarController {
 		
 		// cerco tra i calendari dell'agenzia quello attivo, tra le eccezioni del calendario selezionato quella attiva e la aggiorno
 		outerloop:
-		for (Calendar c: a.getCalendars()) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			for (CalendarDate cd: c.getCalendarDates()) {
 				if (cd.equals(activeCalendarDate)) {
 					cd.setDate(calendarDate.getDate());
@@ -411,7 +411,7 @@ public class CalendarController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:calendari";
 	}

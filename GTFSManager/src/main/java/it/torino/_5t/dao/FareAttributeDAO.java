@@ -9,5 +9,6 @@ public interface FareAttributeDAO {
 	public List<FareAttribute> getAllFareAttributes();
 	public List<FareAttribute> getFareAttributesFromAgency(Agency agency);
 	public FareAttribute getFareAttribute(Integer id);
+	public void addFareAttribute(FareAttribute fareAttribute);
 	public void updateFareAttribute(FareAttribute fareAttribute);
 }

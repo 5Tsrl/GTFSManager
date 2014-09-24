@@ -22,17 +22,6 @@
 	$(function() {
     	$("#navigationBar").load("<c:url value='/resources/html/navbar.html' />", function() {
     		$("#liGestioneGTFS").addClass("active");
-    		
-    		// if no agency has been selected, links of the navigation bar are disabled
-			if (!"${agenziaAttiva}") {
-				$("#navigationBar").find("li").each(function () {
-					if ($(this).attr("id") != "liAgenzie" && $(this).attr("id") != "liGestioneGTFS") {
-						$(this).find("a").each(function() {
-						    $(this).addClass("disabled");
-						});
-					}
-				});
-			}
     	}); 
     });
 	
@@ -179,6 +168,10 @@
 			},
 			success: function(label) {
 				$(label).closest('.form-group').removeClass('has-error').addClass('has-success');
+			},
+			submitHandler: function(form) {
+				$("#progressbarModalImport").modal("show");
+				form.submit();
 			}
 		});
 	});
@@ -325,6 +318,23 @@
 		   			<div class="modal-content">
 						<div class="modal-header">
 							<h3 id="progressbarModalLabel">Creazione GTFS in corso</h3>
+						</div>
+						<div class="modal-body">
+							<div class="progress progress-striped active">
+								<div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
+							</div>
+						</div>
+					</div>
+				</div>
+			</div>
+		</div>
+		
+		<div class="row">
+			<div id="progressbarModalImport" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="progressbarModalImportLabel" aria-hidden="true">
+				<div class="modal-dialog modal-md">
+		   			<div class="modal-content">
+						<div class="modal-header">
+							<h3 id="progressbarModalImportLabel">Importazione GTFS in corso</h3>
 						</div>
 						<div class="modal-body">
 							<div class="progress progress-striped active">
