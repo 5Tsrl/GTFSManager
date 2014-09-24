@@ -205,42 +205,42 @@
 		<div id="creaGTFS">
 			<form:form id="creaGTFSForm" commandName="feedInfo" method="post" role="form" action="/_5t/creaGTFS">
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="publisherName" class="required">Pubblicato da</label>
 			    		<form:input path="publisherName" class="form-control" id="publisherName" placeholder="Inserire il nome del pubblicatore" required="true" maxlength="50" />
 			    		<form:errors path="publisherName" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="publisherUrl" class="required">Sito web</label>
 			    		<form:input path="publisherUrl" class="form-control" id="publisherUrl" placeholder="Inserire l'url del pubblicatore" required="true" maxlength="255" />
 			    		<form:errors path="publisherUrl" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="language" class="required">Lingua</label>
 			    		<form:input path="language" class="form-control" id="language" placeholder="Inserire la lingua" required="true" maxlength="20" />
 			    		<form:errors path="language" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="startDate">Data inizio</label>
 			    		<form:input path="startDate" class="form-control" id="startDate" type="date" />
 			    		<form:errors path="startDate" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="endDate">Data fine</label>
 			    		<form:input path="endDate" class="form-control" id="endDate" type="date" />
 			    		<form:errors path="endDate" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="name">Nome</label>
 						<jsp:useBean id="now" class="java.util.Date" />
 						<fmt:formatDate pattern="yyyy-MM-dd HH.mm.ss" value="${now}" var="formattedNow" />
@@ -249,21 +249,21 @@
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="version">Versione</label>
 			    		<form:input path="version" class="form-control" id="version" placeholder="Inserire la versione del feed" maxlength="50" />
 			    		<form:errors path="version" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<label for="description">Descrizione</label>
 			    		<form:textarea path="description" class="form-control" id="description" maxlength="255" rows="2" />
 			    		<form:errors path="description" cssClass="error"></form:errors>
 					</div>
 				</div>
 				<div class="row">
-					<div class="form-group col-lg-12">
+					<div class="form-group col-lg-8">
 						<input class="btn btn-success" type="submit" value="Crea GTFS" />
 						<a class="btn btn-default" href="/_5t/esportaGTFS">Annulla</a>
 					</div>

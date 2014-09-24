@@ -289,7 +289,6 @@
 		map.addLayer(markers);
 		
 		if ("${not empty shapeAttivo}") {
-			// NON ho più i backslash su encodedPolyline!! (nel controllore ci sono ancora!)
 			console.log("${shapeAttivo.encodedPolyline}");
 			drawnItems.addLayer(L.Polyline.fromEncoded("${shapeAttivo.encodedPolyline}"));
 			
