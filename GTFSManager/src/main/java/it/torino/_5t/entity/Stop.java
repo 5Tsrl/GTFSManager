@@ -49,7 +49,7 @@ public class Stop implements Serializable {
 	private String code;
 	
 	@Column(name = "stop_name")
-	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
+	@Size(min = 1, max = 255, message = "Il campo \"nome\" non può essere vuoto")
 	private String name;
 	
 	@Column(name = "stop_desc")

@@ -31,4 +31,16 @@ public class TransferDAOImpl implements TransferDAO {
 		return null;
 	}
 
+	@Override
+	public void addTransfer(Transfer transfer) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.save(transfer);
+	}
+
+	@Override
+	public void deleteTransfer(Transfer transfer) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.delete(transfer);
+	}
+
 }

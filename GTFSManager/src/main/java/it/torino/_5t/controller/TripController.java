@@ -7,6 +7,7 @@ import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.CalendarDAO;
 import it.torino._5t.dao.RouteDAO;
 import it.torino._5t.dao.ShapeDAO;
+import it.torino._5t.dao.StopDAO;
 import it.torino._5t.dao.TripDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
@@ -43,14 +44,16 @@ public class TripController {
 	private CalendarDAO calendarDAO;
 	@Autowired
 	private ShapeDAO shapeDAO;
+	@Autowired
+	private StopDAO stopDAO;
 	
 	@RequestMapping(value = "/corse", method = RequestMethod.GET)
 	public String showTrips(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		agencyDAO.updateAgency(agency);
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		agencyDAO.updateAgency(agency);
 		
 		Route route = (Route) session.getAttribute("lineaAttiva");
 		if (route == null) {
@@ -58,11 +61,11 @@ public class TripController {
 		}
 		Route r = routeDAO.loadRoute(route.getId());
 		
-		logger.info("Visualizzazione lista corse di " + route.getShortName() + ".");
+		logger.info("Visualizzazione lista corse di " + route.getGtfsId() + ".");
 		
 		//routeDAO.updateRoute(route);
 		model.addAttribute("listaCorse", r.getTrips());
-		model.addAttribute("listaCalendari", agency.getCalendars());
+		model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 		model.addAttribute("trip", new Trip());
 		
 		return "trip";
@@ -95,7 +98,7 @@ public class TripController {
 			logger.error("Errore nella creazione della corsa");
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaCorse", route.getTrips());
-			model.addAttribute("listaCalendari", agency.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showCreateForm", true);
 			return "trip";
 		}
@@ -107,7 +110,7 @@ public class TripController {
 					if (t.getGtfsId().equals(trip.getGtfsId())) {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
-						model.addAttribute("listaCalendari", a.getCalendars());
+						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 						model.addAttribute("showCreateForm", true);
 						model.addAttribute("showAlertDuplicateTrip", true);
 						return "trip";
@@ -132,17 +135,17 @@ public class TripController {
 	// chiamata quando seleziono una corsa (verrà salvata nella sessione)
 	@RequestMapping(value = "/selezionaCorsa", method = RequestMethod.GET)
 	public String selectTrip(@RequestParam("id") Integer tripId, RedirectAttributes redirectAttributes, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		agencyDAO.updateAgency(agency);
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		agencyDAO.updateAgency(agency);
 		
 		Trip trip = tripDAO.getTrip(tripId);
 		
-		logger.info("Corsa selezionata: " + trip.getTripShortName() + ".");
+		logger.info("Corsa selezionata: " + trip.getGtfsId() + ".");
 		
-		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
+		redirectAttributes.addFlashAttribute("listaCalendari", calendarDAO.getAllCalendars());
 
 		session.removeAttribute("servizioAttivo");
 //		session.setAttribute("lineaAttiva", trip.getRoute());
@@ -181,7 +184,7 @@ public class TripController {
 		
 		// rimuovo la corsa anche dal set associato al calendario corrispondente
 		Calendar calendar = calendarDAO.loadCalendar(trip.getCalendar().getId());
-		for (Calendar c: a.getCalendars()) {
+		for (Calendar c: calendarDAO.getAllCalendars()) {
 			if (c.equals(calendar)) {
 				c.getTrips().remove(trip);
 			}
@@ -198,11 +201,11 @@ public class TripController {
 	// chiamata quando clicco sul pulsante "Modifica corsa"
 	@RequestMapping(value = "/modificaCorsa", method = RequestMethod.GET)
 	public String showEditTripForm(RedirectAttributes redirectAttributes, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Trip trip = (Trip) session.getAttribute("corsaAttiva");
 		if (trip == null) {
@@ -211,7 +214,7 @@ public class TripController {
 		
 		redirectAttributes.addFlashAttribute("showEditForm", true);
 		redirectAttributes.addFlashAttribute("trip", trip);
-		redirectAttributes.addFlashAttribute("listaCalendari", a.getCalendars());
+		redirectAttributes.addFlashAttribute("listaCalendari", calendarDAO.getAllCalendars());
 		
 		return "redirect:corse";
 	}
@@ -234,7 +237,7 @@ public class TripController {
 			logger.error("Errore nella modifica della corsa");
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaCorse", route.getTrips());
-			model.addAttribute("listaCalendari", agency.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showEditForm", true);
 			return "trip";
 		}
@@ -253,7 +256,7 @@ public class TripController {
 					if (!activetrip.getGtfsId().equals(trip.getGtfsId()) && t.getGtfsId().equals(trip.getGtfsId())) {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
-						model.addAttribute("listaCalendari", a.getCalendars());
+						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 						model.addAttribute("showEditForm", true);
 						model.addAttribute("showAlertDuplicateTrip", true);
 						return "trip";
@@ -267,7 +270,7 @@ public class TripController {
 						t.setDirectionId(trip.getDirectionId());
 						t.setWheelchairAccessible(trip.getWheelchairAccessible());
 						t.setBikesAllowed(trip.getBikesAllowed());
-						for (Calendar c: a.getCalendars()) {
+						for (Calendar c: calendarDAO.getAllCalendars()) {
 							if (c.equals(calendar)) {
 								c.getTrips().remove(activetrip);
 								c.addTrip(t);
@@ -312,7 +315,7 @@ public class TripController {
 		if (newGtfsId == null) {
 			logger.error("Nessun id inserito per la corsa duplicata");
 			model.addAttribute("listaCorse", route.getTrips());
-			model.addAttribute("listaCalendari", a.getCalendars());
+			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			model.addAttribute("showCreateForm", true);
 			return "trip";
 		}
@@ -324,9 +327,7 @@ public class TripController {
 		duplicatedTrip.setDirectionId(trip.getDirectionId());
 		duplicatedTrip.setWheelchairAccessible(trip.getWheelchairAccessible());
 		duplicatedTrip.setBikesAllowed(trip.getBikesAllowed());
-		for (Frequency f: trip.getFrequencies()) {
-			duplicatedTrip.addFrequency(new Frequency(f.getTrip(), f.getStartTime(), f.getEndTime(), f.getHeadwaySecs(), f.getExactTimes()));
-		}
+		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
@@ -334,7 +335,7 @@ public class TripController {
 					if (t.getGtfsId().equals(newGtfsId)) {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
-						model.addAttribute("listaCalendari", a.getCalendars());
+						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 						model.addAttribute("showAlertDuplicateTrip", true);
 						model.addAttribute("trip", new Trip());
 						return "trip";
@@ -345,13 +346,16 @@ public class TripController {
 					if (t.equals(trip)) {
 						for (StopTime st: t.getStopTimes()) {
 							StopTime stopTime = new StopTime(st.getArrivalTime(), st.getDepartureTime(), st.getStopSequence(), st.getStopHeadsign(), st.getPickupType(), st.getDropOffType(), st.getShapeDistTraveled());
-							for (Stop s: a.getStops()) {
+							for (Stop s: stopDAO.getAllStops()) {
 								if (s.getId().equals(st.getStop().getId())) {
 									s.addStopTime(stopTime);
 									break;
 								}
 							}
 							duplicatedTrip.addStopTime(stopTime);
+						}
+						for (Frequency f: t.getFrequencies()) {
+							duplicatedTrip.addFrequency(new Frequency(f.getTrip(), f.getStartTime(), f.getEndTime(), f.getHeadwaySecs(), f.getExactTimes()));
 						}
 						if (t.getShape() != null) {
 							for (Shape s: a.getShapes()) {

@@ -235,7 +235,7 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttivo.gtfsId}</b></a></li>
+		<li class="active">Trasferimenti</li>
 	</ol>
 	
 	<p>Cliccare su una riga della tabella per selezionare il trasferimento corrispondente.</p>

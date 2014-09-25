@@ -102,9 +102,6 @@
 				gtfsId: {
 					required: true
 				},
-				tripShortName: {
-					required: true
-				},
 				serviceId: {
 					required: true
 				}
@@ -112,9 +109,6 @@
 			messages: {
 				gtfsId: {
 					required: "Il campo id è obbligatorio"
-				},
-				tripShortName: {
-					required: "Il campo nome abbreviato è obbligatorio"
 				},
 				serviceId: {
 					required: "Selezionare un calendario"
@@ -134,9 +128,6 @@
 				gtfsId: {
 					required: true
 				},
-				tripShortName: {
-					required: true
-				},
 				serviceId: {
 					required: true
 				}
@@ -144,9 +135,6 @@
 			messages: {
 				gtfsId: {
 					required: "Il campo id è obbligatorio"
-				},
-				tripShortName: {
-					required: "Il campo nome abbreviato è obbligatorio"
 				},
 				serviceId: {
 					required: "Selezionare un calendario"
@@ -311,15 +299,15 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="tripShortName" class="required">Nome abbreviato</label>
-				    		<form:input path="tripShortName" class="form-control" id="tripShortName" placeholder="Inserisci il nome abbreviato" maxlength="50" />
+							<label for="tripShortName">Nome abbreviato</label>
+				    		<form:input path="tripShortName" class="form-control" id="tripShortName" placeholder="Inserisci il nome abbreviato" maxlength="255" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="tripHeadsign">Display</label>
-				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" placeholder="Inserisci la scritta per il display" maxlength="50" />
+				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" placeholder="Inserisci la scritta per il display" maxlength="255" />
 				    		<form:errors path="tripHeadsign" cssClass="error"></form:errors>
 						</div>
 					</div>
@@ -399,11 +387,19 @@
 					</div>
 					<div class="col-lg-8">
 						<b>Accessibile ai disabili:</b>
-						<% out.write(wheelchairAccessible.get(trip.getWheelchairAccessible())); %>
+						<% 
+						if (trip.getWheelchairAccessible() != null) {
+							out.write(wheelchairAccessible.get(trip.getWheelchairAccessible())); 
+						}
+						%>
 					</div>
 					<div class="col-lg-8">
 						<b>Bici permesse:</b>
-						<% out.write(bikesAllowed.get(trip.getBikesAllowed())); %>
+						<% 
+						if (trip.getBikesAllowed() != null) {
+							out.write(bikesAllowed.get(trip.getBikesAllowed()));
+						}
+						%>
 					</div>
 					<div class="col-lg-12">
 						<a id="modificaCorsaButton" class="btn btn-primary" href="/_5t/modificaCorsa">Modifica</a>
@@ -434,15 +430,15 @@
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
-							<label for="tripShortName" class="required">Nome abbreviato</label>
-				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaAttiva.tripShortName}" maxlength="50" />
+							<label for="tripShortName">Nome abbreviato</label>
+				    		<form:input path="tripShortName" class="form-control" id="tripShortName" value="${corsaAttiva.tripShortName}" maxlength="255" />
 				    		<form:errors path="tripShortName" cssClass="error"></form:errors>
 						</div>
 					</div>
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="tripHeadsign">Display</label>
-				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${corsaAttiva.tripHeadsign}" maxlength="50" />
+				    		<form:input path="tripHeadsign" class="form-control" id="tripHeadsign" value="${corsaAttiva.tripHeadsign}" maxlength="255" />
 				    		<form:errors path="tripHeadsign" cssClass="error"></form:errors>
 						</div>
 					</div>
@@ -493,16 +489,24 @@
 							<form:select path="wheelchairAccessible" class="form-control">
 								<%
 								if (trip != null) {
-									for (int i=0; i<wheelchairAccessible.size(); i++) {
-										if (i == trip.getWheelchairAccessible()) {
+									if (trip.getWheelchairAccessible() != null) {
+										for (int i=0; i<wheelchairAccessible.size(); i++) {
+											if (i == trip.getWheelchairAccessible()) {
 								%>
-										<form:option value="<%= i %>" selected="true"><%= wheelchairAccessible.get(i) %></form:option>
+											<form:option value="<%= i %>" selected="true"><%= wheelchairAccessible.get(i) %></form:option>
 								<%
-										} else { 
+											} else { 
 								%>
-										<form:option value="<%= i %>"><%= wheelchairAccessible.get(i) %></form:option>
+											<form:option value="<%= i %>"><%= wheelchairAccessible.get(i) %></form:option>
 								<%
+											}
 										}
+									} else {
+								%>
+										<form:option value="0" selected="true"><%= wheelchairAccessible.get(0) %></form:option>
+										<form:option value="1"><%= wheelchairAccessible.get(1) %></form:option>
+										<form:option value="2"><%= wheelchairAccessible.get(2) %></form:option>
+								<%
 									}
 								}
 								%>
@@ -516,16 +520,24 @@
 							<form:select path="bikesAllowed" class="form-control">
 								<%
 								if (trip != null) {
-									for (int i=0; i<bikesAllowed.size(); i++) {
-										if (i == trip.getBikesAllowed()) {
+									if (trip.getBikesAllowed() != null) {
+										for (int i=0; i<bikesAllowed.size(); i++) {
+											if (i == trip.getBikesAllowed()) {
 								%>
-										<form:option value="<%= i %>" selected="true"><%= bikesAllowed.get(i) %></form:option>
+											<form:option value="<%= i %>" selected="true"><%= bikesAllowed.get(i) %></form:option>
 								<%
-										} else { 
+											} else { 
 								%>
-										<form:option value="<%= i %>"><%= bikesAllowed.get(i) %></form:option>
+											<form:option value="<%= i %>"><%= bikesAllowed.get(i) %></form:option>
 								<%
+											}
 										}
+									} else {
+								%>
+										<form:option value="0" selected="true"><%= bikesAllowed.get(0) %></form:option>
+								<form:option value="1"><%= bikesAllowed.get(1) %></form:option>
+								<form:option value="2"><%= bikesAllowed.get(2) %></form:option>
+								<%	
 									}
 								}
 								%>
@@ -551,7 +563,7 @@
 	</div>
 	<div id="delete-trip" class="alert alert-danger">
 	    <button type="button" class="close">&times;</button>
-	    <p>Vuoi veramente eliminare la corsa ${corsaAttiva.tripShortName}?</p>
+	    <p>Vuoi veramente eliminare la corsa ${corsaAttiva.gtfsId}?</p>
 	    <button id="delete-trip-button" type="button" class="btn btn-danger">Elimina</button>
 	    <button type="button" class="btn btn-default annulla">Annulla</button>
 	</div>

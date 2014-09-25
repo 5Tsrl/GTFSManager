@@ -74,7 +74,7 @@ public class FareController {
 		
 		session.setAttribute("agenziaAttiva", a);
 		
-		model.addAttribute("listaTariffe", a.getFareAttributes());
+		model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 		model.addAttribute("listaLinee", a.getRoutes());
 		model.addAttribute("listaZone", a.getZones());
 		model.addAttribute("fareAttribute", new FareAttribute());
@@ -102,15 +102,15 @@ public class FareController {
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della tariffa");
-			model.addAttribute("listaTariffe", a.getFareAttributes());
+			model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 			model.addAttribute("showCreateForm", true);
 			return "fare";
 		}
 		
-		for (FareAttribute fa: fareAttributeDAO.getFareAttributesFromAgency(a)) {
+		for (FareAttribute fa: fareAttributeDAO.getAllFareAttributes()) {
 			if (fa.getGtfsId().equals(fareAttribute.getGtfsId())) {
 				logger.error("L'id della tariffa è già presente");
-				model.addAttribute("listaTariffe", a.getFareAttributes());
+				model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 				model.addAttribute("showCreateForm", true);
 				model.addAttribute("showAlertDuplicateFare", true);
 				return "fare";
@@ -153,7 +153,7 @@ public class FareController {
 			return "redirect:tariffe";
 		}
 		
-		a.getFareAttributes().remove(fareAttribute);
+		fareAttributeDAO.getAllFareAttributes().remove(fareAttribute);
 		
 		logger.info("Tariffa eliminata: " + fareAttribute.getGtfsId() + ".");
 		
@@ -199,10 +199,10 @@ public class FareController {
 			return "redirect:tariffe";
 		}
 		
-		for (FareAttribute fa: fareAttributeDAO.getFareAttributesFromAgency(a)) {
+		for (FareAttribute fa: fareAttributeDAO.getAllFareAttributes()) {
 			if (!activeFareAttribute.getGtfsId().equals(fareAttribute.getGtfsId()) && fa.getGtfsId().equals(fareAttribute.getGtfsId())) {
 				logger.error("L'id della tariffa è già presente");
-				model.addAttribute("listaTariffe", a.getFareAttributes());
+				model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 				model.addAttribute("showEditForm", true);
 				model.addAttribute("showAlertDuplicateFare", true);
 				return "fare";
@@ -210,7 +210,7 @@ public class FareController {
 		}
 		
 		// cerco la tariffa attiva tra quelle dell'agenzia e la aggiorno
-		for (FareAttribute f: a.getFareAttributes()) {
+		for (FareAttribute f: fareAttributeDAO.getAllFareAttributes()) {
 			if (f.equals(activeFareAttribute)) {
 				f.setGtfsId(fareAttribute.getGtfsId());
 				f.setPrice(fareAttribute.getPrice());
@@ -246,7 +246,7 @@ public class FareController {
 		
 		if (routeId.length == 0) {
 			logger.error("Nessuna linea selezionata");
-			model.addAttribute("listaTariffe", a.getFareAttributes());
+			model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 			model.addAttribute("showCreateFareRuleForm", true);
 			model.addAttribute("fareAttribute", new FareAttribute());
 			model.addAttribute("listaRegole", fa.getFareRules());
@@ -255,7 +255,7 @@ public class FareController {
 		
 		boolean addFareRule;
 		// cerco la tariffa attiva tra quelle dell'agenzia
-		for (FareAttribute f: a.getFareAttributes()) {
+		for (FareAttribute f: fareAttributeDAO.getAllFareAttributes()) {
 			if (f.equals(fareAttribute)) {
 				// per tutte le linee che voglio aggiungere
 				for (Integer rId: routeId) {
@@ -306,7 +306,7 @@ public class FareController {
 		
 		// cerco tra le tariffe dell'agenzia quella attiva
 		FareAttribute activeFareAttribute = null;
-		for (FareAttribute f: a.getFareAttributes()) {
+		for (FareAttribute f: fareAttributeDAO.getAllFareAttributes()) {
 			if (f.equals(fareAttribute)) {
 				activeFareAttribute = f;
 				break;
@@ -354,7 +354,7 @@ public class FareController {
 		
 		if (originId == null && destinationId == null) {
 			logger.error("Nessuna zona di origine e/o destinazione selezionata");
-			model.addAttribute("listaTariffe", a.getFareAttributes());
+			model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 			model.addAttribute("showCreateFareRuleForm", true);
 			model.addAttribute("fareAttribute", new FareAttribute());
 			model.addAttribute("listaRegole", fa.getFareRules());
@@ -363,7 +363,7 @@ public class FareController {
 		
 		boolean addFareRule;
 		// cerco la tariffa attiva tra quelle dell'agenzia
-		for (FareAttribute f: a.getFareAttributes()) {
+		for (FareAttribute f: fareAttributeDAO.getAllFareAttributes()) {
 			if (f.equals(fareAttribute)) {
 				// per tutte le linee che voglio aggiungere
 				addFareRule = true;
@@ -414,7 +414,7 @@ public class FareController {
 		
 		// cerco tra le tariffe dell'agenzia quella attiva
 		FareAttribute activeFareAttribute = null;
-		for (FareAttribute f: a.getFareAttributes()) {
+		for (FareAttribute f: fareAttributeDAO.getAllFareAttributes()) {
 			if (f.equals(fareAttribute)) {
 				activeFareAttribute = f;
 				break;

@@ -42,7 +42,6 @@ import java.sql.Time;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
@@ -715,232 +714,551 @@ public class GTFSController {
 
 	private void fillDatabase(String uploadedFile) {
 		try {
+			// temporary files to store zip files
+			agencyOutputFile = File.createTempFile("agency", ".txt");
+			calendarOutputFile = File.createTempFile("calendar", ".txt");
+			calendarDateOutputFile = File.createTempFile("calendar_dates", ".txt");
+			fareAttributeOutputFile = File.createTempFile("fare_attributes", ".txt");
+			fareRuleOutputFile = File.createTempFile("fare_rules", ".txt");
+			feedInfoOutputFile = File.createTempFile("feed_info", ".txt");
+			frequencyOutputFile = File.createTempFile("frequencies", ".txt");
+			routeOutputFile = File.createTempFile("routes", ".txt");
+			shapeOutputFile = File.createTempFile("shapes", ".txt");
+			stopOutputFile = File.createTempFile("stops", ".txt");
+			stopTimeOutputFile = File.createTempFile("stop_times", ".txt");
+			transferOutputFile = File.createTempFile("transfers", ".txt");
+			tripOutputFile = File.createTempFile("trips", ".txt");
+			
+			agencyOutput = new FileOutputStream(agencyOutputFile);
+			calendarOutput = new FileOutputStream(calendarOutputFile);
+			calendarDateOutput = new FileOutputStream(calendarDateOutputFile);
+			fareAttributeOutput = new FileOutputStream(fareAttributeOutputFile);
+			fareRuleOutput = new FileOutputStream(fareRuleOutputFile);
+			feedInfoOutput = new FileOutputStream(feedInfoOutputFile);
+			frequencyOutput = new FileOutputStream(frequencyOutputFile);
+			routeOutput = new FileOutputStream(routeOutputFile);
+			shapeOutput = new FileOutputStream(shapeOutputFile);
+			stopOutput = new FileOutputStream(stopOutputFile);
+			stopTimeOutput = new FileOutputStream(stopTimeOutputFile);
+			transferOutput = new FileOutputStream(transferOutputFile);
+			tripOutput = new FileOutputStream(tripOutputFile);
+			
 			ZipFile zipFile = new ZipFile(uploadedFile);
 			
 		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
-	
+		    
 		    while(entries.hasMoreElements()) {
-		        ZipEntry entry = entries.nextElement();
-		        InputStream stream = zipFile.getInputStream(entry);
-		        BufferedReader br = new BufferedReader(new InputStreamReader(stream));
-		        String line = br.readLine();
+		    	ZipEntry entry = entries.nextElement();
+		    	InputStream stream = zipFile.getInputStream(entry);
+		    	if (entry.getName().equals(AGENCY_FILE_NAME)) {
+		    		copyFile(stream, agencyOutput);
+		    	} else if (entry.getName().equals(STOP_FILE_NAME)) {
+		    		copyFile(stream, stopOutput);
+		    	} else if (entry.getName().equals(ROUTE_FILE_NAME)) {
+		    		copyFile(stream, routeOutput);
+		    	} else if (entry.getName().equals(TRIP_FILE_NAME)) {
+		    		copyFile(stream, tripOutput);
+		    	} else if (entry.getName().equals(STOP_TIME_FILE_NAME)) {
+		    		copyFile(stream, stopTimeOutput);
+		    	} else if (entry.getName().equals(CALENDAR_FILE_NAME)) {
+		    		copyFile(stream, calendarOutput);
+		    	} else if (entry.getName().equals(CALENDAR_DATE_FILE_NAME)) {
+		    		copyFile(stream, calendarDateOutput);
+		    	} else if (entry.getName().equals(FARE_ATTRIBUTE_FILE_NAME)) {
+		    		copyFile(stream, fareAttributeOutput);
+		    	} else if (entry.getName().equals(FARE_RULE_FILE_NAME)) {
+		    		copyFile(stream, fareRuleOutput);
+		    	} else if (entry.getName().equals(SHAPE_FILE_NAME)) {
+		    		copyFile(stream, shapeOutput);
+		    	} else if (entry.getName().equals(FREQUENCY_FILE_NAME)) {
+		    		copyFile(stream, frequencyOutput);
+		    	} else if (entry.getName().equals(TRANSFER_FILE_NAME)) {
+		    		copyFile(stream, transferOutput);
+		    	} else if (entry.getName().equals(FEED_INFO_FILE_NAME)) {
+		    		copyFile(stream, feedInfoOutput);
+		    	}
+		    }
+		    
+		    closeOutputStreams();
+		    
+		    // for each entity there is a map to retrieve in a fast way the object in case of foreign references (in order to avoid too many access to the database)
+		    Map<String, Agency> agencies = new HashMap<String, Agency>();
+		    Map<String, Stop> stops = new HashMap<String, Stop>();
+		    Map<String, Calendar> calendars = new HashMap<String, Calendar>();
+		    Map<String, Route> routes = new HashMap<String, Route>();
+		    Map<String, FareAttribute> fareAttributes = new HashMap<String, FareAttribute>();
+		    Map<String, Trip> trips = new HashMap<String, Trip>();
+		    
+		    Map<String, FileInputStream> inputFiles = buildFileInputStreamMap();
+		    
+		    // read files in an order such that all foreign references could be inserted properly
+		    // if I had read files in alphabetical order from the zip, foreign references could not be processed right; e.g. fare_rules is before routes, but contain a reference to route_id)
+		    
+		    if (inputFiles.containsKey(AGENCY_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(AGENCY_FILE_NAME)));
+		    	String line = br.readLine();
 		        String[] header = line.split(",");
-		        if (entry.getName().equals("agency.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		Agency agency = new Agency();
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-			        			if (header[i].equals("agency_id")) {
-			        				agency.setGtfsId(elements[i]);
-			        			} else if (header[i].equals("agency_name")) {
-			        				agency.setName(elements[i]);
-			        			} else if (header[i].equals("agency_url")) {
-			        				agency.setUrl(elements[i]);
-			        			} else if (header[i].equals("agency_timezone")) {
-			        				agency.setTimezone(elements[i]);
-			        			} else if (header[i].equals("agency_lang")) {
-			        				agency.setLanguage(elements[i]);
-			        			} else if (header[i].equals("agency_phone")) {
-			        				agency.setPhone(elements[i]);
-			        			} else if (header[i].equals("agency_fare_url")) {
-			        				agency.setFareUrl(elements[i]);
-			        			}
+		        while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		Agency agency = new Agency();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+		        			if (header[i].equals("agency_id")) {
+		        				agency.setGtfsId(elements[i]);
+		        			} else if (header[i].equals("agency_name")) {
+		        				agency.setName(elements[i]);
+		        			} else if (header[i].equals("agency_url")) {
+		        				agency.setUrl(elements[i]);
+		        			} else if (header[i].equals("agency_timezone")) {
+		        				agency.setTimezone(elements[i]);
+		        			} else if (header[i].equals("agency_lang")) {
+		        				agency.setLanguage(elements[i]);
+		        			} else if (header[i].equals("agency_phone")) {
+		        				agency.setPhone(elements[i]);
+		        			} else if (header[i].equals("agency_fare_url")) {
+		        				agency.setFareUrl(elements[i]);
 		        			}
-		        		}
-		        		agencyDAO.addAgency(agency);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        } else if (entry.getName().equals("calendar.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		Calendar calendar = new Calendar();
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-			        			if (header[i].equals("service_id")) {
-			        				calendar.setGtfsId(elements[i]);
-			        			} else if (header[i].equals("monday")) {
-			        				calendar.setMonday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("tuesday")) {
-			        				calendar.setTuesday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("wednesday")) {
-			        				calendar.setWednesday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("thursday")) {
-			        				calendar.setThursday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("friday")) {
-			        				calendar.setFriday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("saturday")) {
-			        				calendar.setSaturday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("sunday")) {
-			        				calendar.setSunday(parseBoolean(elements[i]));
-			        			} else if (header[i].equals("start_date")) {
-			        				calendar.setStartDate(parseDate(elements[i]));
-			        			} else if (header[i].equals("end_date")) {
-			        				calendar.setEndDate(parseDate(elements[i]));
-			        			}
+	        			}
+	        		}
+	        		agencies.put(agency.getGtfsId(), agency);
+	        		agencyDAO.addAgency(agency);
+	        	}
+		        inputFiles.get(AGENCY_FILE_NAME).close();
+	        	logger.info(AGENCY_FILE_NAME + " letto.");
+		    }
+	
+		    if (inputFiles.containsKey(STOP_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(STOP_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements;
+	        		if (line.contains("\"")) {
+		        		String s = line.substring(line.indexOf("\"") + 1, line.lastIndexOf("\""));
+//		        		logger.info("------> " + s);
+//		        		logger.info("------> " + line.replaceAll("\"", ""));
+//		        		logger.info("------> " + line.replaceAll("\"", "").replace(s, s.replaceAll(",", " ")));
+		        		elements = line.replaceAll("\"", "").replace(s, s.replaceAll(",", "")).split(",");
+	        		} else {
+	        			elements = line.split(",");
+	        		}
+	        		Stop stop = new Stop();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+		        			if (header[i].equals("stop_id")) {
+		        				stop.setGtfsId(elements[i]);
+		        			} else if (header[i].equals("stop_code")) {
+		        				stop.setCode(elements[i]);
+		        			} else if (header[i].equals("stop_name")) {
+		        				stop.setName(elements[i]);
+		        			} else if (header[i].equals("stop_desc")) {
+		        				stop.setDesc(elements[i]);
+		        			} else if (header[i].equals("stop_lat")) {
+		        				stop.setLat(Double.parseDouble(elements[i]));
+		        			} else if (header[i].equals("stop_lon")) {
+		        				stop.setLon(Double.parseDouble(elements[i]));
+		        			} else if (header[i].equals("zone_id")) {
+		        				// TODO: stop.setZone(elements[i]);
+		        			} else if (header[i].equals("stop_url")) {
+		        				stop.setUrl(elements[i]);
+		        			} else if (header[i].equals("location_type")) {
+		        				stop.setLocationType(Integer.parseInt(elements[i]));
+		        			} else if (header[i].equals("parent_station")) {
+		        				// TODO: stop.setParentStation(elements[i]);
+		        			} else if (header[i].equals("stop_timezone")) {
+		        				stop.setTimezone(elements[i]);
+		        			} else if (header[i].equals("wheelchair_boarding")) {
+		        				stop.setWheelchairBoarding(Integer.parseInt(elements[i]));
 		        			}
-		        		}
-		        		calendarDAO.addCalendar(calendar);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        } else if (entry.getName().equals("calendar_dates.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		CalendarDate calendarDate = new CalendarDate();
-		        		Calendar calendar = null;
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-			        			if (header[i].equals("service_id")) {
-			        				for (Calendar c: calendarDAO.getAllCalendars()) {
-			        					if (c.getGtfsId().equals(elements[i])) {
-			        						calendar = c;
-			        					}
-			        				}
-			        			} else if (header[i].equals("date")) {
-			        				calendarDate.setDate(parseDate(elements[i]));
-			        			} else if (header[i].equals("exception_type")) {
-			        				calendarDate.setExceptionType(Integer.parseInt(elements[i]));
-			        			}
+	        			}
+	        		}
+	        		stops.put(stop.getGtfsId(), stop);
+	        		stopDAO.addStop(stop);
+		    	}
+		    	inputFiles.get(STOP_FILE_NAME).close();
+		    	logger.info(STOP_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(CALENDAR_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(CALENDAR_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		Calendar calendar = new Calendar();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+		        			if (header[i].equals("service_id")) {
+		        				calendar.setGtfsId(elements[i]);
+		        			} else if (header[i].equals("monday")) {
+		        				calendar.setMonday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("tuesday")) {
+		        				calendar.setTuesday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("wednesday")) {
+		        				calendar.setWednesday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("thursday")) {
+		        				calendar.setThursday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("friday")) {
+		        				calendar.setFriday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("saturday")) {
+		        				calendar.setSaturday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("sunday")) {
+		        				calendar.setSunday(parseBoolean(elements[i]));
+		        			} else if (header[i].equals("start_date")) {
+		        				calendar.setStartDate(parseDate(elements[i]));
+		        			} else if (header[i].equals("end_date")) {
+		        				calendar.setEndDate(parseDate(elements[i]));
 		        			}
-		        		}
-		        		calendar.addCalendarDate(calendarDate);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        } else if (entry.getName().equals("fare_attributes.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		FareAttribute fareAttribute = new FareAttribute();
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-			        			if (header[i].equals("fare_id")) {
-			        				fareAttribute.setGtfsId(elements[i]);
-			        			} else if (header[i].equals("price")) {
-			        				fareAttribute.setPrice(Double.parseDouble(elements[i]));
-			        			} else if (header[i].equals("currency_type")) {
-			        				fareAttribute.setCurrencyType(elements[i]);
-			        			} else if (header[i].equals("payment_method")) {
-			        				fareAttribute.setPaymentMethod(Integer.parseInt(elements[i]));
-			        			} else if (header[i].equals("transfers")) {
-			        				fareAttribute.setTransfers(Integer.parseInt(elements[i]));
-			        			} else if (header[i].equals("transfer_duration")) {
-			        				fareAttribute.setTransferDuration(Integer.parseInt(elements[i]));
-			        			}
+	        			}
+	        		}
+	        		calendars.put(calendar.getGtfsId(), calendar);
+	        		calendarDAO.addCalendar(calendar);
+		    	}
+		    	inputFiles.get(CALENDAR_FILE_NAME).close();
+		    	logger.info(CALENDAR_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(CALENDAR_DATE_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(CALENDAR_DATE_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		CalendarDate calendarDate = new CalendarDate();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+		        			if (header[i].equals("service_id")) {
+		        				if (calendars.containsKey(elements[i])) {
+		        					calendarDate.setCalendar(calendars.get(elements[i]));
+	        					}
+		        			} else if (header[i].equals("date")) {
+		        				calendarDate.setDate(parseDate(elements[i]));
+		        			} else if (header[i].equals("exception_type")) {
+		        				calendarDate.setExceptionType(Integer.parseInt(elements[i]));
 		        			}
-		        		}
-		        		fareAttributeDAO.addFareAttribute(fareAttribute);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        } else if (entry.getName().equals("fare_rules.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		FareRule fareRule = new FareRule();
-		        		FareAttribute fareAttribute = null;
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-			        			if (header[i].equals("fare_id")) {
-			        				for (FareAttribute fa: fareAttributeDAO.getAllFareAttributes()) {
-			        					if (fa.getGtfsId().equals(elements[i])) {
-			        						fareAttribute = fa;
-			        					}
-			        				}
-			        			} else if (header[i].equals("route_id")) {
-			        				for (Route r: routeDAO.getAllRoutes()) {
-			        					if (r.getGtfsId().equals(elements[i])) {
-			        						r.addFareRule(fareRule);
-			        					}
-			        				}
-			        			} else if (header[i].equals("origin_id")) {
-			        				// TODO: fareRule.setOrigin(elements[i]);
-			        			} else if (header[i].equals("destination_id")) {
-			        				// TODO: fareRule.setDestination(elements[i]);
-			        			} else if (header[i].equals("contains_id")) {
-			        				// TODO: fareRule.setContains(elements[i]);
-			        			}
+	        			}
+	        		}
+	        		calendarDateDAO.addCalendarDate(calendarDate);
+		    	}
+		    	inputFiles.get(CALENDAR_DATE_FILE_NAME).close();
+		    	logger.info(CALENDAR_DATE_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(ROUTE_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(ROUTE_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		Route route = new Route();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+	        				if (header[i].equals("route_id")) {
+	        					route.setGtfsId(elements[i]);
+	        				} else if (header[i].equals("agency_id")) {
+	        					if (agencies.containsKey(elements[i])) {
+	        						route.setAgency(agencies.get(elements[i]));
+	        					}
+	        				} else if (header[i].equals("route_short_name")) {
+	        					route.setShortName(elements[i]);
+	        				} else if (header[i].equals("route_long_name")) {
+	        					route.setLongName(elements[i]);
+	        				} else if (header[i].equals("route_desc")) {
+	        					route.setDescription(elements[i]);
+	        				} else if (header[i].equals("route_type")) {
+	        					route.setType(Integer.parseInt(elements[i]));
+	        				} else if (header[i].equals("route_url")) {
+	        					route.setUrl(elements[i]);
+	        				} else if (header[i].equals("route_color")) {
+	        					route.setColor("#" + elements[i]);
+	        				} else if (header[i].equals("route_text_color")) {
+	        					route.setTextColor("#" + elements[i]);
+	        				}
+	        			}
+	        		}
+	        		routes.put(route.getGtfsId(), route);
+	        		routeDAO.addRoute(route);
+		    	}
+		    	inputFiles.get(ROUTE_FILE_NAME).close();
+		    	logger.info(ROUTE_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(FARE_ATTRIBUTE_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FARE_ATTRIBUTE_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		FareAttribute fareAttribute = new FareAttribute();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+		        			if (header[i].equals("fare_id")) {
+		        				fareAttribute.setGtfsId(elements[i]);
+		        			} else if (header[i].equals("price")) {
+		        				fareAttribute.setPrice(Double.parseDouble(elements[i]));
+		        			} else if (header[i].equals("currency_type")) {
+		        				fareAttribute.setCurrencyType(elements[i]);
+		        			} else if (header[i].equals("payment_method")) {
+		        				fareAttribute.setPaymentMethod(Integer.parseInt(elements[i]));
+		        			} else if (header[i].equals("transfers")) {
+		        				fareAttribute.setTransfers(Integer.parseInt(elements[i]));
+		        			} else if (header[i].equals("transfer_duration")) {
+		        				fareAttribute.setTransferDuration(Integer.parseInt(elements[i]) / 60);
 		        			}
-		        		}
-		        		fareAttribute.addFareRule(fareRule);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        } else if (entry.getName().equals("feed_info.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		FeedInfo feedInfo = new FeedInfo();
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-		        				if (header[i].equals("feed_publisher_name")) {
-		        					feedInfo.setPublisherName(elements[i]);
-		        				} else if (header[i].equals("feed_publisher_url")) {
-		        					feedInfo.setPublisherUrl(elements[i]);
-		        				} else if (header[i].equals("feed_lang")) {
-		        					feedInfo.setLanguage(elements[i]);
-		        				} else if (header[i].equals("feed_start_date")) {
-		        					feedInfo.setStartDate(parseDate(elements[i]));
-		        				} else if (header[i].equals("feed_end_date")) {
-		        					feedInfo.setEndDate(parseDate(elements[i]));
-		        				} else if (header[i].equals("feed_version")) {
-		        					feedInfo.setVersion(elements[i]);
-		        				}
+	        			}
+	        		}
+	        		fareAttributes.put(fareAttribute.getGtfsId(), fareAttribute);
+	        		fareAttributeDAO.addFareAttribute(fareAttribute);
+		    	}
+		    	inputFiles.get(FARE_ATTRIBUTE_FILE_NAME).close();
+		    	logger.info(FARE_ATTRIBUTE_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(FARE_RULE_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FARE_RULE_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		FareRule fareRule = new FareRule();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+		        			if (header[i].equals("fare_id")) {
+		        				if (fareAttributes.containsKey(elements[i])) {
+		        					fareRule.setFareAttribute(fareAttributes.get(elements[i]));
+	        					}
+		        			} else if (header[i].equals("route_id")) {
+		        				if (routes.containsKey(elements[i])) {
+		        					routes.get(elements[i]).addFareRule(fareRule);
+	        					}
+		        			} else if (header[i].equals("origin_id")) {
+		        				// TODO: fareRule.setOrigin(elements[i]);
+		        			} else if (header[i].equals("destination_id")) {
+		        				// TODO: fareRule.setDestination(elements[i]);
+		        			} else if (header[i].equals("contains_id")) {
+		        				// TODO: fareRule.setContains(elements[i]);
 		        			}
-		        		}
-		        		feedInfo.setName(importedFileName);
-		        		feedInfoDAO.addFeedInfo(feedInfo);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        } else if (entry.getName().equals("stops.txt")) {
-		        	while ((line = br.readLine()) != null) {
-		        		String[] elements = line.split(",");
-		        		Stop stop = new Stop();
-		        		//logger.info("---> " + Arrays.toString(elements));
-		        		for (int i=0; i<header.length && i<elements.length; i++) {
-		        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
-		        				//logger.info("---> " + elements[i]);
-			        			if (header[i].equals("stop_id")) {
-			        				stop.setGtfsId(elements[i]);
-			        			} else if (header[i].equals("stop_code")) {
-			        				stop.setCode(elements[i]);
-			        			} else if (header[i].equals("stop_name")) {
-			        				stop.setName(elements[i]);
-			        			} else if (header[i].equals("stop_desc")) {
-			        				stop.setDesc(elements[i]);
-			        			} else if (header[i].equals("stop_lat")) {
-			        				stop.setLat(Double.parseDouble(elements[i]));
-			        			} else if (header[i].equals("stop_lon")) {
-			        				stop.setLon(Double.parseDouble(elements[i]));
-			        			} else if (header[i].equals("zone_id")) {
-			        				// TODO: stop.setZone(elements[i]);
-			        			} else if (header[i].equals("stop_url")) {
-			        				stop.setUrl(elements[i]);
-			        			} else if (header[i].equals("location_type")) {
-			        				stop.setLocationType(Integer.parseInt(elements[i]));
-			        			} else if (header[i].equals("parent_station")) {
-			        				// TODO: stop.setParentStation(elements[i]);
-			        			} else if (header[i].equals("stop_timezone")) {
-			        				stop.setTimezone(elements[i]);
-			        			} else if (header[i].equals("wheelchair_boarding")) {
-			        				stop.setWheelchairBoarding(Integer.parseInt(elements[i]));
-			        			}
-		        			}
-		        		}
-		        		stopDAO.addStop(stop);
-		        	}
-		        	logger.info(entry.getName() + " letto.");
-		        }
+	        			}
+	        		}
+	        		fareRuleDAO.addFareRule(fareRule);
+		    	}
+		    	inputFiles.get(FARE_RULE_FILE_NAME).close();
+		    	logger.info(FARE_RULE_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(TRIP_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(TRIP_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+		    		String[] elements = line.split(",");
+		    		Trip trip = new Trip();
+		    		for (int i=0; i<header.length && i<elements.length; i++) {
+		    			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+		    				//logger.info("---> " + elements[i]);
+		    				if (header[i].equals("route_id")) {
+		    					if (routes.containsKey(elements[i])) {
+		        					trip.setRoute(routes.get(elements[i]));
+	        					}
+		    				} else if (header[i].equals("service_id")) {
+		    					if (calendars.containsKey(elements[i])) {
+		    						calendars.get(elements[i]).addTrip(trip);
+	        					}
+		    				} else if (header[i].equals("trip_id")) {
+		    					trip.setGtfsId(elements[i]);
+		    				} else if (header[i].equals("trip_headsign")) {
+		    					trip.setTripHeadsign(elements[i]);
+		    				} else if (header[i].equals("trip_short_name")) {
+		    					trip.setTripShortName(elements[i]);
+		    				} else if (header[i].equals("direction_id")) {
+		    					trip.setDirectionId(Integer.parseInt(elements[i]));
+		    				} else if (header[i].equals("block_id")) {
+		    					trip.setBlockId(elements[i]);
+		    				} else if (header[i].equals("shape_id")) {
+		    					// TODO
+//		    					for (Shape s: shapeDAO.getAllShapes()) {
+//		    						if (s.getGtfsId().equals(elements[i])) {
+//		    							s.addTrip(trip);
+//        								break;
+//		    						}
+//		    					}
+		    				} else if (header[i].equals("wheelchair_accessible")) {
+		    					trip.setWheelchairAccessible(Integer.parseInt(elements[i]));
+		    				} else if (header[i].equals("bikes_allowed")) {
+		    					trip.setBikesAllowed(Integer.parseInt(elements[i]));
+		    				}
+		    			}
+		    		}
+		    		trips.put(trip.getGtfsId(), trip);
+		    		tripDAO.addTrip(trip);
+		    	}
+		    	inputFiles.get(TRIP_FILE_NAME).close();
+		    	logger.info(TRIP_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(STOP_TIME_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(STOP_TIME_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+		    		String[] elements = line.split(",");
+		    		StopTime stopTime = new StopTime();
+		    		for (int i=0; i<header.length && i<elements.length; i++) {
+		    			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+		    				//logger.info("---> " + elements[i]);
+		    				if (header[i].equals("trip_id")) {
+		    					if (trips.containsKey(elements[i])) {
+		        					stopTime.setTrip(trips.get(elements[i]));
+	        					}
+		    				} else if (header[i].equals("arrival_time")) {
+		    					stopTime.setArrivalTime(parseTime(elements[i]));
+		    				} else if (header[i].equals("departure_time")) {
+		    					stopTime.setDepartureTime(parseTime(elements[i]));
+		    				} else if (header[i].equals("stop_id")) {
+		    					if (stops.containsKey(elements[i])) {
+		    						stops.get(elements[i]).addStopTime(stopTime);
+	        					}
+		    				} else if (header[i].equals("stop_sequence")) {
+		    					stopTime.setStopSequence(Integer.parseInt(elements[i]));
+		    				} else if (header[i].equals("stop_headsign")) {
+		    					stopTime.setStopHeadsign(elements[i]);
+		    				} else if (header[i].equals("pickup_type")) {
+		    					stopTime.setPickupType(Integer.parseInt(elements[i]));
+		    				} else if (header[i].equals("drop_off_type")) {
+		    					stopTime.setDropOffType(Integer.parseInt(elements[i]));
+		    				} else if (header[i].equals("shape_dist_traveled")) {
+		    					stopTime.setShapeDistTraveled(Double.parseDouble(elements[i]));
+		    				}
+		    			}
+		    		}
+		    		stopTimeDAO.addStopTime(stopTime);
+		    	}
+		    	inputFiles.get(STOP_TIME_FILE_NAME).close();
+		    	logger.info(STOP_TIME_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(FREQUENCY_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FREQUENCY_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		Frequency frequency = new Frequency();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+	        				if (header[i].equals("trip_id")) {
+	        					if (trips.containsKey(elements[i])) {
+		        					frequency.setTrip(trips.get(elements[i]));
+	        					}
+	        				} else if (header[i].equals("start_time")) {
+	        					frequency.setStartTime(parseTime(elements[i]));
+	        				} else if (header[i].equals("end_time")) {
+	        					frequency.setEndTime(parseTime(elements[i]));
+	        				} else if (header[i].equals("feed_start_date")) {
+	        					frequency.setHeadwaySecs(Integer.parseInt(elements[i]) / 60);
+	        				} else if (header[i].equals("feed_end_date")) {
+	        					frequency.setExactTimes(Integer.parseInt(elements[i]));
+	        				}
+	        			}
+	        		}
+	        		frequencyDAO.addFrequency(frequency);
+		    	}
+		    	inputFiles.get(FREQUENCY_FILE_NAME).close();
+		    	logger.info(FREQUENCY_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(TRANSFER_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(TRANSFER_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+		    		String[] elements = line.split(",");
+		    		Transfer transfer = new Transfer();
+		    		for (int i=0; i<header.length && i<elements.length; i++) {
+		    			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+		    				//logger.info("---> " + elements[i]);
+		    				if (header[i].equals("from_stop_id")) {
+		    					if (stops.containsKey(elements[i])) {
+		    						stops.get(elements[i]).addFromStopTransfer(transfer);
+	        					}
+		    				} else if (header[i].equals("to_stop_id")) {
+		    					if (stops.containsKey(elements[i])) {
+		    						stops.get(elements[i]).addToStopTransfer(transfer);
+	        					}
+		    				} else if (header[i].equals("transfer_type")) {
+		    					transfer.setTransferType(Integer.parseInt(elements[i]));
+		    				} else if (header[i].equals("min_transfer_time")) {
+		    					transfer.setMinTransferTime(Integer.parseInt(elements[i]) / 60);
+		    				}
+		    			}
+		    		}
+		    		transferDAO.addTransfer(transfer);
+		    	}
+		    	inputFiles.get(TRANSFER_FILE_NAME).close();
+		    	logger.info(TRANSFER_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(FEED_INFO_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FEED_INFO_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	while ((line = br.readLine()) != null) {
+	        		String[] elements = line.split(",");
+	        		FeedInfo feedInfo = new FeedInfo();
+	        		for (int i=0; i<header.length && i<elements.length; i++) {
+	        			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+	        				//logger.info("---> " + elements[i]);
+	        				if (header[i].equals("feed_publisher_name")) {
+	        					feedInfo.setPublisherName(elements[i]);
+	        				} else if (header[i].equals("feed_publisher_url")) {
+	        					feedInfo.setPublisherUrl(elements[i]);
+	        				} else if (header[i].equals("feed_lang")) {
+	        					feedInfo.setLanguage(elements[i]);
+	        				} else if (header[i].equals("feed_start_date")) {
+	        					feedInfo.setStartDate(parseDate(elements[i]));
+	        				} else if (header[i].equals("feed_end_date")) {
+	        					feedInfo.setEndDate(parseDate(elements[i]));
+	        				} else if (header[i].equals("feed_version")) {
+	        					feedInfo.setVersion(elements[i]);
+	        				}
+	        			}
+	        		}
+	        		feedInfo.setName(importedFileName);
+	        		feedInfoDAO.addFeedInfo(feedInfo);
+		    	}
+		    	inputFiles.get(FEED_INFO_FILE_NAME).close();
+		    	logger.info(FEED_INFO_FILE_NAME + " letto.");
 		    }
 		} catch (IOException e) {
 			logger.error("Errore nella lettura del feed");
 			e.printStackTrace();
 		} catch (ParseException e) {
-			logger.error("Errore nella conversione della data");
+			logger.error("Errore nella conversione dell'ora/data");
 			e.printStackTrace();
 		}
 	}
 	
+	private void copyFile(InputStream is, OutputStream os) throws IOException {
+		byte[] buf = new byte[1024];
+	    int len;
+	    while ((len = is.read(buf)) > 0) {
+	    	os.write(buf, 0, len);
+	    }
+	}
+
+	private Time parseTime(String time) throws ParseException {
+		SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
+		return new Time(dateFormat.parse(time).getTime());
+	}
+
 	private Date parseDate(String date) throws ParseException {
 		SimpleDateFormat dateFormat = new SimpleDateFormat("yyyyMMdd");
 		return new Date(dateFormat.parse(date).getTime());

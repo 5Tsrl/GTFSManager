@@ -31,4 +31,10 @@ public class CalendarDateDAOImpl implements CalendarDateDAO {
 		return query.list();
 	}
 
+	@Override
+	public void addCalendarDate(CalendarDate calendarDate) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.save(calendarDate);
+	}
+
 }

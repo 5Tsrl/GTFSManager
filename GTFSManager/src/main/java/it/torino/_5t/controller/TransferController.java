@@ -3,10 +3,9 @@ package it.torino._5t.controller;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import it.torino._5t.dao.AgencyDAO;
+import it.torino._5t.dao.CalendarDAO;
 import it.torino._5t.dao.StopDAO;
 import it.torino._5t.dao.TransferDAO;
-import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Stop;
 import it.torino._5t.entity.Transfer;
 
@@ -26,8 +25,10 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class TransferController {
 	private static final Logger logger = LoggerFactory.getLogger(TransferController.class);
 	
+//	@Autowired
+//	private AgencyDAO agencyDAO;
 	@Autowired
-	private AgencyDAO agencyDAO;
+	private CalendarDAO calendarDAO;
 	@Autowired
 	private StopDAO stopDAO;
 	@Autowired
@@ -35,16 +36,16 @@ public class TransferController {
 
 	@RequestMapping(value = "/trasferimenti", method = RequestMethod.GET)
 	public String showTransfers(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		agencyDAO.updateAgency(agency);
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		agencyDAO.updateAgency(agency);
+//		
+//		logger.info("Visualizzazione lista trasferimenti di " + agency.getName() + ".");
 		
-		logger.info("Visualizzazione lista trasferimenti di " + agency.getName() + ".");
-		
-		model.addAttribute("listaTrasferimenti", agency.getTransfers());
-		model.addAttribute("listaFermate", agency.getStops());
+		model.addAttribute("listaTrasferimenti", transferDAO.getAllTransfers());
+		model.addAttribute("listaFermate", stopDAO.getAllStops());
 		model.addAttribute("transfer", new Transfer());
 		
 		return "transfer";
@@ -62,16 +63,16 @@ public class TransferController {
 	// chiamata al submit del form per la creazione di un nuovo trasferimento
 	@RequestMapping(value = "/trasferimenti", method = RequestMethod.POST)
 	public String submitTransferForm(@ModelAttribute @Valid Transfer transfer, BindingResult bindingResult, @RequestParam("fromStopId") Integer fromStopId, @RequestParam("toStopId") Integer toStopId, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione del trasferimento");
-			model.addAttribute("listaTrasferimenti", agency.getTransfers());
-			model.addAttribute("listaFermate", agency.getStops());
+			model.addAttribute("listaTrasferimenti", transferDAO.getAllTransfers());
+			model.addAttribute("listaFermate", stopDAO.getAllStops());
 			model.addAttribute("showCreateForm", true);
 			return "transfer";
 		}
@@ -80,11 +81,11 @@ public class TransferController {
 		fromStop.addFromStopTransfer(transfer);
 		Stop toStop = stopDAO.getStop(toStopId);
 		toStop.addToStopTransfer(transfer);
-		a.addTransfer(transfer);
+		transferDAO.addTransfer(transfer);
 		
 		logger.info("Trasferimento creato da " + transfer.getFromStop().getName() + " a " + transfer.getToStop().getName() + ".");
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("trasferimentoAttivo", transfer);
 		
 		return "redirect:trasferimenti";
@@ -93,17 +94,17 @@ public class TransferController {
 	// chiamata quando seleziono un trasferimento (verrà salvato nella sessione)
 	@RequestMapping(value = "/selezionaTrasferimento", method = RequestMethod.GET)
 	public String selectTransfer(@RequestParam("id") Integer transferId, RedirectAttributes redirectAttributes, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		agencyDAO.updateAgency(agency);
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		agencyDAO.updateAgency(agency);
 		
 		Transfer transfer = transferDAO.getTransfer(transferId);
 		
 		logger.info("Trasferimento selezionato: da " + transfer.getFromStop().getName() + " a " + transfer.getToStop().getName() + ".");
 		
-		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
+		redirectAttributes.addFlashAttribute("listaCalendari", calendarDAO.getAllCalendars());
 
 		session.setAttribute("trasferimentoAttivo", transfer);
 		
@@ -113,11 +114,11 @@ public class TransferController {
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaTrasferimento", method = RequestMethod.GET)
 	public String deleteTransfer(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Transfer transfer = (Transfer) session.getAttribute("trasferimentoAttivo");
 		if (transfer == null) {
@@ -127,7 +128,7 @@ public class TransferController {
 		// rimuovo la trasferimento dal set associato alle fermate di partenza e arrivo
 		Stop fromStop = stopDAO.getStop(transfer.getFromStop().getId());
 		Stop toStop = stopDAO.getStop(transfer.getToStop().getId());
-		for (Stop s: a.getStops()) {
+		for (Stop s: stopDAO.getAllStops()) {
 			if (s.equals(fromStop)) {
 				s.getFromStopTransfers().remove(transfer);
 			}
@@ -136,12 +137,12 @@ public class TransferController {
 			}
 		}
 		
-		a.getTransfers().remove(transfer);
+		transferDAO.deleteTransfer(transfer);
 		
 		logger.info("Trasferimento eliminata: da " + transfer.getFromStop().getName() + " a " + transfer.getToStop().getName() + ".");
 		
 		session.removeAttribute("trasferimentoAttivo");
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:trasferimenti";
 	}
@@ -149,11 +150,11 @@ public class TransferController {
 	// chiamata quando clicco sul pulsante "Modifica trasferimento"
 	@RequestMapping(value = "/modificaTrasferimento", method = RequestMethod.GET)
 	public String showEditTransferForm(RedirectAttributes redirectAttributes, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Transfer transfer = (Transfer) session.getAttribute("trasferimentoAttivo");
 		if (transfer == null) {
@@ -162,7 +163,7 @@ public class TransferController {
 		
 		redirectAttributes.addFlashAttribute("showEditForm", true);
 		redirectAttributes.addFlashAttribute("transfer", transfer);
-		redirectAttributes.addFlashAttribute("listaFermate", a.getStops());
+		redirectAttributes.addFlashAttribute("listaFermate", stopDAO.getAllStops());
 		
 		return "redirect:trasferimenti";
 	}
@@ -170,16 +171,16 @@ public class TransferController {
 	// chiamata al submit del form per la modifica di un trasferimento
 	@RequestMapping(value = "/modificaTrasferimento", method = RequestMethod.POST)
 	public String editTransfer(@ModelAttribute @Valid Transfer transfer, BindingResult bindingResult, @RequestParam("fromStopId") Integer fromStopId, @RequestParam("toStopId") Integer toStopId, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella modifica del trasferimento");
-			model.addAttribute("listaTrasferimenti", agency.getTransfers());
-			model.addAttribute("listaFermate", agency.getStops());
+			model.addAttribute("listaTrasferimenti", transferDAO.getAllTransfers());
+			model.addAttribute("listaFermate", stopDAO.getAllStops());
 			model.addAttribute("showEditForm", true);
 			return "transfer";
 		}
@@ -193,11 +194,11 @@ public class TransferController {
 		Stop toStop = stopDAO.getStop(toStopId);
 		
 		// cerco tra i trasferimenti dell'agenzia quello attivo e lo aggiorno
-		for (Transfer t: a.getTransfers()) {
+		for (Transfer t: transferDAO.getAllTransfers()) {
 			if (t.equals(activetransfer)) {
 				t.setTransferType(transfer.getTransferType());
 				t.setMinTransferTime(transfer.getMinTransferTime());
-				for (Stop s: a.getStops()) {
+				for (Stop s: stopDAO.getAllStops()) {
 					if (s.equals(fromStop)) {
 						s.getFromStopTransfers().remove(activetransfer);
 						s.addFromStopTransfer(t);
@@ -213,7 +214,7 @@ public class TransferController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:trasferimenti";
 	}

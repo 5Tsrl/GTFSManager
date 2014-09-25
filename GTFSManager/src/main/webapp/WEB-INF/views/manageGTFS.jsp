@@ -313,13 +313,14 @@
 		</div>
 							
 		<div class="row">
-			<div id="progressbarModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="progressbarModalLabel" aria-hidden="true">
+			<div id="progressbarModal" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="progressbarModalLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 				<div class="modal-dialog modal-md">
 		   			<div class="modal-content">
 						<div class="modal-header">
 							<h3 id="progressbarModalLabel">Creazione GTFS in corso</h3>
 						</div>
 						<div class="modal-body">
+							<p>Questa operazione può richiedere alcuni minuti</p>
 							<div class="progress progress-striped active">
 								<div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
 							</div>
@@ -330,13 +331,14 @@
 		</div>
 		
 		<div class="row">
-			<div id="progressbarModalImport" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="progressbarModalImportLabel" aria-hidden="true">
+			<div id="progressbarModalImport" class="modal fade" tabindex="-1" role="dialog" aria-labelledby="progressbarModalImportLabel" aria-hidden="true" data-backdrop="static" data-keyboard="false">
 				<div class="modal-dialog modal-md">
 		   			<div class="modal-content">
 						<div class="modal-header">
 							<h3 id="progressbarModalImportLabel">Importazione GTFS in corso</h3>
 						</div>
 						<div class="modal-body">
+							<p>Questa operazione può richiedere alcuni minuti</p>
 							<div class="progress progress-striped active">
 								<div class="progress-bar" role="progressbar" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100" style="width: 100%"></div>
 							</div>
