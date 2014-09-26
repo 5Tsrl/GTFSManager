@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "shape")
@@ -31,6 +32,7 @@ public class Shape implements Serializable {
 	private Integer id;
 	
 	@Column(name = "shape_gtfs_id")
+	@Size(max = 50)
 	private String gtfsId;
 	
 	@ManyToOne(fetch = FetchType.LAZY)

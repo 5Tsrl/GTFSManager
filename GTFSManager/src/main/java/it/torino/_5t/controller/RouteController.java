@@ -81,7 +81,7 @@ public class RouteController {
 			return "route";
 		}
 		
-		for (Route r: routeDAO.getRoutesFromAgency(a)) {
+		for (Route r: routeDAO.getAllRoutes()) {
 			if (r.getGtfsId().equals(route.getGtfsId())) {
 				logger.error("L'id della linea è già presente");
 				model.addAttribute("listaLinee", agency.getRoutes());
@@ -178,7 +178,7 @@ public class RouteController {
 			return "redirect:linee";
 		}
 		
-		for (Route r: routeDAO.getRoutesFromAgency(a)) {
+		for (Route r: routeDAO.getAllRoutes()) {
 			if (!activeRoute.getGtfsId().equals(route.getGtfsId()) && r.getGtfsId().equals(route.getGtfsId())) {
 				logger.error("L'id della linea è già presente");
 				model.addAttribute("listaLinee", agency.getRoutes());

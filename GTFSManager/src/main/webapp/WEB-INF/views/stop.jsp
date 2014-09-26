@@ -455,10 +455,6 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<c:if test="${not empty lineaAttiva.shortName && not empty corsaAttiva.tripShortName}">
-			<li><a href="/_5t/linee">Linea <b>${lineaAttiva.gtfsId}</b></a></li>
-			<li><a href="/_5t/corse">Corsa <b>${corsaAttiva.gtfsId}</b></a></li>
-		</c:if>
 		<li class="active">Fermate</li>
 	</ol>
 	

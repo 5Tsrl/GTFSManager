@@ -100,7 +100,7 @@ public class GTFSController {
 	private static final String ROUTE_HEADER = "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color\n";
 	private static final String SHAPE_HEADER = "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_dist_traveled\n";
 	private static final String STOP_HEADER = "stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding\n";
-	private static final String STOP_TIME_HEADER = "trip_id,arrival_time,departure_time,stop_id,stop_sequence,pickup_type,drop_off_type,shape_dist_traveled\n";
+	private static final String STOP_TIME_HEADER = "trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled\n";
 	private static final String TRANSFER_HEADER = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n";
 	private static final String TRIP_HEADER = "route_id,service_id,trip_id,trip_headsign,trip_short_name,direction_id,block_id,shape_id,wheelchair_accessible,bikes_allowed\n";
 
@@ -444,8 +444,14 @@ public class GTFSController {
 			row += formatOptionalString(r.getDescription()) + ",";
 			row += r.getType() + ",";
 			row += formatOptionalString(r.getUrl()) + ",";
-			row += formatOptionalString(r.getColor().substring(1).toUpperCase()) + ",";
-			row += formatOptionalString(r.getTextColor().substring(1).toUpperCase()) + "\n";
+			if (r.getColor() != null)
+				row += formatOptionalString(r.getColor().substring(1).toUpperCase()) + ",";
+			else
+				row += ",";
+			if (r.getTextColor() != null)
+				row += formatOptionalString(r.getTextColor().substring(1).toUpperCase()) + "\n";
+			else
+				row += "\n";
 		}
 		routeOutput.write(row.getBytes());
 		logger.info("routes.txt completato.");
@@ -454,14 +460,24 @@ public class GTFSController {
 	private void fillShapes() throws IOException {
 		String row = new String();
 		for (Shape s: shapeDAO.getAllShapes()) {
-			List<Point2D.Double> points = decodePolyline(s.getEncodedPolyline());
+			List<Point2D.Double> points = decodePolyline(s.getEncodedPolyline().replace("\\\\", "\\"));
 			int sequence = 0;
+			double totDistance = 0.0;
 			for (Point2D.Double p: points) {
-				row += s.getId() + ",";
+				if (s.getGtfsId() != null)
+					row += s.getGtfsId() + ",";
+				else
+					row += s.getId() + ",";
 				row += String.format(Locale.ENGLISH, "%.5f", p.getX()) + ",";
 				row += String.format(Locale.ENGLISH, "%.5f", p.getY()) + ",";
-				row += sequence++ + ",";
-				row += String.format(Locale.ENGLISH, "%.4f", computeDistance(p.getX(), p.getY(), points.get(0).getX(), points.get(0).getY())) + "\n";
+				row += sequence + ",";
+				if (sequence == 0) {
+					row += "0.0000\n";
+				} else {
+					totDistance += computeDistance(p.getX(), p.getY(), points.get(sequence-1).getX(), points.get(sequence-1).getY());
+					row += String.format(Locale.ENGLISH, "%.4f", totDistance) + "\n";
+				}
+				sequence++;
 			}
 		}
 		shapeOutput.write(row.getBytes());
@@ -542,8 +558,11 @@ public class GTFSController {
 			row += formatOptionalString(t.getTripHeadsign()) + ",";
 			row += formatOptionalString(t.getTripShortName()) + ",";
 			row += formatOptionalInteger(t.getDirectionId()) + ",";
-			//row += formatOptionalString(t.getBlockId()) + ",";
-			row += (t.getShape()  != null ? t.getShape().getId() : "") + ",";
+			row += formatOptionalString(t.getBlockId()) + ",";
+			if (t.getShape() != null)
+				row += (t.getShape().getGtfsId() != null ? t.getShape().getGtfsId() : t.getShape().getId()) + ",";
+			else
+				row += ",";
 			row += formatOptionalInteger(t.getWheelchairAccessible()) + ",";
 			row += formatOptionalInteger(t.getBikesAllowed()) + "\n";
 		}
@@ -778,6 +797,20 @@ public class GTFSController {
 			transferOutput = new FileOutputStream(transferOutputFile);
 			tripOutput = new FileOutputStream(tripOutputFile);
 			
+			boolean agencyExist = false;
+			boolean calendarExist = false;
+			boolean calendarDateExist = false;
+			boolean fareAttributeExist = false;
+			boolean fareRuleExist = false;
+			boolean feedInfoExist = false;
+			boolean frequencyExist = false;
+			boolean routeExist = false;
+			boolean shapeExist = false;
+			boolean stopExist = false;
+			boolean stopTimeExist = false;
+			boolean transferExist = false;
+			boolean tripExist = false;
+			
 			ZipFile zipFile = new ZipFile(uploadedFile);
 			
 		    Enumeration<? extends ZipEntry> entries = zipFile.entries();
@@ -787,30 +820,43 @@ public class GTFSController {
 		    	InputStream stream = zipFile.getInputStream(entry);
 		    	if (entry.getName().equals(AGENCY_FILE_NAME)) {
 		    		copyFile(stream, agencyOutput);
+		    		agencyExist = true;
 		    	} else if (entry.getName().equals(STOP_FILE_NAME)) {
 		    		copyFile(stream, stopOutput);
+		    		stopExist = true;
 		    	} else if (entry.getName().equals(ROUTE_FILE_NAME)) {
 		    		copyFile(stream, routeOutput);
+		    		routeExist = true;
 		    	} else if (entry.getName().equals(TRIP_FILE_NAME)) {
 		    		copyFile(stream, tripOutput);
+		    		tripExist = true;
 		    	} else if (entry.getName().equals(STOP_TIME_FILE_NAME)) {
 		    		copyFile(stream, stopTimeOutput);
+		    		stopTimeExist = true;
 		    	} else if (entry.getName().equals(CALENDAR_FILE_NAME)) {
 		    		copyFile(stream, calendarOutput);
+		    		calendarExist = true;
 		    	} else if (entry.getName().equals(CALENDAR_DATE_FILE_NAME)) {
 		    		copyFile(stream, calendarDateOutput);
+		    		calendarDateExist = true;
 		    	} else if (entry.getName().equals(FARE_ATTRIBUTE_FILE_NAME)) {
 		    		copyFile(stream, fareAttributeOutput);
+		    		fareAttributeExist = true;
 		    	} else if (entry.getName().equals(FARE_RULE_FILE_NAME)) {
 		    		copyFile(stream, fareRuleOutput);
+		    		fareRuleExist = true;
 		    	} else if (entry.getName().equals(SHAPE_FILE_NAME)) {
 		    		copyFile(stream, shapeOutput);
+		    		shapeExist = true;
 		    	} else if (entry.getName().equals(FREQUENCY_FILE_NAME)) {
 		    		copyFile(stream, frequencyOutput);
+		    		frequencyExist = true;
 		    	} else if (entry.getName().equals(TRANSFER_FILE_NAME)) {
 		    		copyFile(stream, transferOutput);
+		    		transferExist = true;
 		    	} else if (entry.getName().equals(FEED_INFO_FILE_NAME)) {
 		    		copyFile(stream, feedInfoOutput);
+		    		feedInfoExist = true;
 		    	}
 		    }
 		    
@@ -836,7 +882,7 @@ public class GTFSController {
 		    // read files in an order such that all foreign references could be inserted properly
 		    // if I had read files in alphabetical order from the zip, foreign references could not be processed right; e.g. fare_rules is before routes, but contain a reference to route_id)
 		    
-		    if (inputFiles.containsKey(AGENCY_FILE_NAME)) {
+		    if (agencyExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(AGENCY_FILE_NAME)));
 		    	String line = br.readLine();
 		        String[] header = line.split(",");
@@ -870,7 +916,7 @@ public class GTFSController {
 	        	logger.info(AGENCY_FILE_NAME + " letto.");
 		    }
 	
-		    if (inputFiles.containsKey(STOP_FILE_NAME)) {
+		    if (stopExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(STOP_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -930,7 +976,7 @@ public class GTFSController {
 		    	logger.info(STOP_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(CALENDAR_FILE_NAME)) {
+		    if (calendarExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(CALENDAR_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -970,7 +1016,7 @@ public class GTFSController {
 		    	logger.info(CALENDAR_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(CALENDAR_DATE_FILE_NAME)) {
+		    if (calendarDateExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(CALENDAR_DATE_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -997,7 +1043,7 @@ public class GTFSController {
 		    	logger.info(CALENDAR_DATE_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(ROUTE_FILE_NAME)) {
+		    if (routeExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(ROUTE_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1037,7 +1083,7 @@ public class GTFSController {
 		    	logger.info(ROUTE_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(FARE_ATTRIBUTE_FILE_NAME)) {
+		    if (fareAttributeExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FARE_ATTRIBUTE_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1069,7 +1115,7 @@ public class GTFSController {
 		    	logger.info(FARE_ATTRIBUTE_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(FARE_RULE_FILE_NAME)) {
+		    if (fareRuleExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FARE_RULE_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1123,7 +1169,7 @@ public class GTFSController {
 		    	logger.info(FARE_RULE_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(SHAPE_FILE_NAME)) {
+		    if (shapeExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(SHAPE_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1170,7 +1216,7 @@ public class GTFSController {
 		    	logger.info(SHAPE_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(TRIP_FILE_NAME)) {
+		    if (tripExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(TRIP_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1216,7 +1262,7 @@ public class GTFSController {
 		    	logger.info(TRIP_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(STOP_TIME_FILE_NAME)) {
+		    if (stopTimeExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(STOP_TIME_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1231,8 +1277,16 @@ public class GTFSController {
 		        					stopTime.setTrip(trips.get(elements[i]));
 	        					}
 		    				} else if (header[i].equals("arrival_time")) {
+		    					String[] arrival = elements[i].split(":");
+		    					if (Integer.parseInt(arrival[0]) > 23) {
+		    						stopTime.setContinueFromPreviousDay(true);
+		    					}
 		    					stopTime.setArrivalTime(parseTime(elements[i]));
 		    				} else if (header[i].equals("departure_time")) {
+		    					String[] departure = elements[i].split(":");
+		    					if (Integer.parseInt(departure[0]) > 23) {
+		    						stopTime.setContinueFromPreviousDay(true);
+		    					}
 		    					stopTime.setDepartureTime(parseTime(elements[i]));
 		    				} else if (header[i].equals("stop_id")) {
 		    					if (stops.containsKey(elements[i])) {
@@ -1257,7 +1311,7 @@ public class GTFSController {
 		    	logger.info(STOP_TIME_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(FREQUENCY_FILE_NAME)) {
+		    if (frequencyExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FREQUENCY_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1288,7 +1342,7 @@ public class GTFSController {
 		    	logger.info(FREQUENCY_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(TRANSFER_FILE_NAME)) {
+		    if (transferExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(TRANSFER_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1319,7 +1373,7 @@ public class GTFSController {
 		    	logger.info(TRANSFER_FILE_NAME + " letto.");
 		    }
 		    
-		    if (inputFiles.containsKey(FEED_INFO_FILE_NAME)) {
+		    if (feedInfoExist) {
 		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(FEED_INFO_FILE_NAME)));
 		    	String line = br.readLine();
 		    	String[] header = line.split(",");
@@ -1349,6 +1403,10 @@ public class GTFSController {
 		    	}
 		    	inputFiles.get(FEED_INFO_FILE_NAME).close();
 		    	logger.info(FEED_INFO_FILE_NAME + " letto.");
+		    } else {
+		    	FeedInfo feedInfo = new FeedInfo();
+		    	feedInfo.setName(importedFileName);
+        		feedInfoDAO.addFeedInfo(feedInfo);
 		    }
 		    
 		    for (Map.Entry<Stop, String> map: stopWithParent.entrySet()) {

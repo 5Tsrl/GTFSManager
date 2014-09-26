@@ -15,6 +15,7 @@
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
+	<script src="//cdn.datatables.net/plug-ins/a5734b29083/sorting/date-uk.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script type="text/javascript">
@@ -416,6 +417,10 @@
 		$('#listaCalendari').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
+	    	"columnDefs": [{
+				"targets": [1, 2],
+				type: "date-uk"
+    	    }],
 	    	// default sorting on the first column ("Nome")
 	    	"order": [[0, "asc"]],
 	    	"language": {
@@ -436,6 +441,10 @@
 		$('#listaEccezioni').dataTable({
 	    	paging: false,
 	    	"bInfo": false,
+	    	"columnDefs": [{
+	    	    "targets": 0,
+	    	    type: "date-uk"
+    	    }],
 	    	// default sorting on the first column ("Data")
 	    	"order": [[0, "asc"]],
 	    	"language": {

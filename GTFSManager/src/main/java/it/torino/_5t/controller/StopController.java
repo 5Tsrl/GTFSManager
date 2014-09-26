@@ -1,6 +1,7 @@
 package it.torino._5t.controller;
 
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 
 import javax.servlet.http.HttpSession;
@@ -46,15 +47,19 @@ public class StopController {
 //		
 //		session.setAttribute("agenziaAttiva", a);
 		
+		// if the stop list is not in the session yet, fill it from the database
+		if (session.getAttribute("listaFermate") == null) {
+			session.setAttribute("listaFermate", stopDAO.getAllStops());
+		}
+		
 		Set<Stop> stations = new HashSet<Stop>();
-		for (Stop s: stopDAO.getAllStops()) {
+		for (Stop s: (List<Stop>) session.getAttribute("listaFermate")) {
 			if (s.getLocationType() != null && s.getLocationType() != null && s.getLocationType() == 1) {
 				stations.add(s);
 			}
 		}
 		model.addAttribute("listaStazioni", stations);
 		model.addAttribute("listaZone", zoneDAO.getAllZones());
-		model.addAttribute("listaFermate", stopDAO.getAllStops());
 		model.addAttribute("stop", new Stop());
 		
 		return "stop";
@@ -69,34 +74,34 @@ public class StopController {
 //		}
 //		Agency a = agencyDAO.loadAgency(agency.getId());
 		
+		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
+		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della fermata");
 //			agencyDAO.updateAgency(agency);
 			Set<Stop> stations = new HashSet<Stop>();
-			for (Stop s: stopDAO.getAllStops()) {
+			for (Stop s: stopList) {
 				if (s.getLocationType() != null && s.getLocationType() == 1) {
 					stations.add(s);
 				}
 			}
 			model.addAttribute("listaStazioni", stations);
 			model.addAttribute("listaZone", zoneDAO.getAllZones());
-			model.addAttribute("listaFermate", stopDAO.getAllStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
 		}
 		
-		for (Stop s: stopDAO.getAllStops()) {
+		for (Stop s: stopList) {
 			if (s.getGtfsId().equals(stop.getGtfsId())) {
 				logger.error("L'id della fermata è già presente");
 				Set<Stop> stations = new HashSet<Stop>();
-				for (Stop s1: stopDAO.getAllStops()) {
+				for (Stop s1: stopList) {
 					if (s1.getLocationType() == 1) {
 						stations.add(s1);
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
 				model.addAttribute("listaZone", zoneDAO.getAllZones());
-				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
 				return "stop";
@@ -109,19 +114,18 @@ public class StopController {
 			if (stop.getLocationType() == 1) {
 				logger.error("Una stazione non può avere una stazione padre.");
 				Set<Stop> stations = new HashSet<Stop>();
-				for (Stop s1: stopDAO.getAllStops()) {
+				for (Stop s1: stopList) {
 					if (s1.getLocationType() == 1) {
 						stations.add(s1);
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
 				model.addAttribute("listaZone", zoneDAO.getAllZones());
-				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertParentStation", true);
 				return "stop";
 			}
-			for (Stop s: stopDAO.getAllStops()) {
+			for (Stop s: stopList) {
 				if (s.getId().equals(parentStationId)) {
 					s.addChildStop(stop);
 					break;
@@ -141,8 +145,10 @@ public class StopController {
 		
 //		a.addStop(stop);
 		stopDAO.addStop(stop);
+		stopList.add(stop);
+		session.setAttribute("listaFermate", stopList);
 		
-		logger.info("Fermata creata: " + stop.getName() + ".");
+		logger.info("Fermata creata: " + stop.getGtfsId() + ".");
 		
 //		session.setAttribute("agenziaAttiva", a);
 		
@@ -161,36 +167,36 @@ public class StopController {
 //		}
 //		Agency a = agencyDAO.loadAgency(agency.getId());
 		
+		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
+		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella modifica della fermata");
 //			agencyDAO.updateAgency(agency);
 			Set<Stop> stations = new HashSet<Stop>();
-			for (Stop s: stopDAO.getAllStops()) {
+			for (Stop s: stopList) {
 				if (s.getLocationType() != null && s.getLocationType() == 1) {
 					stations.add(s);
 				}
 			}
 			model.addAttribute("listaStazioni", stations);
 			model.addAttribute("listaZone", zoneDAO.getAllZones());
-			model.addAttribute("listaFermate", stopDAO.getAllStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
 		}
 		
 		Stop activeStop = stopDAO.getStop(id);
 		
-		for (Stop s: stopDAO.getAllStops()) {
+		for (Stop s: stopList) {
 			if (!activeStop.getGtfsId().equals(stop.getGtfsId()) && s.getGtfsId().equals(stop.getGtfsId())) {
 				logger.error("L'id della fermata è già presente");
 				Set<Stop> stations = new HashSet<Stop>();
-				for (Stop s1: stopDAO.getAllStops()) {
+				for (Stop s1: stopList) {
 					if (s1.getLocationType() == 1) {
 						stations.add(s1);
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
 				model.addAttribute("listaZone", zoneDAO.getAllZones());
-				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
 				return "stop";
@@ -203,14 +209,13 @@ public class StopController {
 			if (stop.getLocationType() == 1) {
 				logger.error("Una stazione non può avere una stazione padre.");
 				Set<Stop> stations = new HashSet<Stop>();
-				for (Stop s1: stopDAO.getAllStops()) {
+				for (Stop s1: stopList) {
 					if (s1.getLocationType() == 1) {
 						stations.add(s1);
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
 				model.addAttribute("listaZone", zoneDAO.getAllZones());
-				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertParentStation", true);
 				return "stop";
@@ -219,14 +224,14 @@ public class StopController {
 			// remove the stop from the previous parent station, if it had one
 			if (activeStop.getParentStation() != null) {
 				//logger.info("------> Aveva una staz: la elimino");
-				for (Stop s: stopDAO.getAllStops()) {
+				for (Stop s: stopList) {
 					if (s.getId().equals(activeStop.getParentStation().getId())) {
 						s.getStops().remove(activeStop);
 						break;
 					}
 				}
 			}
-			for (Stop s: stopDAO.getAllStops()) {
+			for (Stop s: stopList) {
 				if (s.getId().equals(parentStationId)) {
 					//logger.info("------> NUOVA staz padre aggiunta: " + s.getId() + " " + s.getName());
 					s.addChildStop(stop);
@@ -238,7 +243,7 @@ public class StopController {
 			//logger.info("------> NO staz padre");
 			if (activeStop.getParentStation() != null) {
 				//logger.info("------> Aveva una staz: la elimino");
-				for (Stop s: stopDAO.getAllStops()) {
+				for (Stop s: stopList) {
 					if (s.getId().equals(activeStop.getParentStation().getId())) {
 						s.getStops().remove(activeStop);
 						break;
@@ -276,7 +281,7 @@ public class StopController {
 		}
 				
 		// cerco la fermata da modificare tra quelle dell'agenzia e la aggiorno
-		for (Stop s: stopDAO.getAllStops()) {
+		for (Stop s: stopList) {
 			if (s.equals(activeStop)) {
 				s.setGtfsId(stop.getGtfsId());
 				s.setCode(stop.getCode());
@@ -290,12 +295,13 @@ public class StopController {
 				s.setParentStation(stop.getParentStation());
 				s.setTimezone(stop.getTimezone());
 				s.setWheelchairBoarding(stop.getWheelchairBoarding());
-				logger.info("Fermata modificata: " + s.getName() + ".");
+				logger.info("Fermata modificata: " + s.getGtfsId() + ".");
 				break;
 			}
 		}
 		
 //		session.setAttribute("agenziaAttiva", a);
+		session.setAttribute("listaFermate", stopList);
 		
 		redirectAttributes.addFlashAttribute("lat", stop.getLat());
 		redirectAttributes.addFlashAttribute("lon", stop.getLon());
@@ -311,12 +317,14 @@ public class StopController {
 //			return "redirect:agenzie";
 //		}
 //		Agency a = agencyDAO.loadAgency(agency.getId());
+
+		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
 		
 		Stop stop = stopDAO.getStop(id);
 		
 		// remove the stop from the parent station, if it had one
 		if (stop.getParentStation() != null) {
-			for (Stop s: stopDAO.getAllStops()) {
+			for (Stop s: stopList) {
 				if (s.getId().equals(stop.getParentStation().getId())) {
 					s.getStops().remove(stop);
 					break;
@@ -334,8 +342,10 @@ public class StopController {
 		}
 		//a.getStops().remove(stop);
 		stopDAO.deleteStop(stop);
+		stopList.remove(stop);
+		session.setAttribute("listaFermate", stopList);
 		
-		logger.info("Fermata eliminata: " + stop.getName() + ".");
+		logger.info("Fermata eliminata: " + stop.getGtfsId() + ".");
 		
 //		session.setAttribute("agenziaAttiva", a);
 		

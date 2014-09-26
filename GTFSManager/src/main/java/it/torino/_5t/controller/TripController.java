@@ -107,7 +107,7 @@ public class TripController {
 			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			Trip tr = (Trip) session.getAttribute("corsaAttiva");
 			if (tr != null) {
-				tripDAO.updateTrip(tr);
+				//tripDAO.updateTrip(tr);
 				model.addAttribute("listaFermateCorsa", tr.getStopTimes());
 			}
 			model.addAttribute("showCreateForm", true);
@@ -117,14 +117,14 @@ public class TripController {
 		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
-				for (Trip t: tripDAO.getTripsFromRoute(r)) {
+				for (Trip t: tripDAO.getAllTrips()) {
 					if (t.getGtfsId().equals(trip.getGtfsId())) {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
 						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 						Trip tr = (Trip) session.getAttribute("corsaAttiva");
 						if (tr != null) {
-							tripDAO.updateTrip(tr);
+							//tripDAO.updateTrip(tr);
 							model.addAttribute("listaFermateCorsa", tr.getStopTimes());
 						}
 						model.addAttribute("showCreateForm", true);
@@ -256,7 +256,7 @@ public class TripController {
 			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 			Trip tr = (Trip) session.getAttribute("corsaAttiva");
 			if (tr != null) {
-				tripDAO.updateTrip(tr);
+				//tripDAO.updateTrip(tr);
 				model.addAttribute("listaFermateCorsa", tr.getStopTimes());
 			}
 			model.addAttribute("showEditForm", true);
@@ -273,14 +273,14 @@ public class TripController {
 		// cerco tra le linee dell'agenzia quella attiva, tra le corse della linea selezionata quella attiva e la aggiorno
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
-				for (Trip t: tripDAO.getTripsFromRoute(r)) {
+				for (Trip t: tripDAO.getAllTrips()) {
 					if (!activetrip.getGtfsId().equals(trip.getGtfsId()) && t.getGtfsId().equals(trip.getGtfsId())) {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
 						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
 						Trip tr = (Trip) session.getAttribute("corsaAttiva");
 						if (tr != null) {
-							tripDAO.updateTrip(tr);
+							//tripDAO.updateTrip(tr);
 							model.addAttribute("listaFermateCorsa", tr.getStopTimes());
 						}
 						model.addAttribute("showEditForm", true);
@@ -357,7 +357,7 @@ public class TripController {
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
 			if (r.equals(route)) {
-				for (Trip t: tripDAO.getTripsFromRoute(r)) {
+				for (Trip t: tripDAO.getAllTrips()) {
 					if (t.getGtfsId().equals(newGtfsId)) {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());

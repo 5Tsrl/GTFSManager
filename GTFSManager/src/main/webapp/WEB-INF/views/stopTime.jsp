@@ -134,8 +134,8 @@
 		
 		var markers = new L.MarkerClusterGroup();
 		
-		// per ogni fermata dell'agenzia non associata alla corsa attiva (listaFermate) creo un marker, con un popup contenente il form per l'associazione con la corsa
-		<c:forEach var="fermata" items="${listaFermate}">
+		// per ogni fermata dell'agenzia non associata alla corsa attiva (listaFermateNonAssociate) creo un marker, con un popup contenente il form per l'associazione con la corsa
+		<c:forEach var="fermata" items="${listaFermateNonAssociate}">
 			var popupContent = '<form:form name="creaFermataCorsaForm" commandName="stopTime" method="post" role="form" onsubmit="return validateCreaFermataCorsaForm()">' +
 									"<b>Fermata: </b> ${fermata.name}" +
 									'<input name="stopId" type="hidden" value="${fermata.id}" />' +
