@@ -13,6 +13,7 @@ import it.torino._5t.dao.StopDAO;
 import it.torino._5t.dao.StopTimeDAO;
 import it.torino._5t.dao.TransferDAO;
 import it.torino._5t.dao.TripDAO;
+import it.torino._5t.dao.ZoneDAO;
 import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
 import it.torino._5t.entity.CalendarDate;
@@ -26,6 +27,7 @@ import it.torino._5t.entity.Stop;
 import it.torino._5t.entity.StopTime;
 import it.torino._5t.entity.Transfer;
 import it.torino._5t.entity.Trip;
+import it.torino._5t.entity.Zone;
 
 import java.awt.geom.Point2D;
 import java.io.BufferedReader;
@@ -160,6 +162,8 @@ public class GTFSController {
 	private TransferDAO transferDAO;
 	@Autowired
 	private TripDAO tripDAO;
+	@Autowired
+	private ZoneDAO zoneDAO;
 	
 	private FeedInfo currentFeedInfo;
 
@@ -682,6 +686,37 @@ public class GTFSController {
         return path;
     }
 	
+	private static String encode(final List<Point2D.Double> path) {
+        long lastLat = 0;
+        long lastLng = 0;
+
+        final StringBuffer result = new StringBuffer();
+
+        for (final Point2D.Double point : path) {
+            long lat = Math.round(point.getX() * 1e5);
+            long lng = Math.round(point.getY() * 1e5);
+
+            long dLat = lat - lastLat;
+            long dLng = lng - lastLng;
+
+            encode(dLat, result);
+            encode(dLng, result);
+
+            lastLat = lat;
+            lastLng = lng;
+        }
+        return result.toString();
+    }
+
+    private static void encode(long v, StringBuffer result) {
+        v = v < 0 ? ~(v << 1) : v << 1;
+        while (v >= 0x20) {
+            result.append(Character.toChars((int) ((0x20 | (v & 0x1f)) + 63)));
+            v >>= 5;
+        }
+        result.append(Character.toChars((int) (v + 63)));
+    }
+	
 	private double computeDistance(double lat1, double lng1, double lat2, double lng2) {
 	    double earthRadius = 6371; //kilometers
 	    double dLat = Math.toRadians(lat2-lat1);
@@ -787,7 +822,14 @@ public class GTFSController {
 		    Map<String, Calendar> calendars = new HashMap<String, Calendar>();
 		    Map<String, Route> routes = new HashMap<String, Route>();
 		    Map<String, FareAttribute> fareAttributes = new HashMap<String, FareAttribute>();
+		    Map<String, Shape> shapes = new HashMap<String, Shape>();
 		    Map<String, Trip> trips = new HashMap<String, Trip>();
+		    Map<String, Zone> zones = new HashMap<String, Zone>();
+		    Map<Stop, String> stopWithParent = new HashMap<Stop, String>();
+		    Map<Stop, String> stopWithZones = new HashMap<Stop, String>();
+		    Map<FareRule, String> fareWithOrigin = new HashMap<FareRule, String>();
+		    Map<FareRule, String> fareWithDestination = new HashMap<FareRule, String>();
+		    Map<FareRule, String> fareWithContains = new HashMap<FareRule, String>();
 		    
 		    Map<String, FileInputStream> inputFiles = buildFileInputStreamMap();
 		    
@@ -860,13 +902,20 @@ public class GTFSController {
 		        			} else if (header[i].equals("stop_lon")) {
 		        				stop.setLon(Double.parseDouble(elements[i]));
 		        			} else if (header[i].equals("zone_id")) {
-		        				// TODO: stop.setZone(elements[i]);
+		        				if (!zones.containsKey(elements[i])) {
+		        					Zone zone = new Zone();
+		        					zone.setGtfsId(elements[i]);
+		        					zone.setName(elements[i]);
+		        					zones.put(elements[i], zone);
+		        					zoneDAO.addZone(zone);
+		        				}
+		        				stopWithZones.put(stop, elements[i]);
 		        			} else if (header[i].equals("stop_url")) {
 		        				stop.setUrl(elements[i]);
 		        			} else if (header[i].equals("location_type")) {
 		        				stop.setLocationType(Integer.parseInt(elements[i]));
 		        			} else if (header[i].equals("parent_station")) {
-		        				// TODO: stop.setParentStation(elements[i]);
+		        				stopWithParent.put(stop, elements[i]);
 		        			} else if (header[i].equals("stop_timezone")) {
 		        				stop.setTimezone(elements[i]);
 		        			} else if (header[i].equals("wheelchair_boarding")) {
@@ -1039,11 +1088,32 @@ public class GTFSController {
 		        					routes.get(elements[i]).addFareRule(fareRule);
 	        					}
 		        			} else if (header[i].equals("origin_id")) {
-		        				// TODO: fareRule.setOrigin(elements[i]);
+		        				if (!zones.containsKey(elements[i])) {
+		        					Zone zone = new Zone();
+		        					zone.setGtfsId(elements[i]);
+		        					zone.setName(elements[i]);
+		        					zones.put(elements[i], zone);
+		        					zoneDAO.addZone(zone);
+		        				}
+		        				fareWithOrigin.put(fareRule, elements[i]);
 		        			} else if (header[i].equals("destination_id")) {
-		        				// TODO: fareRule.setDestination(elements[i]);
+		        				if (!zones.containsKey(elements[i])) {
+		        					Zone zone = new Zone();
+		        					zone.setGtfsId(elements[i]);
+		        					zone.setName(elements[i]);
+		        					zones.put(elements[i], zone);
+		        					zoneDAO.addZone(zone);
+		        				}
+		        				fareWithDestination.put(fareRule, elements[i]);
 		        			} else if (header[i].equals("contains_id")) {
-		        				// TODO: fareRule.setContains(elements[i]);
+		        				if (!zones.containsKey(elements[i])) {
+		        					Zone zone = new Zone();
+		        					zone.setGtfsId(elements[i]);
+		        					zone.setName(elements[i]);
+		        					zones.put(elements[i], zone);
+		        					zoneDAO.addZone(zone);
+		        				}
+		        				fareWithContains.put(fareRule, elements[i]);
 		        			}
 	        			}
 	        		}
@@ -1051,6 +1121,53 @@ public class GTFSController {
 		    	}
 		    	inputFiles.get(FARE_RULE_FILE_NAME).close();
 		    	logger.info(FARE_RULE_FILE_NAME + " letto.");
+		    }
+		    
+		    if (inputFiles.containsKey(SHAPE_FILE_NAME)) {
+		    	BufferedReader br = new BufferedReader(new InputStreamReader(inputFiles.get(SHAPE_FILE_NAME)));
+		    	String line = br.readLine();
+		    	String[] header = line.split(",");
+		    	Map<String, List<Point2D.Double>> shapesToEncode = new HashMap<String, List<Point2D.Double>>();
+		    	while ((line = br.readLine()) != null) {
+		    		String[] elements = line.split(",");
+		    		String shapeId = new String();
+		    		Double lat = null, lon = null;
+		    		for (int i=0; i<header.length && i<elements.length; i++) {
+		    			if (!elements[i].isEmpty() && !elements[i].trim().equals("")) {
+		    				//logger.info("---> " + elements[i]);
+		    				if (header[i].equals("shape_id")) {
+		    					shapeId = elements[i];
+		    					if (!shapesToEncode.containsKey(elements[i])) {
+		    						shapesToEncode.put(elements[i], new ArrayList<Point2D.Double>());
+		    						//logger.info("---> Id " + elements[i]);
+		    					}
+		    				} else if (header[i].equals("shape_pt_lat")) {
+		    					lat = Double.parseDouble(elements[i]);
+		    					//logger.info("---> Lat " + elements[i]);
+		    				} else if (header[i].equals("shape_pt_lon")) {
+		    					lon = Double.parseDouble(elements[i]);
+		    					//logger.info("---> Lon " + elements[i]);
+		    				} else if (header[i].equals("shape_pt_sequence")) {
+		    					//logger.info("---> Sequence " + elements[i]);
+		    					
+		    				} else if (header[i].equals("shape_dist_traveled")) {
+		    					//logger.info("---> Dist " + elements[i]);
+		    					
+		    				}
+		    			}
+		    		}
+		    		shapesToEncode.get(shapeId).add(new Point2D.Double(lat, lon));
+		    	}
+		    	for (Map.Entry<String, List<Point2D.Double>> sh: shapesToEncode.entrySet()) {
+		    		Shape shape = new Shape();
+		    		shape.setGtfsId(sh.getKey());
+		    		shape.setEncodedPolyline(encode(sh.getValue()).replace("\\", "\\\\"));
+		    		//logger.info("-----> Encoded " + shape.getEncodedPolyline());
+		    		shapes.put(shape.getGtfsId(), shape);
+		    		shapeDAO.addShape(shape);
+		    	}
+		    	inputFiles.get(SHAPE_FILE_NAME).close();
+		    	logger.info(SHAPE_FILE_NAME + " letto.");
 		    }
 		    
 		    if (inputFiles.containsKey(TRIP_FILE_NAME)) {
@@ -1082,13 +1199,9 @@ public class GTFSController {
 		    				} else if (header[i].equals("block_id")) {
 		    					trip.setBlockId(elements[i]);
 		    				} else if (header[i].equals("shape_id")) {
-		    					// TODO
-//		    					for (Shape s: shapeDAO.getAllShapes()) {
-//		    						if (s.getGtfsId().equals(elements[i])) {
-//		    							s.addTrip(trip);
-//        								break;
-//		    						}
-//		    					}
+		    					if (shapes.containsKey(elements[i])) {
+		    						shapes.get(elements[i]).addTrip(trip);
+	        					}
 		    				} else if (header[i].equals("wheelchair_accessible")) {
 		    					trip.setWheelchairAccessible(Integer.parseInt(elements[i]));
 		    				} else if (header[i].equals("bikes_allowed")) {
@@ -1236,6 +1349,32 @@ public class GTFSController {
 		    	}
 		    	inputFiles.get(FEED_INFO_FILE_NAME).close();
 		    	logger.info(FEED_INFO_FILE_NAME + " letto.");
+		    }
+		    
+		    for (Map.Entry<Stop, String> map: stopWithParent.entrySet()) {
+		    	Stop stop = map.getKey();
+		    	stop.setParentStation(stops.get(map.getValue()));
+		    	stopDAO.updateStop(stop);
+		    }
+		    for (Map.Entry<Stop, String> map: stopWithZones.entrySet()) {
+		    	Stop stop = map.getKey();
+		    	stop.setZone(zones.get(map.getValue()));
+		    	stopDAO.updateStop(stop);
+		    }
+		    for (Map.Entry<FareRule, String> map: fareWithOrigin.entrySet()) {
+		    	FareRule fareRule = map.getKey();
+		    	fareRule.setOrigin(zones.get(map.getValue()));
+		    	fareRuleDAO.updateFareRule(fareRule);
+		    }
+		    for (Map.Entry<FareRule, String> map: fareWithDestination.entrySet()) {
+		    	FareRule fareRule = map.getKey();
+		    	fareRule.setOrigin(zones.get(map.getValue()));
+		    	fareRuleDAO.updateFareRule(fareRule);
+		    }
+		    for (Map.Entry<FareRule, String> map: fareWithContains.entrySet()) {
+		    	FareRule fareRule = map.getKey();
+		    	fareRule.setOrigin(zones.get(map.getValue()));
+		    	fareRuleDAO.updateFareRule(fareRule);
 		    }
 		} catch (IOException e) {
 			logger.error("Errore nella lettura del feed");

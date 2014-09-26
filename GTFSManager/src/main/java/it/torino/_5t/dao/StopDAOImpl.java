@@ -52,4 +52,10 @@ public class StopDAOImpl implements StopDAO {
 		session.delete(stop);
 	}
 
+	@Override
+	public void updateStop(Stop stop) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.update(stop);
+	}
+
 }

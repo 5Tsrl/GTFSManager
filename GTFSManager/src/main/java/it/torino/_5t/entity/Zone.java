@@ -40,7 +40,7 @@ public class Zone implements Serializable {
 	private Agency agency;
 	
 	@Column(name = "name")
-	@Size(min = 1, max = 50, message = "Il campo \"nome\" non può essere vuoto")
+	@Size(min = 1, max = 255, message = "Il campo \"nome\" non può essere vuoto")
 	private String name;
 	
 	//TODO

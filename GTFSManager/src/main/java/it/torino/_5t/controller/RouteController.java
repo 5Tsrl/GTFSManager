@@ -93,7 +93,7 @@ public class RouteController {
 		
 		a.addRoute(route);
 		
-		logger.info("Linea creata: " + route.getShortName() + ".");
+		logger.info("Linea creata: " + route.getGtfsId() + ".");
 		
 		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("lineaAttiva", route);
@@ -109,7 +109,7 @@ public class RouteController {
 			return "redirect:linee";
 		}
 		
-		logger.info("Linea selezionata: " + route.getShortName() + ".");
+		logger.info("Linea selezionata: " + route.getGtfsId() + ".");
 		
 		session.removeAttribute("corsaAttiva");
 		session.removeAttribute("servizioAttivo");
@@ -134,7 +134,7 @@ public class RouteController {
 		
 		a.getRoutes().remove(route);
 		
-		logger.info("Linea eliminata: " + route.getShortName() + ".");
+		logger.info("Linea eliminata: " + route.getGtfsId() + ".");
 		
 		session.removeAttribute("lineaAttiva");
 		session.setAttribute("agenziaAttiva", a);
@@ -199,7 +199,7 @@ public class RouteController {
 				r.setUrl(route.getUrl());
 				r.setColor(route.getColor());
 				r.setTextColor(route.getTextColor());
-				logger.info("Linea modificata: " + r.getShortName() + ".");
+				logger.info("Linea modificata: " + r.getGtfsId() + ".");
 				session.setAttribute("lineaAttiva", r);
 				break;
 			}

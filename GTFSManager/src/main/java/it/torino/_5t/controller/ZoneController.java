@@ -3,9 +3,7 @@ package it.torino._5t.controller;
 import java.util.HashSet;
 import java.util.Set;
 
-import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.ZoneDAO;
-import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.FareAttribute;
 import it.torino._5t.entity.FareRule;
 import it.torino._5t.entity.Zone;
@@ -29,18 +27,18 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class ZoneController {
 	private static final Logger logger = LoggerFactory.getLogger(ZoneController.class);
 
-	@Autowired
-	private AgencyDAO agencyDAO;
+//	@Autowired
+//	private AgencyDAO agencyDAO;
 	@Autowired
 	private ZoneDAO zoneDAO;
 	
 	@RequestMapping(value = "/zone", method = RequestMethod.GET)
 	public String showZones(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		// se c'è una zona attiva, la rendo persistent per poter accedere alla lista delle fermate
 		Zone zone = (Zone) session.getAttribute("zonaAttiva");
@@ -63,11 +61,11 @@ public class ZoneController {
 			model.addAttribute("listaTariffeDestinazione", faDestination);
 		}
 		
-		logger.info("Visualizzazione zone di " + agency.getName() + ".");
+//		logger.info("Visualizzazione zone di " + agency.getName() + ".");
+//		
+//		session.setAttribute("agenziaAttiva", a);
 		
-		session.setAttribute("agenziaAttiva", a);
-		
-		model.addAttribute("listaZone", a.getZones());
+		model.addAttribute("listaZone", zoneDAO.getAllZones());
 		model.addAttribute("zone", new Zone());
 		
 		return "zone";
@@ -85,15 +83,15 @@ public class ZoneController {
 	// chiamata al submit del form per la creazione di una nuova zona
 	@RequestMapping(value = "/zone", method = RequestMethod.POST)
 	public String submitZoneForm(@ModelAttribute @Valid Zone zone, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della zona");
-			model.addAttribute("listaZone", a.getZones());
+			model.addAttribute("listaZone", zoneDAO.getAllZones());
 			model.addAttribute("showCreateForm", true);
 			Zone zon = (Zone) session.getAttribute("zonaAttiva");
 			if (zon != null) {
@@ -117,10 +115,10 @@ public class ZoneController {
 			return "zone";
 		}
 		
-		for (Zone z: a.getZones()) {
+		for (Zone z: zoneDAO.getAllZones()) {
 			if (z.getGtfsId().equals(zone.getGtfsId())) {
 				logger.error("L'id della zona è già presente");
-				model.addAttribute("listaZone", a.getZones());
+				model.addAttribute("listaZone", zoneDAO.getAllZones());
 				model.addAttribute("showCreateForm", true);
 				model.addAttribute("showAlertDuplicateZone", true);
 				Zone zon = (Zone) session.getAttribute("zonaAttiva");
@@ -146,11 +144,11 @@ public class ZoneController {
 			}
 		}
 		
-		a.addZone(zone);
+		zoneDAO.addZone(zone);
 		
 		logger.info("Zona creata: " + zone.getName() + ".");
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("zonaAttiva", zone);
 		
 		return "redirect:zone";
@@ -171,23 +169,23 @@ public class ZoneController {
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaZona", method = RequestMethod.GET)
 	public String deleteZoneAttribute(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		Zone zone = (Zone) session.getAttribute("zonaAttiva");
 		if (zone == null) {
 			return "redirect:zone";
 		}
 		
-		a.getZones().remove(zone);
+		zoneDAO.deleteZone(zone);
 		
 		logger.info("Zona eliminata: " + zone.getGtfsId() + ".");
 		
 		session.removeAttribute("zonaAttiva");
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:zone";
 	}
@@ -208,17 +206,17 @@ public class ZoneController {
 	
 	// chiamata al submit del form per la modifica di una tariffa
 	@RequestMapping(value = "/modificaZona", method = RequestMethod.POST)
-	public String editFareAttribute(@ModelAttribute @Valid Zone zone, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+	public String editZone(@ModelAttribute @Valid Zone zone, BindingResult bindingResult, Model model, HttpSession session) {
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella modifica della zona");
-			agencyDAO.updateAgency(agency);
-			model.addAttribute("listaZone", agency.getZones());
+//			agencyDAO.updateAgency(agency);
+			model.addAttribute("listaZone", zoneDAO.getAllZones());
 			model.addAttribute("showEditForm", true);
 			Zone zon = (Zone) session.getAttribute("zonaAttiva");
 			if (zon != null) {
@@ -247,10 +245,10 @@ public class ZoneController {
 			return "redirect:zone";
 		}
 		
-		for (Zone z: a.getZones()) {
+		for (Zone z: zoneDAO.getAllZones()) {
 			if (!activeZone.getGtfsId().equals(zone.getGtfsId()) && z.getGtfsId().equals(zone.getGtfsId())) {
 				logger.error("L'id della zona è già presente");
-				model.addAttribute("listaZone", a.getZones());
+				model.addAttribute("listaZone", zoneDAO.getAllZones());
 				model.addAttribute("showEditForm", true);
 				model.addAttribute("showAlertDuplicateZone", true);
 				Zone zon = (Zone) session.getAttribute("zonaAttiva");
@@ -277,7 +275,7 @@ public class ZoneController {
 		}
 		
 		// cerco la tariffa attiva tra quelle dell'agenzia e la aggiorno
-		for (Zone z: a.getZones()) {
+		for (Zone z: zoneDAO.getAllZones()) {
 			if (z.equals(activeZone)) {
 				z.setGtfsId(zone.getGtfsId());
 				z.setName(zone.getName());
@@ -287,7 +285,7 @@ public class ZoneController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:zone";
 	}

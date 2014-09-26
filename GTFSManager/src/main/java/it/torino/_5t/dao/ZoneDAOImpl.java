@@ -30,4 +30,23 @@ public class ZoneDAOImpl implements ZoneDAO {
 		session.update(zone);
 	}
 
+	@Override
+	public void addZone(Zone zone) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.save(zone);
+	}
+
+	@Override
+	public List<Zone> getAllZones() {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		Query query = session.createQuery("from Zone");
+		return query.list();
+	}
+
+	@Override
+	public void deleteZone(Zone zone) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.delete(zone);
+	}
+
 }

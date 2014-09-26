@@ -6,9 +6,8 @@ import java.util.Set;
 import javax.servlet.http.HttpSession;
 import javax.validation.Valid;
 
-import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.StopDAO;
-import it.torino._5t.entity.Agency;
+import it.torino._5t.dao.ZoneDAO;
 import it.torino._5t.entity.Stop;
 import it.torino._5t.entity.Zone;
 
@@ -28,10 +27,12 @@ import org.springframework.web.servlet.mvc.support.RedirectAttributes;
 public class StopController {
 	private static final Logger logger = LoggerFactory.getLogger(StopController.class);
 	
-	@Autowired
-	private AgencyDAO agencyDAO;
+//	@Autowired
+//	private AgencyDAO agencyDAO;
 	@Autowired
 	private StopDAO stopDAO;
+	@Autowired
+	private ZoneDAO zoneDAO;
 	
 	@RequestMapping(value = "/fermate", method = RequestMethod.GET)
 	public String showStops(Model model, HttpSession session) {
@@ -52,7 +53,7 @@ public class StopController {
 			}
 		}
 		model.addAttribute("listaStazioni", stations);
-//		model.addAttribute("listaZone", a.getZones());
+		model.addAttribute("listaZone", zoneDAO.getAllZones());
 		model.addAttribute("listaFermate", stopDAO.getAllStops());
 		model.addAttribute("stop", new Stop());
 		
@@ -78,7 +79,7 @@ public class StopController {
 				}
 			}
 			model.addAttribute("listaStazioni", stations);
-//			model.addAttribute("listaZone", a.getZones());
+			model.addAttribute("listaZone", zoneDAO.getAllZones());
 			model.addAttribute("listaFermate", stopDAO.getAllStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
@@ -94,7 +95,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
-//				model.addAttribute("listaZone", a.getZones());
+				model.addAttribute("listaZone", zoneDAO.getAllZones());
 				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
@@ -114,7 +115,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
-//				model.addAttribute("listaZone", a.getZones());
+				model.addAttribute("listaZone", zoneDAO.getAllZones());
 				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertParentStation", true);
@@ -129,15 +130,15 @@ public class StopController {
 		}
 		
 		// if it is in a zone, save the stop in the zone stops list
-//		if (zoneId != null) {
-//			for (Zone z: a.getZones()) {
-//				if (z.getId().equals(zoneId)) {
-//					z.addStop(stop);
-//					break;
-//				}
-//			}
-//		}
-//		
+		if (zoneId != null) {
+			for (Zone z: zoneDAO.getAllZones()) {
+				if (z.getId().equals(zoneId)) {
+					z.addStop(stop);
+					break;
+				}
+			}
+		}
+		
 //		a.addStop(stop);
 		stopDAO.addStop(stop);
 		
@@ -170,7 +171,7 @@ public class StopController {
 				}
 			}
 			model.addAttribute("listaStazioni", stations);
-//			model.addAttribute("listaZone", a.getZones());
+			model.addAttribute("listaZone", zoneDAO.getAllZones());
 			model.addAttribute("listaFermate", stopDAO.getAllStops());
 			model.addAttribute("stop", new Stop());
 			return "stop";
@@ -188,7 +189,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
-//				model.addAttribute("listaZone", a.getZones());
+				model.addAttribute("listaZone", zoneDAO.getAllZones());
 				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertDuplicateStop", true);
@@ -208,7 +209,7 @@ public class StopController {
 					}
 				}
 				model.addAttribute("listaStazioni", stations);
-//				model.addAttribute("listaZone", a.getZones());
+				model.addAttribute("listaZone", zoneDAO.getAllZones());
 				model.addAttribute("listaFermate", stopDAO.getAllStops());
 				model.addAttribute("stop", new Stop());
 				model.addAttribute("showAlertParentStation", true);
@@ -246,33 +247,33 @@ public class StopController {
 			}
 		}
 		// if it is in a zone, save the stop in the zone stops list
-//		if (zoneId != null) {
-//			// remove the stop from the previous zone, if it had one
-//			if (activeStop.getZone() != null) {
-//				for (Zone z: a.getZones()) {
-//					if (z.getId().equals(activeStop.getZone().getId())) {
-//						z.getStops().remove(activeStop);
-//						break;
-//					}
-//				}
-//			}
-//			for (Zone z: a.getZones()) {
-//				if (z.getId().equals(zoneId)) {
-//					z.addStop(stop);
-//					break;
-//				}
-//			}
-//		} else {
-//			// remove the stop from the previous zone, if it had one
-//			if (activeStop.getZone() != null) {
-//				for (Zone z: a.getZones()) {
-//					if (z.getId().equals(activeStop.getZone().getId())) {
-//						z.getStops().remove(activeStop);
-//						break;
-//					}
-//				}
-//			}
-//		}
+		if (zoneId != null) {
+			// remove the stop from the previous zone, if it had one
+			if (activeStop.getZone() != null) {
+				for (Zone z: zoneDAO.getAllZones()) {
+					if (z.getId().equals(activeStop.getZone().getId())) {
+						z.getStops().remove(activeStop);
+						break;
+					}
+				}
+			}
+			for (Zone z: zoneDAO.getAllZones()) {
+				if (z.getId().equals(zoneId)) {
+					z.addStop(stop);
+					break;
+				}
+			}
+		} else {
+			// remove the stop from the previous zone, if it had one
+			if (activeStop.getZone() != null) {
+				for (Zone z: zoneDAO.getAllZones()) {
+					if (z.getId().equals(activeStop.getZone().getId())) {
+						z.getStops().remove(activeStop);
+						break;
+					}
+				}
+			}
+		}
 				
 		// cerco la fermata da modificare tra quelle dell'agenzia e la aggiorno
 		for (Stop s: stopDAO.getAllStops()) {
@@ -323,14 +324,14 @@ public class StopController {
 			}
 		}
 		// remove the stop from the previous zone, if it had one
-//		if (stop.getZone() != null) {
-//			for (Zone z: a.getZones()) {
-//				if (z.getId().equals(stop.getZone().getId())) {
-//					z.getStops().remove(stop);
-//					break;
-//				}
-//			}
-//		}
+		if (stop.getZone() != null) {
+			for (Zone z: zoneDAO.getAllZones()) {
+				if (z.getId().equals(stop.getZone().getId())) {
+					z.getStops().remove(stop);
+					break;
+				}
+			}
+		}
 		//a.getStops().remove(stop);
 		stopDAO.deleteStop(stop);
 		

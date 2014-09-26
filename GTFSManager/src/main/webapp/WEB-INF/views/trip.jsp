@@ -1,3 +1,13 @@
+<%@page import="java.sql.Time"%>
+<%@page import="java.util.GregorianCalendar"%>
+<%@page import="java.util.Calendar"%>
+<%@page import="java.text.SimpleDateFormat"%>
+<%@page import="java.util.Collections"%>
+<%@page import="java.util.Set"%>
+<%@page import="java.util.ArrayList"%>
+<%@page import="java.util.List"%>
+<%@page import="it.torino._5t.entity.StopTime"%>
+<%@page import="java.util.Comparator"%>
 <%@ page language="java" contentType="text/html; charset=ISO-8859-1"
     pageEncoding="ISO-8859-1"%>
 <%@ page import="java.util.HashMap" %>
@@ -553,6 +563,59 @@
 					</div>
 				</form:form>
 			</div>
+			
+			<c:if test="${not empty corsaAttiva && not empty corsaAttiva.stopTimes}">
+				<div class="row col-lg-12">
+					<table class="stopSequence">
+						<thead>
+							<tr>
+								<th>N°</th>
+								<th>Fermata</th>
+								<th>Arrivo</th>
+								<th>Partenza</th>
+							</tr>
+						</thead>
+						<tbody>
+						<%
+						class StopTimeComparator implements Comparator<StopTime> {
+		
+							@Override
+							public int compare(StopTime o1, StopTime o2) {
+								return o1.getStopSequence().compareTo(o2.getStopSequence());
+							}
+							
+						}
+						if (((Trip) session.getAttribute("corsaAttiva")) != null) {
+							List<StopTime> stopTimes = new ArrayList<StopTime>((Set<StopTime>) request.getAttribute("listaFermateCorsa"));
+							Collections.sort(stopTimes, new StopTimeComparator());
+							SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+							Calendar cal = new GregorianCalendar();
+							cal.setTime(new Time(0, 0, 0));
+							int i = 1;
+							for (StopTime st: stopTimes) {
+							%>
+							<tr>
+								<td><%= i++ %></td>
+								<td><% out.write(st.getStop().getName()); %></td>
+				            	<%
+				            	if (st.getArrivalTime() != null)
+				            		cal.setTime(st.getArrivalTime());
+				            	%>
+				              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+				            	<%
+				            	if (st.getDepartureTime() != null)
+				            		cal.setTime(st.getDepartureTime());
+				            	%>
+				              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+							</tr>
+							<% 
+								}
+							}
+							%>
+						</tbody>
+				    </table>
+				</div>
+			</c:if>
 		</div>
 	</div>
 	

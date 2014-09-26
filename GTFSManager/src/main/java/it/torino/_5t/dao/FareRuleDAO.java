@@ -8,4 +8,5 @@ public interface FareRuleDAO {
 	public List<FareRule> getAllFareRules();
 	public FareRule getFareRule(Integer id);
 	public void addFareRule(FareRule fareRule);
+	public void updateFareRule(FareRule fareRule);
 }

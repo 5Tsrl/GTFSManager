@@ -61,6 +61,12 @@ public class TripController {
 		}
 		Route r = routeDAO.loadRoute(route.getId());
 		
+		Trip trip = (Trip) session.getAttribute("corsaAttiva");
+		if (trip != null) {
+			tripDAO.updateTrip(trip);
+			model.addAttribute("listaFermateCorsa", trip.getStopTimes());
+		}
+		
 		logger.info("Visualizzazione lista corse di " + route.getGtfsId() + ".");
 		
 		//routeDAO.updateRoute(route);
@@ -99,6 +105,11 @@ public class TripController {
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaCorse", route.getTrips());
 			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
+			Trip tr = (Trip) session.getAttribute("corsaAttiva");
+			if (tr != null) {
+				tripDAO.updateTrip(tr);
+				model.addAttribute("listaFermateCorsa", tr.getStopTimes());
+			}
 			model.addAttribute("showCreateForm", true);
 			return "trip";
 		}
@@ -111,6 +122,11 @@ public class TripController {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
 						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
+						Trip tr = (Trip) session.getAttribute("corsaAttiva");
+						if (tr != null) {
+							tripDAO.updateTrip(tr);
+							model.addAttribute("listaFermateCorsa", tr.getStopTimes());
+						}
 						model.addAttribute("showCreateForm", true);
 						model.addAttribute("showAlertDuplicateTrip", true);
 						return "trip";
@@ -124,7 +140,7 @@ public class TripController {
 		Calendar calendar = calendarDAO.getCalendar(serviceId);
 		calendar.addTrip(trip);
 		
-		logger.info("Corsa creata: " + trip.getTripShortName() + ".");
+		logger.info("Corsa creata: " + trip.getGtfsId() + ".");
 		
 		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("corsaAttiva", trip);
@@ -190,7 +206,7 @@ public class TripController {
 			}
 		}
 		
-		logger.info("Corsa eliminata: " + trip.getTripShortName() + ".");
+		logger.info("Corsa eliminata: " + trip.getGtfsId() + ".");
 		
 		session.removeAttribute("corsaAttiva");
 		session.setAttribute("agenziaAttiva", a);
@@ -238,6 +254,11 @@ public class TripController {
 			routeDAO.updateRoute(route);
 			model.addAttribute("listaCorse", route.getTrips());
 			model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
+			Trip tr = (Trip) session.getAttribute("corsaAttiva");
+			if (tr != null) {
+				tripDAO.updateTrip(tr);
+				model.addAttribute("listaFermateCorsa", tr.getStopTimes());
+			}
 			model.addAttribute("showEditForm", true);
 			return "trip";
 		}
@@ -257,6 +278,11 @@ public class TripController {
 						logger.error("L'id della corsa è già presente");
 						model.addAttribute("listaCorse", r.getTrips());
 						model.addAttribute("listaCalendari", calendarDAO.getAllCalendars());
+						Trip tr = (Trip) session.getAttribute("corsaAttiva");
+						if (tr != null) {
+							tripDAO.updateTrip(tr);
+							model.addAttribute("listaFermateCorsa", tr.getStopTimes());
+						}
 						model.addAttribute("showEditForm", true);
 						model.addAttribute("showAlertDuplicateTrip", true);
 						return "trip";
@@ -278,7 +304,7 @@ public class TripController {
 								break;
 							}
 						}
-						logger.info("Corsa modificata: " + t.getTripShortName() + ".");
+						logger.info("Corsa modificata: " + t.getGtfsId() + ".");
 						session.setAttribute("corsaAttiva", t);
 						session.setAttribute("lineaAttiva", r);
 						break;
@@ -358,7 +384,7 @@ public class TripController {
 							duplicatedTrip.addFrequency(new Frequency(f.getTrip(), f.getStartTime(), f.getEndTime(), f.getHeadwaySecs(), f.getExactTimes()));
 						}
 						if (t.getShape() != null) {
-							for (Shape s: a.getShapes()) {
+							for (Shape s: shapeDAO.getAllShapes()) {
 								if (s.getId().equals(t.getShape().getId())) {
 									Shape shape = new Shape();
 									shape.setEncodedPolyline(s.getEncodedPolyline());
@@ -387,7 +413,7 @@ public class TripController {
 		Calendar calendar = calendarDAO.getCalendar(trip.getCalendar().getId());
 		calendar.addTrip(duplicatedTrip);
 		
-		logger.info("Corsa creata: " + duplicatedTrip.getTripShortName() + ".");
+		logger.info("Corsa creata: " + duplicatedTrip.getGtfsId() + ".");
 		
 		session.removeAttribute("servizioAttivo");
 		session.setAttribute("agenziaAttiva", a);

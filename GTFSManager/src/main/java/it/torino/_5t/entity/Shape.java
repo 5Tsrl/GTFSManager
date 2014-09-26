@@ -30,6 +30,9 @@ public class Shape implements Serializable {
 	@Column(name = "shape_id")
 	private Integer id;
 	
+	@Column(name = "shape_gtfs_id")
+	private String gtfsId;
+	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "agency_id")
 	private Agency agency;
@@ -73,6 +76,14 @@ public class Shape implements Serializable {
 		this.id = id;
 	}
 	
+	public String getGtfsId() {
+		return gtfsId;
+	}
+
+	public void setGtfsId(String gtfsId) {
+		this.gtfsId = gtfsId;
+	}
+
 	public Agency getAgency() {
 		return agency;
 	}

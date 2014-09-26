@@ -63,7 +63,7 @@ public class Trip implements Serializable{
 	@Size(max = 50)
 	private String blockId;
 	
-	@ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.REMOVE)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "shape_id")
 	private Shape shape;
 	

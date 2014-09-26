@@ -76,7 +76,7 @@ public class FareController {
 		
 		model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 		model.addAttribute("listaLinee", a.getRoutes());
-		model.addAttribute("listaZone", a.getZones());
+		model.addAttribute("listaZone", zoneDAO.getAllZones());
 		model.addAttribute("fareAttribute", new FareAttribute());
 		
 		return "fare";
@@ -428,7 +428,7 @@ public class FareController {
 			activeFareAttribute.getFareRules().remove(fareRule);
 			
 			// cerco tra le zone dell'agenzia quella attiva e le tolgo l'associazione selezionata
-			for (Zone z: a.getZones()) {
+			for (Zone z: zoneDAO.getAllZones()) {
 				if (z.equals(fareRule.getOrigin())) {
 					z.getOriginFareRules().remove(fareRule);
 				}

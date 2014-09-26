@@ -37,4 +37,10 @@ public class FareRuleDAOImpl implements FareRuleDAO {
 		session.save(fareRule);
 	}
 
+	@Override
+	public void updateFareRule(FareRule fareRule) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.update(fareRule);
+	}
+
 }

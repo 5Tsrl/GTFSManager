@@ -62,7 +62,7 @@ public class StopTimeController {
 		}
 		Trip t = tripDAO.loadTrip(trip.getId());
 		
-		logger.info("Visualizzazione fermate di " + t.getTripShortName());
+		logger.info("Visualizzazione fermate di " + t.getGtfsId());
 		
 		Set<Stop> stops = new HashSet<Stop>(stopDAO.getAllStops());
 		for (StopTime st: t.getStopTimes()) {
@@ -147,7 +147,7 @@ public class StopTimeController {
 						t.addStopTime(stopTime);
 						session.setAttribute("corsaAttiva", t);
 						session.setAttribute("lineaAttiva", r);
-						logger.info("Fermata " + stopTime.getStop().getName() + " associata alla corsa " + t.getTripShortName());
+						logger.info("Fermata " + stopTime.getStop().getName() + " associata alla corsa " + t.getGtfsId());
 						break;
 					}
 				}
@@ -257,7 +257,7 @@ public class StopTimeController {
 								}
 								session.setAttribute("corsaAttiva", t);
 								session.setAttribute("lineaAttiva", r);
-								logger.info("Fermata " + activeStopTime.getStop().getName() + " della corsa " + t.getTripShortName() + " aggiornata.");
+								logger.info("Fermata " + activeStopTime.getStop().getName() + " della corsa " + t.getGtfsId() + " aggiornata.");
 								break;
 							}
 						}
@@ -316,24 +316,24 @@ public class StopTimeController {
 							// non è ancora stato associato nessuno shape alla corsa -> ne creo uno nuovo
 							shape.addTrip(t);
 							a.addShape(shape);
-							logger.info("Shape creato per la corsa " + t.getTripShortName());
+							logger.info("Shape creato per la corsa " + t.getGtfsId());
 						} else {
 							// c'è già uno shape associato alla corsa
 							Shape sh = shapeDAO.loadShape(shapeId);
 							// cerco tra gli shape dell'agenzia quello associato alla corsa attiva
-							for (Shape s: a.getShapes()) {
+							for (Shape s: shapeDAO.getAllShapes()) {
 								if (s.getId() == sh.getId()) {
 									if (s.getTrips().size() == 1) {
 										// c'è una sola corsa associata allo shape -> aggiorno lo shape
 										s.setEncodedPolyline(shape.getEncodedPolyline());
 										t.setShape(s);
-										logger.info("Shape aggiornato per la corsa " + t.getTripShortName());
+										logger.info("Shape aggiornato per la corsa " + t.getGtfsId());
 									} else {
 										// c'è più di una corsa associata allo shape -> creo uno shape nuovo
 										s.getTrips().remove(trip);
 										shape.addTrip(t);
 										a.addShape(shape);
-										logger.info("Shape creato da shape precedente per la corsa " + t.getTripShortName());
+										logger.info("Shape creato da shape precedente per la corsa " + t.getGtfsId());
 									}
 									break;
 								}
@@ -405,7 +405,7 @@ public class StopTimeController {
 						t.getStopTimes().remove(stopTime);
 						session.setAttribute("corsaAttiva", t);
 						session.setAttribute("lineaAttiva", r);
-						logger.info("Fermata " + stopTime.getStop().getName() + " eliminata dalla corsa " + t.getTripShortName());
+						logger.info("Fermata " + stopTime.getStop().getName() + " eliminata dalla corsa " + t.getGtfsId());
 						break;
 					}
 				}
