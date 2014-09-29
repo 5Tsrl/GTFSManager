@@ -136,7 +136,7 @@ public class StopTimeRelativeController {
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				// tra le corse della linea quella attiva e le aggiungo la fermata
 				for (TripPattern tp: r.getTripPatterns()) {
 					logger.info("--->" + tp.getId() + " " + tripPattern.getId() + " -> " + tp.equals(tripPattern));
@@ -205,7 +205,7 @@ public class StopTimeRelativeController {
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				// tra le corse della linea quella attiva e le modifico l'associazione
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (tp.equals(tripPattern)) {
@@ -304,7 +304,7 @@ public class StopTimeRelativeController {
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				// tra le corse della linea quella attiva e le aggiungo lo shape
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (tp.equals(tripPattern)) {
@@ -373,7 +373,7 @@ public class StopTimeRelativeController {
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				// tra le corse della linea quella attiva e le elimino l'associazione
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (tp.equals(tripPattern)) {

@@ -112,7 +112,7 @@ public class TripPatternController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (tp.getGtfsId().equals(tripPattern.getGtfsId())) {
 						logger.error("L'id dello schema corsa è già presente");
@@ -187,7 +187,7 @@ public class TripPatternController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le tolgo lo schema corsa selezionato
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				r.getTripPatterns().remove(tripPattern);
 				session.setAttribute("lineaAttiva", r);
 				break;
@@ -268,7 +268,7 @@ public class TripPatternController {
 		
 		// cerco tra le linee dell'agenzia quella attiva, tra le corse della linea selezionata quella attiva e la aggiorno
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (!activetrippattern.getGtfsId().equals(tripPattern.getGtfsId()) && tp.getGtfsId().equals(tripPattern.getGtfsId())) {
 						logger.error("L'id dello schema corsa è già presente");
@@ -346,7 +346,7 @@ public class TripPatternController {
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				// controllo che l'id inserito non esista già
 				for (TripPattern tp: r.getTripPatterns()) {
 					if (tp.getGtfsId().equals(newGtfsId)) {
