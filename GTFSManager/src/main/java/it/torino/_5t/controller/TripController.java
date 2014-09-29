@@ -116,7 +116,7 @@ public class TripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (Trip t: tripDAO.getAllTrips()) {
 					if (t.getGtfsId().equals(trip.getGtfsId())) {
 						logger.error("L'id della corsa è già presente");
@@ -164,7 +164,8 @@ public class TripController {
 		redirectAttributes.addFlashAttribute("listaCalendari", calendarDAO.getAllCalendars());
 
 		session.removeAttribute("servizioAttivo");
-//		session.setAttribute("lineaAttiva", trip.getRoute());
+		session.setAttribute("agenziaAttiva", agencyDAO.getAgency(trip.getRoute().getAgency().getId()));
+		session.setAttribute("lineaAttiva", routeDAO.getRoute(trip.getRoute().getId()));
 		session.setAttribute("corsaAttiva", trip);
 		
 		return "redirect:corse";
@@ -191,7 +192,7 @@ public class TripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le tolgo la corsa selezionata
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				r.getTrips().remove(trip);
 				session.setAttribute("lineaAttiva", r);
 				break;
@@ -272,7 +273,7 @@ public class TripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva, tra le corse della linea selezionata quella attiva e la aggiorno
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (Trip t: tripDAO.getAllTrips()) {
 					if (!activetrip.getGtfsId().equals(trip.getGtfsId()) && t.getGtfsId().equals(trip.getGtfsId())) {
 						logger.error("L'id della corsa è già presente");
@@ -289,7 +290,7 @@ public class TripController {
 					}
 				}
 				for (Trip t: r.getTrips()) {
-					if (t.equals(activetrip)) {
+					if (t.getId().equals(activetrip.getId())) {
 						t.setGtfsId(trip.getGtfsId());
 						t.setTripHeadsign(trip.getTripHeadsign());
 						t.setTripShortName(trip.getTripShortName());
@@ -356,7 +357,7 @@ public class TripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (Trip t: tripDAO.getAllTrips()) {
 					if (t.getGtfsId().equals(newGtfsId)) {
 						logger.error("L'id della corsa è già presente");
@@ -369,7 +370,7 @@ public class TripController {
 				}
 				// tra le corse della linea quella attiva e le modifico l'associazione
 				for (Trip t: r.getTrips()) {
-					if (t.equals(trip)) {
+					if (t.getId().equals(trip.getId())) {
 						for (StopTime st: t.getStopTimes()) {
 							StopTime stopTime = new StopTime(st.getArrivalTime(), st.getDepartureTime(), st.getStopSequence(), st.getStopHeadsign(), st.getPickupType(), st.getDropOffType(), st.getShapeDistTraveled());
 							for (Stop s: stopDAO.getAllStops()) {
@@ -403,7 +404,7 @@ public class TripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le aggiungo la nuova corsa
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				r.addTrip(duplicatedTrip);
 				session.setAttribute("lineaAttiva", r);
 				break;

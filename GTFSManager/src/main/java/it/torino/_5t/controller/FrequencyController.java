@@ -108,9 +108,9 @@ public class FrequencyController {
 		
 		// cerco tra le linee dell'agenzia quella attiva, la corsa attiva della linea selezionata e le aggiungo il servizio
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (Trip t: r.getTrips()) {
-					if (t.equals(trip)) {
+					if (t.getId().equals(trip.getId())) {
 						t.addFrequency(frequency);
 						session.setAttribute("servizioAttivo", frequency);
 						session.setAttribute("corsaAttiva", t);
@@ -172,11 +172,11 @@ public class FrequencyController {
 		
 		// cerco tra le linee dell'agenzia quella attiva, la corsa attiva della linea selezionata, il servizio attivo della corsa selezionata e la elimino
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (Trip t: r.getTrips()) {
-					if (t.equals(trip)) {
+					if (t.getId().equals(trip.getId())) {
 						for (Frequency f: t.getFrequencies()) {
-							if (f.equals(frequency)) {
+							if (f.getId().equals(frequency.getId())) {
 								t.getFrequencies().remove(f);
 								session.removeAttribute("servizioAttivo");
 								session.setAttribute("corsaAttiva", t);
@@ -252,11 +252,11 @@ public class FrequencyController {
 		
 		// cerco tra le linee dell'agenzia quella attiva, tra le corse della linea selezionata quella attiva, tra i servizi della corsa selezionata quello attivo e lo aggiorno
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (Trip t: r.getTrips()) {
-					if (t.equals(trip)) {
+					if (t.getId().equals(trip.getId())) {
 						for (Frequency f: t.getFrequencies()) {
-							if (f.equals(activeFrequency)) {
+							if (f.getId().equals(activeFrequency.getId())) {
 								f.setStartTime(frequency.getStartTime());
 								f.setEndTime(frequency.getEndTime());
 								f.setHeadwaySecs(frequency.getHeadwaySecs());
