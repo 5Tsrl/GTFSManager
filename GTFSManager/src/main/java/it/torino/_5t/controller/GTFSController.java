@@ -63,8 +63,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-public class ExportGTFSController {
-	private static final Logger logger = LoggerFactory.getLogger(ExportGTFSController.class);
+public class GTFSController {
+	private static final Logger logger = LoggerFactory.getLogger(GTFSController.class);
 	
 	private static final String AGENCY_FILE_NAME = "agency.txt";
 	private static final String CALENDAR_FILE_NAME = "calendar.txt";
@@ -92,7 +92,7 @@ public class ExportGTFSController {
 	private static final String ROUTE_HEADER = "route_id,agency_id,route_short_name,route_long_name,route_desc,route_type,route_url,route_color,route_text_color\n";
 	private static final String SHAPE_HEADER = "shape_id,shape_pt_lat,shape_pt_lon,shape_pt_sequence,shape_dist_traveled\n";
 	private static final String STOP_HEADER = "stop_id,stop_code,stop_name,stop_desc,stop_lat,stop_lon,zone_id,stop_url,location_type,parent_station,stop_timezone,wheelchair_boarding\n";
-	private static final String STOP_TIME_HEADER = "trip_id,arrival_time,departure_time,stop_id,stop_sequence,pickup_type,drop_off_type,shape_dist_traveled\n";
+	private static final String STOP_TIME_HEADER = "trip_id,arrival_time,departure_time,stop_id,stop_sequence,stop_headsign,pickup_type,drop_off_type,shape_dist_traveled\n";
 	private static final String TRANSFER_HEADER = "from_stop_id,to_stop_id,transfer_type,min_transfer_time\n";
 	private static final String TRIP_HEADER = "route_id,service_id,trip_id,trip_headsign,trip_short_name,direction_id,block_id,shape_id,wheelchair_accessible,bikes_allowed\n";
 
@@ -154,14 +154,14 @@ public class ExportGTFSController {
 	
 	private FeedInfo currentFeedInfo;
 
-	@RequestMapping(value = "/esportaGTFS", method = RequestMethod.GET)
-	public String showExportGTFS(Model model, HttpSession session) {
-		logger.info("Visualizzazione pagina per esportazione GTFS.");
+	@RequestMapping(value = "/GTFS", method = RequestMethod.GET)
+	public String showManageGTFS(Model model, HttpSession session) {
+		logger.info("Visualizzazione pagina per gestione GTFS.");
 		
 		model.addAttribute("listaGTFS", feedInfoDAO.getAllFeedInfos());
 		model.addAttribute("feedInfo", new FeedInfo());
 		
-		return "exportGTFS";
+		return "manageGTFS";
 	}
 	
 	@RequestMapping(value = "/scaricaGTFS", method = RequestMethod.GET)
@@ -207,7 +207,7 @@ public class ExportGTFSController {
 			logger.info(feedInfo.getName() + " eliminato.");
 		}
 		
-		return "redirect:esportaGTFS";
+		return "redirect:GTFS";
 	}
 	
 	@RequestMapping(value = "/creaGTFS", method = RequestMethod.POST)
@@ -217,7 +217,7 @@ public class ExportGTFSController {
 			logger.error(bindingResult.getAllErrors().toString());
 			model.addAttribute("listaGTFS", feedInfoDAO.getAllFeedInfos());
 			model.addAttribute("feedInfo", new FeedInfo());
-			return "exportGTFS";
+			return "manageGTFS";
 		}
 		
 		if (feedInfo.getStartDate().toString().equals("1000-01-01"))
@@ -241,7 +241,7 @@ public class ExportGTFSController {
 			e.printStackTrace();
 		}
 		
-		return "redirect:esportaGTFS";
+		return "redirect:GTFS";
 	}
 
 	private void initializeOutputStreams() throws IOException {
@@ -320,13 +320,13 @@ public class ExportGTFSController {
 	private void fillAgency() throws IOException {
 		String row = new String();
 		for (Agency a: agencyDAO.getAllAgencies()) {
-			row += a.getGtfsId() + ",";
+			row += formatOptionalString(a.getGtfsId()) + ",";
 			row += a.getName() + ",";
 			row += a.getUrl() + ",";
 			row += a.getTimezone() + ",";
-			row += a.getLanguage() + ",";
-			row += a.getPhone() + ",";
-			row += a.getFareUrl() + "\n";
+			row += formatOptionalString(a.getLanguage()) + ",";
+			row += formatOptionalString(a.getPhone()) + ",";
+			row += formatOptionalString(a.getFareUrl()) + "\n";
 		}
 		agencyOutput.write(row.getBytes());
 		logger.info("agency.txt completato.");
@@ -395,7 +395,7 @@ public class ExportGTFSController {
 		row += currentFeedInfo.getLanguage() + ",";
 		row += (currentFeedInfo.getStartDate() != null ? formatDate(currentFeedInfo.getStartDate()) : "") + ",";
 		row += (currentFeedInfo.getEndDate() != null ? formatDate(currentFeedInfo.getEndDate()) : "") + ",";
-		row += currentFeedInfo.getVersion() + "\n";
+		row += formatOptionalString(currentFeedInfo.getVersion()) + "\n";
 		feedInfoOutput.write(row.getBytes());
 		logger.info("feed_info.txt completato.");
 	}
@@ -432,11 +432,17 @@ public class ExportGTFSController {
 			row += (r.getAgency()  != null ? r.getAgency().getGtfsId() : "") + ",";
 			row += r.getShortName() + ",";
 			row += r.getLongName() + ",";
-			row += r.getDescription() + ",";
+			row += formatOptionalString(r.getDescription()) + ",";
 			row += r.getType() + ",";
-			row += r.getUrl() + ",";
-			row += r.getColor().substring(1).toUpperCase() + ",";
-			row += r.getTextColor().substring(1).toUpperCase() + "\n";
+			row += formatOptionalString(r.getUrl()) + ",";
+			if (r.getColor() != null)
+				row += formatOptionalString(r.getColor().substring(1).toUpperCase()) + ",";
+			else
+				row += ",";
+			if (r.getTextColor() != null)
+				row += formatOptionalString(r.getTextColor().substring(1).toUpperCase()) + "\n";
+			else
+				row += "\n";
 		}
 		routeOutput.write(row.getBytes());
 		logger.info("routes.txt completato.");
@@ -445,7 +451,7 @@ public class ExportGTFSController {
 	private void fillShapes() throws IOException {
 		String row = new String();
 		for (Shape s: shapeDAO.getAllShapes()) {
-			List<Point2D.Double> points = decodePolyline(s.getEncodedPolyline());
+			List<Point2D.Double> points = decodePolyline(s.getEncodedPolyline().replace("\\\\", "\\"));
 			int sequence = 0;
 			double totDistance = 0.0;
 			for (Point2D.Double p: points) {
@@ -470,16 +476,16 @@ public class ExportGTFSController {
 		String row = new String();
 		for (Stop s: stopDAO.getAllStops()) {
 			row += s.getGtfsId() + ",";
-			row += s.getCode() + ",";
+			row += formatOptionalString(s.getCode()) + ",";
 			row += s.getName() + ",";
-			row += s.getDesc() + ",";
+			row += formatOptionalString(s.getDesc()) + ",";
 			row += s.getLat() + ",";
 			row += s.getLon() + ",";
 			row += (s.getZone()  != null ? s.getZone().getGtfsId() : "") + ",";
-			row += s.getUrl() + ",";
+			row += formatOptionalString(s.getUrl()) + ",";
 			row += formatOptionalInteger(s.getLocationType()) + ",";
 			row += (s.getParentStation()  != null ? s.getParentStation().getId() : "") + ",";
-			row += s.getTimezone() + ",";
+			row += formatOptionalString(s.getTimezone()) + ",";
 			row += formatOptionalInteger(s.getWheelchairBoarding()) + "\n";
 		}
 		stopOutput.write(row.getBytes());
@@ -572,10 +578,10 @@ public class ExportGTFSController {
 			row += t.getRoute().getGtfsId() + ",";
 			row += t.getCalendar().getGtfsId() + ",";
 			row += t.getGtfsId() + ",";
-			row += t.getTripHeadsign() + ",";
-			row += t.getTripShortName() + ",";
+			row += formatOptionalString(t.getTripHeadsign()) + ",";
+			row += formatOptionalString(t.getTripShortName()) + ",";
 			row += formatOptionalInteger(t.getDirectionId()) + ",";
-			row += t.getBlockId() + ",";
+			row += formatOptionalString(t.getBlockId()) + ",";
 			row += (t.getShape()  != null ? t.getShape().getId() : "") + ",";
 			row += formatOptionalInteger(t.getWheelchairAccessible()) + ",";
 			row += formatOptionalInteger(t.getBikesAllowed()) + "\n";
@@ -661,6 +667,13 @@ public class ExportGTFSController {
 	private String formatOptionalDouble(Double d) {
 		if (d != null)
 			return d.toString();
+		else
+			return "";
+	}
+	
+	private String formatOptionalString(String s) {
+		if (s != null)
+			return s;
 		else
 			return "";
 	}

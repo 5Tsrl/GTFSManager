@@ -560,7 +560,7 @@
 									startDay.add(java.util.Calendar.MINUTE, trip.getHeadwaySecs() % 60);
 								}
 							} else {
-								while (start.before(end)) {
+								while (start.compareTo(end) <= 0) {
 									out.write(dateFormat.format(new Time(start.get(java.util.Calendar.HOUR_OF_DAY), start.get(java.util.Calendar.MINUTE), 0)) + "  ");
 									start.add(java.util.Calendar.HOUR_OF_DAY, trip.getHeadwaySecs() / 60);
 									start.add(java.util.Calendar.MINUTE, trip.getHeadwaySecs() % 60);

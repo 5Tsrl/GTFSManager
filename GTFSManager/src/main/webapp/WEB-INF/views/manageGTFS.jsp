@@ -265,7 +265,7 @@
 				<div class="row">
 					<div class="form-group col-lg-8">
 						<input class="btn btn-success" type="submit" value="Crea GTFS" />
-						<a class="btn btn-default" href="/_5t/esportaGTFS">Annulla</a>
+						<a class="btn btn-default" href="/_5t/GTFS">Annulla</a>
 					</div>
 				</div>
 			</form:form>

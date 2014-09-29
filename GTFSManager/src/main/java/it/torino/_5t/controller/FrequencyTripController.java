@@ -134,9 +134,9 @@ public class FrequencyTripController {
 		}
 		
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (TripPattern tp: r.getTripPatterns()) {
-					if (tp.equals(tripPattern)) {
+					if (tp.getId().equals(tripPattern.getId())) {
 						trip.setRoute(tripPattern.getRoute());
 						trip.setShape(tripPattern.getShape());
 						String[] startT = startTime.split(":");
@@ -211,9 +211,9 @@ public class FrequencyTripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le tolgo lo schema corsa selezionato
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (TripPattern tp: r.getTripPatterns()) {
-					if (tp.equals(tripPattern)) {
+					if (tp.getId().equals(tripPattern.getId())) {
 						tp.getTrips().remove(trip);
 						session.setAttribute("schemaCorsaAttivo", tp);
 						session.setAttribute("lineaAttiva", r);
@@ -317,11 +317,11 @@ public class FrequencyTripController {
 		
 		// cerco tra le linee dell'agenzia quella attiva e le tolgo lo schema corsa selezionato
 		for (Route r: a.getRoutes()) {
-			if (r.equals(route)) {
+			if (r.getId().equals(route.getId())) {
 				for (TripPattern tp: r.getTripPatterns()) {
-					if (tp.equals(tripPattern)) {
+					if (tp.getId().equals(tripPattern.getId())) {
 						for (Trip t: tp.getTrips()) {
-							if (t.equals(activetrip)) {
+							if (t.getId().equals(activetrip.getId())) {
 								t.setGtfsId(trip.getGtfsId());
 								t.setTripHeadsign(trip.getTripHeadsign());
 								t.setTripShortName(trip.getTripShortName());

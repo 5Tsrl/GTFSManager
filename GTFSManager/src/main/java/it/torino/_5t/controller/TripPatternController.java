@@ -14,7 +14,6 @@ import it.torino._5t.entity.Route;
 import it.torino._5t.entity.Shape;
 import it.torino._5t.entity.Stop;
 import it.torino._5t.entity.StopTimeRelative;
-import it.torino._5t.entity.Trip;
 import it.torino._5t.entity.TripPattern;
 
 import org.slf4j.Logger;
