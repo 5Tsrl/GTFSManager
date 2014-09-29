@@ -180,6 +180,8 @@ public class FrequencyTripController {
 		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
 
 		session.removeAttribute("servizioAttivo");
+		session.setAttribute("lineaAttiva", routeDAO.getRoute(trip.getTripPattern().getRoute().getId()));
+		session.setAttribute("schemaCorsaAttivo", tripPatternDAO.getTripPattern(trip.getTripPattern().getId()));
 		session.setAttribute("corsaAFrequenzaAttiva", trip);
 		
 		return "redirect:corseAFrequenza";

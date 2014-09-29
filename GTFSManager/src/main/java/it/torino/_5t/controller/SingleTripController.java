@@ -178,6 +178,8 @@ public class SingleTripController {
 		redirectAttributes.addFlashAttribute("listaCalendari", agency.getCalendars());
 
 		session.removeAttribute("servizioAttivo");
+		session.setAttribute("lineaAttiva", routeDAO.getRoute(trip.getTripPattern().getRoute().getId()));
+		session.setAttribute("schemaCorsaAttivo", tripPatternDAO.getTripPattern(trip.getTripPattern().getId()));
 		session.setAttribute("corsaSingolaAttiva", trip);
 		
 		return "redirect:corseSingole";
