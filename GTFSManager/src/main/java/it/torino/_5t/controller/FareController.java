@@ -232,11 +232,11 @@ public class FareController {
 	// chiamata al submit del form per la creazione di una nuova associazione con una linea
 	@RequestMapping(value = "/creaRegolaLinea", method = RequestMethod.POST)
 	public String submitFareRuleRouteForm(@RequestParam("routeId") Integer[] routeId, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (fareAttribute == null) {
@@ -285,7 +285,7 @@ public class FareController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:tariffe";
 	}
@@ -340,11 +340,11 @@ public class FareController {
 	// chiamata al submit del form per la creazione di una nuova associazione con una zona
 	@RequestMapping(value = "/creaRegolaZona", method = RequestMethod.POST)
 	public String submitFareRuleRouteForm(@RequestParam("originId") Integer originId, @RequestParam("destinationId") Integer destinationId, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (fareAttribute == null) {
@@ -393,7 +393,7 @@ public class FareController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:tariffe";
 	}
@@ -401,11 +401,11 @@ public class FareController {
 	// chiamata quando clicco sul pulsante "Elimina associazione"
 	@RequestMapping(value = "/eliminaRegolaZona", method = RequestMethod.GET)
 	public String deleteFareRuleZone(Model model, HttpSession session, @RequestParam("id") Integer[] fareRuleId) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (fareAttribute == null) {
@@ -441,7 +441,7 @@ public class FareController {
 		}
 		
 		session.setAttribute("tariffaAttiva", activeFareAttribute);
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:tariffe";
 	}

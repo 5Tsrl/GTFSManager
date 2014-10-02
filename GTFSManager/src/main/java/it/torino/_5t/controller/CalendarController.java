@@ -1,9 +1,7 @@
 package it.torino._5t.controller;
 
-import it.torino._5t.dao.AgencyDAO;
 import it.torino._5t.dao.CalendarDAO;
 import it.torino._5t.dao.CalendarDateDAO;
-import it.torino._5t.entity.Agency;
 import it.torino._5t.entity.Calendar;
 import it.torino._5t.entity.CalendarDate;
 import it.torino._5t.entity.Trip;
@@ -31,8 +29,6 @@ public class CalendarController {
 	private CalendarDAO calendarDAO;
 	@Autowired
 	private CalendarDateDAO calendarDateDAO;
-	@Autowired
-	private AgencyDAO agencyDAO;
 	
 	private boolean modify = false;
 	
@@ -120,6 +116,7 @@ public class CalendarController {
 		}
 		
 //		a.addCalendar(calendar);
+		calendarDAO.addCalendar(calendar);
 		
 		logger.info("Calendario creato: " + calendar.getGtfsId() + ".");
 		

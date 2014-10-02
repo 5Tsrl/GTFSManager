@@ -58,9 +58,9 @@ public class StopTimeController {
 //		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		// if the stop list is not in the session yet, fill it from the database
-		if (session.getAttribute("listaFermate") == null) {
-			session.setAttribute("listaFermate", stopDAO.getAllStops());
-		}
+//		if (session.getAttribute("listaFermate") == null) {
+//			session.setAttribute("listaFermate", stopDAO.getAllStops());
+//		}
 				
 		Trip trip = (Trip) session.getAttribute("corsaAttiva");
 		if (trip == null) {
@@ -70,7 +70,7 @@ public class StopTimeController {
 		
 		logger.info("Visualizzazione fermate di " + t.getGtfsId());
 		
-		Set<Stop> stops = new HashSet<Stop>((List<Stop>) session.getAttribute("listaFermate"));
+		Set<Stop> stops = new HashSet<Stop>(stopDAO.getAllStops());
 		for (StopTime st: t.getStopTimes()) {
 			stops.remove(st.getStop());
 		}
@@ -111,12 +111,10 @@ public class StopTimeController {
 			return "redirect:corse";
 		}
 		
-		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
-		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione dell'associazione tra corsa e fermata");
 			agencyDAO.updateAgency(agency);
-			Set<Stop> stops = new HashSet<Stop>(stopList);
+			Set<Stop> stops = new HashSet<Stop>(stopDAO.getAllStops());
 			for (StopTime st: trip.getStopTimes()) {
 				stops.remove(st.getStop());
 			}
@@ -139,7 +137,7 @@ public class StopTimeController {
 		Stop activeStop = stopDAO.getStop(stopId);
 		
 		// cerco la fermata da modificare tra quelle dell'agenzia e le aggiungo l'associazione con la corsa
-		for (Stop s: stopList) {
+		for (Stop s: stopDAO.getAllStops()) {
 			if (s.equals(activeStop)) {
 				s.addStopTime(stopTime);
 			}
@@ -164,7 +162,6 @@ public class StopTimeController {
 		}
 		
 		session.setAttribute("agenziaAttiva", a);
-		session.setAttribute("listaFermate", stopList);
 		
 		redirectAttributes.addFlashAttribute("lat", activeStop.getLat());
 		redirectAttributes.addFlashAttribute("lon", activeStop.getLon());
@@ -194,12 +191,10 @@ public class StopTimeController {
 			return "redirect:corse";
 		}
 		
-		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
-		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella modifica dell'associazione tra corsa e fermata");
 			agencyDAO.updateAgency(agency);
-			Set<Stop> stops = new HashSet<Stop>(stopList);
+			Set<Stop> stops = new HashSet<Stop>(stopDAO.getAllStops());
 			for (StopTime st: trip.getStopTimes()) {
 				stops.remove(st.getStop());
 			}
@@ -280,7 +275,6 @@ public class StopTimeController {
 		}
 		
 		session.setAttribute("agenziaAttiva", a);
-		session.setAttribute("listaFermate", stopList);
 				
 		return "redirect:fermateCorse";
 	}
@@ -304,12 +298,10 @@ public class StopTimeController {
 			return "redirect:corse";
 		}
 		
-		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
-		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione dello shape");
 			agencyDAO.updateAgency(agency);
-			Set<Stop> stops = new HashSet<Stop>(stopList);
+			Set<Stop> stops = new HashSet<Stop>(stopDAO.getAllStops());
 			for (StopTime st: trip.getStopTimes()) {
 				stops.remove(st.getStop());
 			}
@@ -389,8 +381,6 @@ public class StopTimeController {
 			return "redirect:corse";
 		}
 		
-		List<Stop> stopList = (List<Stop>) session.getAttribute("listaFermate");
-		
 		// cerco tra le linee dell'agenzia quella attiva
 		for (Route r: a.getRoutes()) {
 			if (r.getId().equals(route.getId())) {
@@ -430,7 +420,6 @@ public class StopTimeController {
 		}
 		
 		session.setAttribute("agenziaAttiva", a);
-		session.setAttribute("listaFermate", stopList);
 		
 		return "redirect:fermateCorse";
 	}

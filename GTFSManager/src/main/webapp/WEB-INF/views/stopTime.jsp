@@ -439,7 +439,7 @@
 		<li class="active">Fermate</li>
 	</ol>
 	
-	<h3>Assegnazione fermate alla corsa ${corsaAttiva.tripShortName}</h3>
+	<h3>Assegnazione fermate alla corsa ${corsaAttiva.gtfsId}</h3>
 	
 	<p>Cliccare su una fermata per aggiungerla alla corsa. Le fermate verdi appartengono alla corsa.<br>
 	"Unisci fermate" unisce le fermate che appartengono alla corsa con segmenti. Lo shape può essere modificato cliccando sul pulsante "Edit layers" sotto lo zoom.</p>

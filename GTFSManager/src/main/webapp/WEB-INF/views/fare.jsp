@@ -641,8 +641,8 @@
 						<c:forEach var="regola" items="${listaRegoleLinea}">
 							<c:if test="${not empty regola.route}">
 								<tr>
-									<td><a href="/_5t/selezionaLinea?id=${regola.route.id}">${regola.route.shortName}</a></td>
-									<td>${regola.route.shortName}</td>
+									<td><a href="/_5t/selezionaLinea?id=${regola.route.id}">${regola.route.gtfsId}</a></td>
+									<td>${regola.route.gtfsId}</td>
 									<td class="hidden">${regola.id}</td>
 								</tr>
 							</c:if>
@@ -663,7 +663,7 @@
 								<label for="routeId" class="required">Linee</label>
 								<select name="routeId" id="routeId" class="multiselect" multiple="multiple">
 									<c:forEach var="linea" items="${listaLinee}">
-										<option value="${linea.id}">${linea.shortName}</option>
+										<option value="${linea.id}">${linea.gtfsId}</option>
 									</c:forEach>
 								</select>
 							</div>

@@ -5,8 +5,8 @@
 <hibernate-configuration>
   <session-factory>
     <property name= "hibernate.connection.driver_class">org.postgresql.Driver</property>
-    <property name="hibernate.connection.url">jdbc:postgresql://supremo.5t.torino.it:5432/GTFSManager</property>
-<!--     <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/GTFSManager</property> -->
+<!--     <property name="hibernate.connection.url">jdbc:postgresql://supremo.5t.torino.it:5432/GTFSManager</property> -->
+    <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/GTFSManager</property>
     <property name="hibernate.default_schema">feed_import</property>
     <property name="hibernate.connection.username">postgres</property>
     <property name="connection.password">postgres</property>
