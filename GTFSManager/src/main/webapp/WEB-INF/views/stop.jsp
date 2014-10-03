@@ -210,9 +210,15 @@
 				if ("${fn:length(fermata.stopTimes)}" > 0 || "${fn:length(fermata.stops)}" > 0) {
 					// if the stop has some trips associated or it is a station with some children stops, it is green and can't be deleted; a list of all trips associated and children stops is displayed
 					popupContent +=	'<p>Non puoi eliminare questa fermata.<br>Le seguenti corse sono associate ad essa:</p><ul>';
-					<c:forEach var="stopTime" items="${fermata.stopTimes}">
-						popupContent +=	'<li>${stopTime.trip.route.gtfsId} - ${stopTime.trip.gtfsId}</li>';
+					var tripsNotShown = 0;
+					<c:forEach var="stopTime" items="${fermata.stopTimes}" varStatus="i">
+						if ("${i.index}" < 10)
+							popupContent +=	'<li>${stopTime.trip.route.gtfsId} - ${stopTime.trip.gtfsId}</li>';
+						else
+							tripsNotShown++;
 					</c:forEach>
+					if (tripsNotShown > 0)
+						popupContent +=	"<li>... altre " + tripsNotShown + " corse</li>";
 					popupContent +=	'</ul>';
 					popupContent +=	'<p>Le seguenti fermate sono all\'interno della stazione:</p><ul>';
 					<c:forEach var="childStop" items="${fermata.stops}">
