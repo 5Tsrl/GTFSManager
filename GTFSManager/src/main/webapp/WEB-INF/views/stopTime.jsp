@@ -143,13 +143,13 @@
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="arrival" class="required">Ora arrivo</label>' +
-											'<input type="time" name="arrival" class="form-control" id="arrivalTime" required="true" />' +
+											'<input type="time" name="arrival" class="form-control" id="arrivalTime" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="departure" class="required">Ora partenza</label>' +
-											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
+											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="checkbox">' +
@@ -225,13 +225,13 @@
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="arrival" class="required">Ora arrivo</label>' +
-											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.arrivalTime}" required="true" />' +
+											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.arrivalTime}" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
 											'<label for="departure" class="required">Ora partenza</label>' +
-											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.departureTime}" required="true" />' +
+											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.departureTime}" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="checkbox">' +
@@ -493,7 +493,7 @@
 						}
 						List<StopTime> stopTimes = new ArrayList<StopTime>((Set<StopTime>) request.getAttribute("listaFermateCorsa"));
 						Collections.sort(stopTimes, new StopTimeComparator());
-						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 						Calendar cal = new GregorianCalendar();
 						cal.setTime(new Time(0, 0, 0));
 						int i = 1;
@@ -506,12 +506,12 @@
 			            	if (st.getArrivalTime() != null)
 			            		cal.setTime(st.getArrivalTime());
 			            	%>
-			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 			            	<%
 			            	if (st.getDepartureTime() != null)
 			            		cal.setTime(st.getDepartureTime());
 			            	%>
-			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 						</tr>
 						<% } %>
 					</tbody>

@@ -589,7 +589,7 @@
 						if (((Trip) session.getAttribute("corsaAttiva")) != null) {
 							List<StopTime> stopTimes = new ArrayList<StopTime>((Set<StopTime>) request.getAttribute("listaFermateCorsa"));
 							Collections.sort(stopTimes, new StopTimeComparator());
-							SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+							SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 							Calendar cal = new GregorianCalendar();
 							cal.setTime(new Time(0, 0, 0));
 							int i = 1;
@@ -602,12 +602,12 @@
 				            	if (st.getArrivalTime() != null)
 				            		cal.setTime(st.getArrivalTime());
 				            	%>
-				              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+				              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 				            	<%
 				            	if (st.getDepartureTime() != null)
 				            		cal.setTime(st.getDepartureTime());
 				            	%>
-				              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+				              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 							</tr>
 							<% 
 								}
