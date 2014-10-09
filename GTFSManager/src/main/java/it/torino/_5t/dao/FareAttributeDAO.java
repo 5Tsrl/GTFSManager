@@ -11,4 +11,5 @@ public interface FareAttributeDAO {
 	public FareAttribute getFareAttribute(Integer id);
 	public void addFareAttribute(FareAttribute fareAttribute);
 	public void updateFareAttribute(FareAttribute fareAttribute);
+	public void deleteFareAttribute(FareAttribute fareAttribute);
 }

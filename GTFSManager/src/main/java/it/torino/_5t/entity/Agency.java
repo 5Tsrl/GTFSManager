@@ -66,23 +66,23 @@ public class Agency implements Serializable {
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
 	private Set<Route> routes = new HashSet<Route>();
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
-	private Set<Calendar> calendars = new HashSet<Calendar>();
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
+//	private Set<Calendar> calendars = new HashSet<Calendar>();
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
-	private Set<FareAttribute> fareAttributes = new HashSet<FareAttribute>();
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
+//	private Set<FareAttribute> fareAttributes = new HashSet<FareAttribute>();
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
-	private Set<Stop> stops = new HashSet<Stop>();
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
+//	private Set<Stop> stops = new HashSet<Stop>();
 	
 	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
 	private Set<Shape> shapes = new HashSet<Shape>();
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
-	private Set<Zone> zones = new HashSet<Zone>();
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
+//	private Set<Zone> zones = new HashSet<Zone>();
 	
-	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
-	private Set<Transfer> transfers = new HashSet<Transfer>();
+//	@OneToMany(fetch = FetchType.LAZY, cascade = CascadeType.ALL, orphanRemoval=true, mappedBy = "agency")
+//	private Set<Transfer> transfers = new HashSet<Transfer>();
 
 	@Override
 	public int hashCode() {
@@ -181,29 +181,29 @@ public class Agency implements Serializable {
 		this.routes = routes;
 	}
 	
-	public Set<Calendar> getCalendars() {
-		return calendars;
-	}
-
-	public void setCalendars(Set<Calendar> calendars) {
-		this.calendars = calendars;
-	}
-	
-	public Set<FareAttribute> getFareAttributes() {
-		return fareAttributes;
-	}
-
-	public void setFareAttributes(Set<FareAttribute> fareAttributes) {
-		this.fareAttributes = fareAttributes;
-	}
-
-	public Set<Stop> getStops() {
-		return stops;
-	}
-
-	public void setStops(Set<Stop> stops) {
-		this.stops = stops;
-	}
+//	public Set<Calendar> getCalendars() {
+//		return calendars;
+//	}
+//
+//	public void setCalendars(Set<Calendar> calendars) {
+//		this.calendars = calendars;
+//	}
+//	
+//	public Set<FareAttribute> getFareAttributes() {
+//		return fareAttributes;
+//	}
+//
+//	public void setFareAttributes(Set<FareAttribute> fareAttributes) {
+//		this.fareAttributes = fareAttributes;
+//	}
+//
+//	public Set<Stop> getStops() {
+//		return stops;
+//	}
+//
+//	public void setStops(Set<Stop> stops) {
+//		this.stops = stops;
+//	}
 
 	public Set<Shape> getShapes() {
 		return shapes;
@@ -213,54 +213,54 @@ public class Agency implements Serializable {
 		this.shapes = shapes;
 	}
 
-	public Set<Zone> getZones() {
-		return zones;
-	}
-
-	public void setZones(Set<Zone> zones) {
-		this.zones = zones;
-	}
-
-	public Set<Transfer> getTransfers() {
-		return transfers;
-	}
-
-	public void setTransfers(Set<Transfer> transfers) {
-		this.transfers = transfers;
-	}
+//	public Set<Zone> getZones() {
+//		return zones;
+//	}
+//
+//	public void setZones(Set<Zone> zones) {
+//		this.zones = zones;
+//	}
+//
+//	public Set<Transfer> getTransfers() {
+//		return transfers;
+//	}
+//
+//	public void setTransfers(Set<Transfer> transfers) {
+//		this.transfers = transfers;
+//	}
 
 	public void addRoute(Route route) {
 		route.setAgency(this);
 		routes.add(route);
 	}
 	
-	public void addCalendar(Calendar calendar) {
-		calendar.setAgency(this);
-		calendars.add(calendar);
-	}
-	
-	public void addFareAttribute(FareAttribute fareAttribute) {
-		fareAttribute.setAgency(this);
-		fareAttributes.add(fareAttribute);
-	}
-	
-	public void addStop(Stop stop) {
-		stop.setAgency(this);
-		//stops.add(stop);
-	}
+//	public void addCalendar(Calendar calendar) {
+//		calendar.setAgency(this);
+//		calendars.add(calendar);
+//	}
+//	
+//	public void addFareAttribute(FareAttribute fareAttribute) {
+//		fareAttribute.setAgency(this);
+//		fareAttributes.add(fareAttribute);
+//	}
+//	
+//	public void addStop(Stop stop) {
+//		stop.setAgency(this);
+//		stops.add(stop);
+//	}
 	
 	public void addShape(Shape shape) {
 		shape.setAgency(this);
 		shapes.add(shape);
 	}
 	
-	public void addZone(Zone zone) {
-		zone.setAgency(this);
-		zones.add(zone);
-	}
-	
-	public void addTransfer(Transfer transfer) {
-		transfer.setAgency(this);
-		transfers.add(transfer);
-	}
+//	public void addZone(Zone zone) {
+//		zone.setAgency(this);
+//		zones.add(zone);
+//	}
+//	
+//	public void addTransfer(Transfer transfer) {
+//		transfer.setAgency(this);
+//		transfers.add(transfer);
+//	}
 }

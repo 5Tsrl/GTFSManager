@@ -51,4 +51,10 @@ public class FareAttributeDAOImpl implements FareAttributeDAO {
 		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
 		session.save(fareAttribute);
 	}
+
+	@Override
+	public void deleteFareAttribute(FareAttribute fareAttribute) {
+		Session session = HibernateUtil.getSessionFactory().getCurrentSession();
+		session.delete(fareAttribute);
+	}
 }

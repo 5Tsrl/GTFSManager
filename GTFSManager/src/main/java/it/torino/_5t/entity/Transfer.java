@@ -29,9 +29,9 @@ public class Transfer implements Serializable {
 	@Column(name = "transfer_id")
 	private Integer id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "agency_id")
-	private Agency agency;
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "agency_id")
+//	private Agency agency;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "from_stop_id")
@@ -83,13 +83,13 @@ public class Transfer implements Serializable {
 		this.id = id;
 	}
 
-	public Agency getAgency() {
-		return agency;
-	}
-
-	public void setAgency(Agency agency) {
-		this.agency = agency;
-	}
+//	public Agency getAgency() {
+//		return agency;
+//	}
+//
+//	public void setAgency(Agency agency) {
+//		this.agency = agency;
+//	}
 
 	public Stop getFromStop() {
 		return fromStop;

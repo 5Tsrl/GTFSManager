@@ -10,8 +10,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -35,9 +33,9 @@ public class Zone implements Serializable {
 	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
 	private String gtfsId;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "agency_id")
-	private Agency agency;
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "agency_id")
+//	private Agency agency;
 	
 	@Column(name = "name")
 	@Size(min = 1, max = 255, message = "Il campo \"nome\" non può essere vuoto")
@@ -97,13 +95,13 @@ public class Zone implements Serializable {
 		this.gtfsId = gtfsId;
 	}
 
-	public Agency getAgency() {
-		return agency;
-	}
-
-	public void setAgency(Agency agency) {
-		this.agency = agency;
-	}
+//	public Agency getAgency() {
+//		return agency;
+//	}
+//
+//	public void setAgency(Agency agency) {
+//		this.agency = agency;
+//	}
 
 	public String getName() {
 		return name;

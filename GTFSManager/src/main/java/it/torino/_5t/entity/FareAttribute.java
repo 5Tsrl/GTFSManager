@@ -11,8 +11,6 @@ import javax.persistence.FetchType;
 import javax.persistence.GeneratedValue;
 import javax.persistence.GenerationType;
 import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
@@ -34,9 +32,9 @@ public class FareAttribute implements Serializable {
 	@Column(name = "fare_id")
 	private Integer id;
 	
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "agency_id")
-	private Agency agency;
+//	@ManyToOne(fetch = FetchType.LAZY)
+//	@JoinColumn(name = "agency_id")
+//	private Agency agency;
 	
 	@Column(name = "fare_attribute_gtfs_id")
 	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
@@ -98,13 +96,13 @@ public class FareAttribute implements Serializable {
 		this.id = id;
 	}
 
-	public Agency getAgency() {
-		return agency;
-	}
-
-	public void setAgency(Agency agency) {
-		this.agency = agency;
-	}
+//	public Agency getAgency() {
+//		return agency;
+//	}
+//
+//	public void setAgency(Agency agency) {
+//		this.agency = agency;
+//	}
 
 	public String getGtfsId() {
 		return gtfsId;

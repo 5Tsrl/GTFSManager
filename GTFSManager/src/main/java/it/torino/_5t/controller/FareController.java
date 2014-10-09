@@ -94,11 +94,11 @@ public class FareController {
 	// chiamata al submit del form per la creazione di una nuova tariffa
 	@RequestMapping(value = "/tariffe", method = RequestMethod.POST)
 	public String submitFareAttributeForm(@ModelAttribute @Valid FareAttribute fareAttribute, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella creazione della tariffa");
@@ -117,11 +117,12 @@ public class FareController {
 			}
 		}
 		
-		a.addFareAttribute(fareAttribute);
+//		a.addFareAttribute(fareAttribute);
+		fareAttributeDAO.addFareAttribute(fareAttribute);
 		
 		logger.info("Tariffa creata: " + fareAttribute.getGtfsId() + ".");
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		session.setAttribute("tariffaAttiva", fareAttribute);
 		
 		return "redirect:tariffe";
@@ -142,23 +143,23 @@ public class FareController {
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaTariffa", method = RequestMethod.GET)
 	public String deleteFareAttribute(Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		FareAttribute fareAttribute = (FareAttribute) session.getAttribute("tariffaAttiva");
 		if (fareAttribute == null) {
 			return "redirect:tariffe";
 		}
 		
-		fareAttributeDAO.getAllFareAttributes().remove(fareAttribute);
+		fareAttributeDAO.deleteFareAttribute(fareAttribute);
 		
 		logger.info("Tariffa eliminata: " + fareAttribute.getGtfsId() + ".");
 		
 		session.removeAttribute("tariffaAttiva");
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:tariffe";
 	}
@@ -180,16 +181,16 @@ public class FareController {
 	// chiamata al submit del form per la modifica di una tariffa
 	@RequestMapping(value = "/modificaTariffa", method = RequestMethod.POST)
 	public String editFareAttribute(@ModelAttribute @Valid FareAttribute fareAttribute, BindingResult bindingResult, Model model, HttpSession session) {
-		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
-		if (agency == null) {
-			return "redirect:agenzie";
-		}
-		Agency a = agencyDAO.loadAgency(agency.getId());
+//		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+//		if (agency == null) {
+//			return "redirect:agenzie";
+//		}
+//		Agency a = agencyDAO.loadAgency(agency.getId());
 		
 		if (bindingResult.hasErrors()) {
 			logger.error("Errore nella modifica della tariffa");
-			agencyDAO.updateAgency(agency);
-			model.addAttribute("listaTariffe", agency.getFareAttributes());
+//			agencyDAO.updateAgency(agency);
+			model.addAttribute("listaTariffe", fareAttributeDAO.getAllFareAttributes());
 			model.addAttribute("showEditForm", true);
 			return "fare";
 		}
@@ -224,7 +225,7 @@ public class FareController {
 			}
 		}
 		
-		session.setAttribute("agenziaAttiva", a);
+//		session.setAttribute("agenziaAttiva", a);
 		
 		return "redirect:tariffe";
 	}
