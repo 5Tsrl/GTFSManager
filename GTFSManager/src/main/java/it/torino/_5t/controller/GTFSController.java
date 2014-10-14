@@ -491,8 +491,8 @@ public class GTFSController {
 			row += formatOptionalString(s.getCode()) + ",";
 			row += s.getName() + ",";
 			row += formatOptionalString(s.getDesc()) + ",";
-			row += s.getLat() + ",";
-			row += s.getLon() + ",";
+			row += String.format(Locale.ENGLISH, "%.5f", s.getLat()) + ",";
+			row += String.format(Locale.ENGLISH, "%.5f", s.getLon()) + ",";
 			row += (s.getZone()  != null ? s.getZone().getGtfsId() : "") + ",";
 			row += formatOptionalString(s.getUrl()) + ",";
 			row += formatOptionalInteger(s.getLocationType()) + ",";

@@ -152,10 +152,10 @@
 					if ("${station.id != fermata.id}" != "false") {
 						<c:choose>
 							<c:when test="${station.id == fermata.parentStation.id}">
-										popupContent += '<option value="${station.id}" selected="true">${station.name}</option>';
+										popupContent += '<option value="${station.id}" selected="true">${station.gtfsId}</option>';
 							</c:when>
 							<c:otherwise>
-										popupContent += '<option value="${station.id}">${station.name}</option>';
+										popupContent += '<option value="${station.id}">${station.gtfsId}</option>';
 							</c:otherwise>
 						</c:choose>
 					}
@@ -222,7 +222,7 @@
 					popupContent +=	'</ul>';
 					popupContent +=	'<p>Le seguenti fermate sono all\'interno della stazione:</p><ul>';
 					<c:forEach var="childStop" items="${fermata.stops}">
-						popupContent +=	'<li>${childStop.name}</li>';
+						popupContent +=	'<li>${childStop.gtfsId}</li>';
 					</c:forEach>
 					popupContent +=	'</ul>';
 					
@@ -234,14 +234,14 @@
 					});
 					marker = L.marker(["${fermata.lat}", "${fermata.lon}"], {draggable: true, icon: greenIcon})
 						.bindPopup(popupContent, {minWidth: 300})
-						.bindLabel("${fermata.name}");
+						.bindLabel("${fermata.gtfsId}");
 				} else {
 					// else it can be deleted, since it has no trips associated
 					popupContent +=	'<a class="btn btn-danger active" href="/_5t/eliminaFermata?id=${fermata.id}">Elimina</a>';
 					
 					marker = L.marker(["${fermata.lat}", "${fermata.lon}"], {draggable: true})
 						.bindPopup(popupContent, {minWidth: 300})
-						.bindLabel("${fermata.name}");
+						.bindLabel("${fermata.gtfsId}");
 				}
 				
 				lats["${fermata.id}"] = "${fermata.lat}";
@@ -360,7 +360,7 @@
 										'<select name="parentStationId" class="form-control" id="parentStationId">' +
 											'<option></option>';
 			<c:forEach var="station" items="${listaStazioni}">
-							popupContent += '<option value="${station.id}">${station.name}</option>';
+							popupContent += '<option value="${station.id}">${station.gtfsId}</option>';
 			</c:forEach>
 						popupContent += '</select>' +
 									'</div>' +
@@ -389,7 +389,7 @@
 								'</div>' +
 							'</form:form>';
 			
-			var marker = L.marker(e.latlng, {title: "${fermata.name}"}).addTo(map)
+			var marker = L.marker(e.latlng, {title: "${fermata.gtfsId}"}).addTo(map)
 			    .bindPopup(popupContent, {minWidth: 300})
 			    .openPopup();
 			$("#lat").val(e.latlng.lat);

@@ -138,7 +138,7 @@
 		// per ogni fermata dell'agenzia non associata alla corsa attiva (listaFermateNonAssociate) creo un marker, con un popup contenente il form per l'associazione con la corsa
 		<c:forEach var="fermata" items="${listaFermateNonAssociate}">
 			var popupContent = '<form:form name="creaFermataCorsaForm" commandName="stopTime" method="post" role="form" onsubmit="return validateCreaFermataCorsaForm()">' +
-									"<b>Fermata: </b> ${fermata.name}" +
+									"<b>Fermata: </b> ${fermata.gtfsId}" +
 									'<input name="stopId" type="hidden" value="${fermata.id}" />' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
@@ -203,7 +203,7 @@
 			
 			var marker = L.marker(["${fermata.lat}", "${fermata.lon}"])
 				.bindPopup(popupContent, {minWidth: 300})
-				.bindLabel("${fermata.name}");
+				.bindLabel("${fermata.gtfsId}");
 			
 			markers.addLayer(marker);
 		</c:forEach>
@@ -213,7 +213,7 @@
 		// per ogni fermata associata alla corsa attiva (listaFermateCorsa) creo un marker, con un popup contenente il form per la modifica dell'associazione con la corsa
 		<c:forEach var="fermataCorsa" items="${listaFermateCorsa}">
 			var popupContent = '<form:form name="modificaFermataCorsaForm" commandName="stopTime" method="post" role="form" action="/_5t/modificaFermataCorsa" onsubmit="return validateModificaFermataCorsaForm()">' +
-									"<b>Fermata: </b> ${fermataCorsa.stop.name}" +
+									"<b>Fermata: </b> ${fermataCorsa.stop.gtfsId}" +
 									'<input name="stopTimeId" type="hidden" value="${fermataCorsa.id}" />' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-6">' +
@@ -334,7 +334,7 @@
 		    
 			var marker = L.marker(["${fermataCorsa.stop.lat}", "${fermataCorsa.stop.lon}"], {icon: greenIcon})
 				.bindPopup(popupContent, {minWidth: 300})
-				.bindLabel("${fermataCorsa.stopSequence} ${fermataCorsa.stop.name}");
+				.bindLabel("${fermataCorsa.stopSequence} ${fermataCorsa.stop.gtfsId}");
 			
 			markers.addLayer(marker);
 			

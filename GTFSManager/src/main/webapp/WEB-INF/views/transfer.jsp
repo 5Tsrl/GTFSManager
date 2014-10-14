@@ -266,8 +266,8 @@
 								<tr>
 							</c:otherwise>
 						</c:choose>
-							<td>${trasferimento.fromStop.name}</td>
-							<td>${trasferimento.toStop.name}</td>
+							<td>${trasferimento.fromStop.gtfsId}</td>
+							<td>${trasferimento.toStop.gtfsId}</td>
 							<td>
 								<c:choose>
 									<c:when test="${trasferimento.transferType == 0}">Raccomandato</c:when>
@@ -297,7 +297,7 @@
 							<select name="fromStopId" class="form-control" required>
 								<option value="">Seleziona la fermata di partenza</option>
 								<c:forEach var="fermata" items="${listaFermate}">
-									<option value="${fermata.id}">${fermata.name}</option>
+									<option value="${fermata.id}">${fermata.gtfsId}</option>
 								</c:forEach>
 							</select>
 						</div>
@@ -308,7 +308,7 @@
 							<select name="toStopId" class="form-control" required>
 								<option value="">Seleziona la fermata di arrivo</option>
 								<c:forEach var="fermata" items="${listaFermate}">
-									<option value="${fermata.id}">${fermata.name}</option>
+									<option value="${fermata.id}">${fermata.gtfsId}</option>
 								</c:forEach>
 							</select>
 						</div>
@@ -347,10 +347,10 @@
 			<c:if test="${not empty trasferimentoAttivo}">
 				<div id="riassuntoTrasferimento" class="riassunto">
 					<div class="col-lg-8">
-						<b>Dalla fermata:</b> ${trasferimentoAttivo.fromStop.name}
+						<b>Dalla fermata:</b> ${trasferimentoAttivo.fromStop.gtfsId}
 					</div>
 					<div class="col-lg-8">
-						<b>Alla fermata:</b> ${trasferimentoAttivo.toStop.name}
+						<b>Alla fermata:</b> ${trasferimentoAttivo.toStop.gtfsId}
 					</div>
 					<div class="col-lg-8">
 						<b>Tipo di trasferimento:</b>
@@ -382,10 +382,10 @@
 								<c:forEach var="fermata" items="${listaFermate}">
 									<c:choose>
 										<c:when test="${trasferimentoAttivo.fromStop.id == fermata.id}">
-											<option value="${fermata.id}" selected>${fermata.name}</option>
+											<option value="${fermata.id}" selected>${fermata.gtfsId}</option>
 										</c:when>
 										<c:otherwise>
-											<option value="${fermata.id}">${fermata.name}</option>
+											<option value="${fermata.id}">${fermata.gtfsId}</option>
 										</c:otherwise>
 									</c:choose>
 								</c:forEach>
@@ -400,10 +400,10 @@
 								<c:forEach var="fermata" items="${listaFermate}">
 									<c:choose>
 										<c:when test="${trasferimentoAttivo.toStop.id == fermata.id}">
-											<option value="${fermata.id}" selected>${fermata.name}</option>
+											<option value="${fermata.id}" selected>${fermata.gtfsId}</option>
 										</c:when>
 										<c:otherwise>
-											<option value="${fermata.id}">${fermata.name}</option>
+											<option value="${fermata.id}">${fermata.gtfsId}</option>
 										</c:otherwise>
 									</c:choose>
 								</c:forEach>

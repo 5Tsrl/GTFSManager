@@ -73,7 +73,7 @@ public class ZoneController {
 	
 	// chiamata quando clicco sul pulsante "Crea una tariffa"
 	@RequestMapping(value = "/creaZona", method = RequestMethod.GET)
-	public String showCreateFareAttributeForm(RedirectAttributes redirectAttributes, HttpSession session) {
+	public String showCreateZoneForm(RedirectAttributes redirectAttributes, HttpSession session) {
 		redirectAttributes.addFlashAttribute("showCreateForm", true);
 		redirectAttributes.addFlashAttribute("zone", new Zone());
 		
@@ -168,7 +168,7 @@ public class ZoneController {
 	
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaZona", method = RequestMethod.GET)
-	public String deleteZoneAttribute(Model model, HttpSession session) {
+	public String deleteZone(Model model, HttpSession session) {
 //		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 //		if (agency == null) {
 //			return "redirect:agenzie";

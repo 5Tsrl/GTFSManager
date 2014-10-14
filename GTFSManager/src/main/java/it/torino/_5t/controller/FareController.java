@@ -340,7 +340,7 @@ public class FareController {
 	
 	// chiamata al submit del form per la creazione di una nuova associazione con una zona
 	@RequestMapping(value = "/creaRegolaZona", method = RequestMethod.POST)
-	public String submitFareRuleRouteForm(@RequestParam("originId") Integer originId, @RequestParam("destinationId") Integer destinationId, Model model, HttpSession session) {
+	public String submitFareRuleZoneForm(@RequestParam("originId") Integer originId, @RequestParam("destinationId") Integer destinationId, Model model, HttpSession session) {
 //		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 //		if (agency == null) {
 //			return "redirect:agenzie";

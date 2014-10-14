@@ -180,7 +180,7 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li class="active">Zone</li>
 	</ol>
 	
 	<p>Cliccare su una riga della tabella per selezionare la zona corrispondente.</p>
