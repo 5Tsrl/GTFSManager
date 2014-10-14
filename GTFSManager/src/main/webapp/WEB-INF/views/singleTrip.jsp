@@ -625,7 +625,7 @@
 					Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva");
 					List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
 					Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
-					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+					SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 					Calendar cal = new GregorianCalendar();
 					cal.setTime(trip.getStartTime());
 					int i = 1;
@@ -639,14 +639,16 @@
 		            	toAdd.setTime(str.getRelativeArrivalTime());
 		            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+		            	cal.add(java.util.Calendar.SECOND, toAdd.get(java.util.Calendar.SECOND));
 		            	%>
-		              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+		              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 		            	<%
 		            	toAdd.setTime(str.getRelativeDepartureTime());
 		            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+						cal.add(java.util.Calendar.SECOND, toAdd.get(java.util.Calendar.SECOND));
 		            	%>
-		              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+		              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 					</tr>
 					<% } %>
 				</tbody>

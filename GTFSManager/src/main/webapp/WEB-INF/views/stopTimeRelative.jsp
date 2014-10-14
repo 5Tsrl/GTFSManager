@@ -119,13 +119,13 @@
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
 											'<label for="arrival" class="required">Tempo di arrivo dall\'ultima fermata</label>' +
-											'<input type="time" name="arrival" class="form-control" id="arrivalTime" required="true" />' +
+											'<input type="time" name="arrival" class="form-control" id="arrivalTime" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
 											'<label for="departure" class="required">Tempo di permanenza in fermata</label>' +
-											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" />' +
+											'<input type="time" name="departure" class="form-control" id="departureTime" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
@@ -189,13 +189,13 @@
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
 											'<label for="arrival" class="required">Tempo di arrivo dall\'ultima fermata</label>' +
-											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.relativeArrivalTime}" required="true" />' +
+											'<input type="time" name="arrival" class="form-control" id="arrivalTime" value="${fermataCorsa.relativeArrivalTime}" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
 										'<div class="form-group col-lg-8">' +
 											'<label for="departure" class="required">Tempo di permanenza in fermata</label>' +
-											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.relativeDepartureTime}" required="true" />' +
+											'<input type="time" name="departure" class="form-control" id="departureTime" value="${fermataCorsa.relativeDepartureTime}" required="true" step="1" />' +
 										'</div>' +
 									'</div>' +
 									'<div class="row">' +
@@ -298,6 +298,10 @@
 		
 		// le fermate appartenenti alla corsa vengono unite in una polyline
 		$("#unisciFermateButton").click(function() {
+			if (fermateCorsaCoordinates.length < 2) {
+				alert("Devi prima associare almeno 2 fermate allo schema corsa");
+				return false;
+			}
 			var polyline = new L.Polyline([]);
 			for (var i=1; i<fermateCorsaCoordinates.length; i++) {
 				polyline.addLatLng(L.latLng(fermateCorsaCoordinates[i][0], fermateCorsaCoordinates[i][1]));
@@ -311,6 +315,10 @@
 		});
 		
 		$("#calcolaPercorsoOTPButton").click(function() {
+			if (fermateCorsaCoordinates.length < 2) {
+				alert("Devi prima associare almeno 2 fermate allo schema corsa");
+				return false;
+			}
 			var polyline = new L.Polyline([]);
 			// for each couple of stops
 			for (var i=2; i<fermateCorsaCoordinates.length; i++) {
@@ -444,7 +452,7 @@
 						}
 						List<StopTimeRelative> stopTimeRelatives = new ArrayList<StopTimeRelative>((Set<StopTimeRelative>) request.getAttribute("listaFermateCorsa"));
 						Collections.sort(stopTimeRelatives, new StopTimeRelativeComparator());
-						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm");
+						SimpleDateFormat dateFormat = new SimpleDateFormat("HH:mm:ss");
 						Calendar cal = new GregorianCalendar();
 						cal.setTime(new Time(0, 0, 0));
 						int i = 1;
@@ -458,14 +466,16 @@
 			            	toAdd.setTime(str.getRelativeArrivalTime());
 			            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 							cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+							cal.add(java.util.Calendar.SECOND, toAdd.get(java.util.Calendar.SECOND));
 			            	%>
-			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 			            	<%
 			            	toAdd.setTime(str.getRelativeDepartureTime());
 			            	cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 							cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+							cal.add(java.util.Calendar.SECOND, toAdd.get(java.util.Calendar.SECOND));
 			            	%>
-			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0))); %></td>
+			              	<td><% out.write(dateFormat.format(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)))); %></td>
 						</tr>
 						<% } %>
 					</tbody>

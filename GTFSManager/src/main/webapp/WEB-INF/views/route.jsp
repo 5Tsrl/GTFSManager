@@ -391,11 +391,24 @@
 						<b>Sito web:</b> <a href="${lineaAttiva.url}">${lineaAttiva.url}</a>
 					</div>
 					<div class="col-lg-8">
-						<b>Colore linea:</b> <p class="colored" style="background: ${lineaAttiva.color};"></p>
+						<c:choose>
+							<c:when test="${empty lineaAttiva.color}">
+								<b>Colore linea:</b> <p class="colored" style="background: white;"></p>
+							</c:when>
+							<c:otherwise>
+								<b>Colore linea:</b> <p class="colored" style="background: ${lineaAttiva.color};"></p>
+							</c:otherwise>
+						</c:choose>
 					</div>
 					<div class="col-lg-8">
-						<b>Colore testo:</b> <p class="colored" style="background: ${lineaAttiva.textColor};"></p>
-					</div>
+						<c:choose>
+							<c:when test="${empty lineaAttiva.textColor}">
+								<b>Colore testo:</b> <p class="colored" style="background: black;"></p>
+							</c:when>
+							<c:otherwise>
+								<b>Colore testo:</b> <p class="colored" style="background: ${lineaAttiva.textColor};"></p>
+							</c:otherwise>
+						</c:choose>
 					<div class="col-lg-8">
 						<b>Tariffe:</b>
 						<c:forEach var="tariffa" items="${listaTariffe}" varStatus="i">
