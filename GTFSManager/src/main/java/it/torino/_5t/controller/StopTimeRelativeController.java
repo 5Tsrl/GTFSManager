@@ -354,7 +354,7 @@ public class StopTimeRelativeController {
 	
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaFermataCorsa", method = RequestMethod.GET)
-	public String deleteRoute(RedirectAttributes redirectAttributes, @RequestParam("id") Integer id, HttpSession session) {
+	public String deleteStopTime(RedirectAttributes redirectAttributes, @RequestParam("id") Integer id, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";

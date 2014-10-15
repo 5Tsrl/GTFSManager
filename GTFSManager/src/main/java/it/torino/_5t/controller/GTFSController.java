@@ -510,8 +510,9 @@ public class GTFSController {
 						toAdd.setTime(str.getRelativeArrivalTime());
 						cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+						cal.add(java.util.Calendar.SECOND, toAdd.get(java.util.Calendar.SECOND));
 						cal.set(1970, java.util.Calendar.JANUARY, 1);
-						String startTime = formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0));
+						String startTime = formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)));
 						if (startT.getTime().after(cal.getTime())) {
 							// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
 							String[] start = startTime.split(":");
@@ -523,8 +524,9 @@ public class GTFSController {
 						toAdd.setTime(str.getRelativeDepartureTime());
 						cal.add(java.util.Calendar.HOUR_OF_DAY, toAdd.get(java.util.Calendar.HOUR_OF_DAY));
 						cal.add(java.util.Calendar.MINUTE, toAdd.get(java.util.Calendar.MINUTE));
+						cal.add(java.util.Calendar.SECOND, toAdd.get(java.util.Calendar.SECOND));
 						cal.set(1970, java.util.Calendar.JANUARY, 1);
-						String endTime = formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), 0));
+						String endTime = formatTime(new Time(cal.get(java.util.Calendar.HOUR_OF_DAY), cal.get(java.util.Calendar.MINUTE), cal.get(java.util.Calendar.SECOND)));
 						if (startT.getTime().after(cal.getTime())) {
 							// if start time > end time, the time should be represented as a value greater than 24:00:00 in HH:MM:SS local time for the day on which the trip schedule begins. E.g. 25:35:00.
 							String[] end = endTime.split(":");

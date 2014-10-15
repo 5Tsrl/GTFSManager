@@ -44,7 +44,7 @@ public class TripPatternController {
 	private ShapeDAO shapeDAO;
 	
 	@RequestMapping(value = "/schemiCorse", method = RequestMethod.GET)
-	public String showTrips(Model model, HttpSession session) {
+	public String showTripPatterns(Model model, HttpSession session) {
 		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
 		if (agency == null) {
 			return "redirect:agenzie";
@@ -75,7 +75,7 @@ public class TripPatternController {
 	
 	// chiamata quando clicco sul pulsante "Crea uno schema corsa"
 	@RequestMapping(value = "/creaSchemaCorsa", method = RequestMethod.GET)
-	public String showCreateTripForm(RedirectAttributes redirectAttributes, HttpSession session) {
+	public String showCreateTripPatternForm(RedirectAttributes redirectAttributes, HttpSession session) {
 		redirectAttributes.addFlashAttribute("showCreateForm", true);
 		redirectAttributes.addFlashAttribute("tripPattern", new TripPattern());
 		
