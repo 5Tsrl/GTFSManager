@@ -202,6 +202,15 @@
 	    		"zeroRecords": "Nessuna corsa singola"
 	    	}
 	    });
+		$('#stopTimeTable').dataTable({
+	    	paging: false,
+	    	"bInfo": false,
+	    	"bSort": false,
+	    	"language": {
+	    		"search": "Cerca:",
+	    		"zeroRecords": "Nessuno fermata associata"
+	    	}
+	    });
 	});
 	</script>
 </head>
@@ -603,7 +612,8 @@
 			</div>
 			
 			<div class="row col-lg-12">
-				<table class="stopSequence">
+				<hr>
+				<table id="stopTimeTable" class="table table-striped">
 					<thead>
 						<tr>
 							<th>N°</th>
