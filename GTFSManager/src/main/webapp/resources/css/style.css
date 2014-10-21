@@ -46,3 +46,8 @@ label.required:after {
 	width: 100%;
 	margin-top: 15px;
 }
+/*change breadcrumb separator to raquo symbol*/
+.breadcrumb>li+li:before {
+     content: "\003E";
+     color: #ccc;
+}
