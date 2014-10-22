@@ -8,8 +8,8 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<title>GTFS Manager - Servizi</title>
 	<link href="<c:url value='/resources/images/favicon.ico' />" rel="icon" type="image/x-icon">
-	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
+	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
@@ -206,9 +206,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea <b>${lineaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/corse">Corsa <b>${corsaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
+		<li><a href="/_5t/corse">Corsa: <b>${corsaAttiva.gtfsId}</b></a></li>
 		<li class="active">Servizi</li>
 	</ol>
 	
