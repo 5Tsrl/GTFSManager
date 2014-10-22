@@ -27,7 +27,9 @@
 	<link href="<c:url value='/resources/css/leaflet.markcluster.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
 	<link href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css" type="text/css" rel="stylesheet">
+	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
+	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
 	<script src="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.js"></script>
@@ -425,6 +427,16 @@
 		$('.annulla').click(function() {
 			$(this).parent().hide();
 		});
+		
+		$('#stopTimeTable').dataTable({
+	    	paging: false,
+	    	"bInfo": false,
+	    	"bSort": false,
+	    	"language": {
+	    		"search": "Cerca:",
+	    		"zeroRecords": "Nessuna fermata associata"
+	    	}
+	    });
 	});
     </script>
 </head>
@@ -472,7 +484,7 @@
 		<br><br><br>
 		<c:if test="${not empty listaFermateCorsa}">
 			<div class="row col-lg-12">
-				<table class="stopSequence">
+				<table id="stopTimeTable" class="table table-striped">
 					<thead>
 						<tr>
 							<th>N°</th>
