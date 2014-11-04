@@ -125,10 +125,10 @@ public class StopTimeController {
 		}
 		
 		String[] arrivalT = arrivalTime.split(":");
-		Time arrival = new Time(Integer.parseInt(arrivalT[0]), Integer.parseInt(arrivalT[1]), Integer.parseInt(arrivalT[2]));
+		Time arrival = new Time(Integer.parseInt(arrivalT[0]), Integer.parseInt(arrivalT[1]), arrivalT.length==3 ? Integer.parseInt(arrivalT[2]) : 0);
 		stopTime.setArrivalTime(arrival);
 		String[] departureT = departureTime.split(":");
-		Time departure = new Time(Integer.parseInt(departureT[0]), Integer.parseInt(departureT[1]), Integer.parseInt(departureT[2]));
+		Time departure = new Time(Integer.parseInt(departureT[0]), Integer.parseInt(departureT[1]), departureT.length==3 ? Integer.parseInt(departureT[2]) : 0);
 		stopTime.setDepartureTime(departure);
 		
 		stopTime.setStopSequence(trip.getStopTimes().size() + 1);
@@ -205,10 +205,10 @@ public class StopTimeController {
 		}
 		
 		String[] arrivalT = arrivalTime.split(":");
-		Time arrival = new Time(Integer.parseInt(arrivalT[0]), Integer.parseInt(arrivalT[1]), Integer.parseInt(arrivalT[2]));
+		Time arrival = new Time(Integer.parseInt(arrivalT[0]), Integer.parseInt(arrivalT[1]), arrivalT.length==3 ? Integer.parseInt(arrivalT[2]) : 0);
 		stopTime.setArrivalTime(arrival);
 		String[] departureT = departureTime.split(":");
-		Time departure = new Time(Integer.parseInt(departureT[0]), Integer.parseInt(departureT[1]), Integer.parseInt(departureT[2]));
+		Time departure = new Time(Integer.parseInt(departureT[0]), Integer.parseInt(departureT[1]), departureT.length==3 ? Integer.parseInt(departureT[2]) : 0);
 		stopTime.setDepartureTime(departure);
 		
 		// cerco tra le linee dell'agenzia quella attiva
