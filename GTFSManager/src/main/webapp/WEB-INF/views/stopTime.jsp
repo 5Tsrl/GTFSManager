@@ -372,7 +372,9 @@
 			for (var i=2; i<fermateCorsaCoordinates.length; i++) {
 				// call to the otp web service to calculate trip
 				$.ajax({
-					url: "http://bunet/otp-rest-servlet/ws/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=BICYCLE",
+					url: "http://www.5t.torino.it/otpws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR",
+					//url: "http://www.5t.torino.it/otp/ws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR",
+					//url: "http://oltrepo:8080/otp/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR",
 					dataType: "json",
 					async: false
 				}).done(function(data) {
