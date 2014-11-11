@@ -20,7 +20,6 @@
 	<title>GTFS Manager - Fermate</title>
 	<link href="<c:url value='/resources/images/favicon.ico' />" rel="icon" type="image/x-icon">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
-	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
 	<link href="<c:url value='/resources/css/leaflet.label.css' />" type="text/css" rel="stylesheet">
@@ -28,6 +27,7 @@
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
 	<link href="https://api.tiles.mapbox.com/mapbox.js/plugins/leaflet-draw/v0.2.2/leaflet.draw.css" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//cdn.datatables.net/1.10.0/css/jquery.dataTables.css">
+	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="//cdn.datatables.net/1.10.0/js/jquery.dataTables.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
@@ -214,7 +214,7 @@
 		
 		// per ogni fermata associata alla corsa attiva (listaFermateCorsa) creo un marker, con un popup contenente il form per la modifica dell'associazione con la corsa
 		<c:forEach var="fermataCorsa" items="${listaFermateCorsa}">
-			var popupContent = '<form:form name="modificaFermataCorsaForm" commandName="stopTime" method="post" role="form" action="/_5t/modificaFermataCorsa" onsubmit="return validateModificaFermataCorsaForm()">' +
+			var popupContent = '<form:form name="modificaFermataCorsaForm" commandName="stopTime" method="post" role="form" action="modificaFermataCorsa" onsubmit="return validateModificaFermataCorsaForm()">' +
 									"<b>Fermata: </b> ${fermataCorsa.stop.gtfsId}" +
 									'<input name="stopTimeId" type="hidden" value="${fermataCorsa.id}" />' +
 									'<div class="row">' +
@@ -325,7 +325,7 @@
 										'</div>' +
 									'</div>' +
 								'</form:form>' +
-								'<a class="btn btn-danger active" href="/_5t/eliminaFermataCorsa?id=${fermataCorsa.id}">Rimuovi dalla corsa</a>';
+								'<a class="btn btn-danger active" href="eliminaFermataCorsa?id=${fermataCorsa.id}">Rimuovi dalla corsa</a>';
 		
 			var greenIcon = L.icon({
 			    iconUrl: "<c:url value='/resources/images/green-marker.png' />",
@@ -373,7 +373,6 @@
 				// call to the otp web service to calculate trip
 				$.ajax({
 					url: "http://www.5t.torino.it/otpws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR",
-					//url: "http://www.5t.torino.it/otp/ws/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR",
 					//url: "http://oltrepo:8080/otp/routers/default/plan?fromPlace=" + fermateCorsaCoordinates[i-1][0]+ "%2C" + fermateCorsaCoordinates[i-1][1] + "&toPlace=" + fermateCorsaCoordinates[i][0]+ "%2C" + fermateCorsaCoordinates[i][1]+ "&mode=CAR",
 					dataType: "json",
 					async: false
@@ -447,9 +446,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/corse">Corsa: <b>${corsaAttiva.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
+		<li><a href="corse">Corsa: <b>${corsaAttiva.gtfsId}</b></a></li>
 		<li class="active">Fermate</li>
 	</ol>
 	
@@ -462,7 +461,7 @@
 	<div class="col-lg-4">
 		<button id="unisciFermateButton" class="btn btn-primary">Unisci fermate</button>
 		<button id="calcolaPercorsoOTPButton" class="btn btn-primary">Calcola percorso con OTP</button>
-		<form:form id="creaShapeForm" commandName="shape" role="form" method="post" action="/_5t/creaShape">
+		<form:form id="creaShapeForm" commandName="shape" role="form" method="post" action="creaShape">
 			<div class="row">
 				<div class="form-group">
 					<form:hidden path="encodedPolyline" id="encodedPolyline" />
@@ -481,7 +480,7 @@
 		</form:form>
 		
 		<div class="row col-lg-12">
-			<a type="button" class="btn btn-default" href="/_5t/fermate">Aggiungi altre fermate all'agenzia</a>
+			<a type="button" class="btn btn-default" href="fermate">Aggiungi altre fermate all'agenzia</a>
 		</div>
 		<br><br><br>
 		<c:if test="${not empty listaFermateCorsa}">

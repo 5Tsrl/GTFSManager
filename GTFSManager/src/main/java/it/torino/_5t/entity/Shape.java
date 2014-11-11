@@ -40,6 +40,7 @@ public class Shape implements Serializable {
 	private Agency agency;
 	
 	@Column(name = "shape_encoded_polyline")
+	@Size(max=1000000)
 	private String encodedPolyline;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "shape")

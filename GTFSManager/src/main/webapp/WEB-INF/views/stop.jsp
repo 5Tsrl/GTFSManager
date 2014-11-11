@@ -9,13 +9,13 @@
 	<meta http-equiv="Content-Type" content="text/html; charset=ISO-8859-1">
 	<title>GTFS Manager - Fermate</title>
 	<link href="<c:url value='/resources/images/favicon.ico' />" rel="icon" type="image/x-icon">
-	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<link rel="stylesheet" href="//netdna.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap.min.css">
 	<link rel="stylesheet" href="http://maxcdn.bootstrapcdn.com/bootstrap/3.1.1/css/bootstrap-theme.min.css">
 	<link rel="stylesheet" href="http://cdn.leafletjs.com/leaflet-0.7.3/leaflet.css" />
 	<link href="<c:url value='/resources/css/leaflet.label.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.markcluster.css' />" type="text/css" rel="stylesheet">
 	<link href="<c:url value='/resources/css/leaflet.geosearch.css' />" type="text/css" rel="stylesheet">
+	<link href="<c:url value='/resources/css/style.css' />" type="text/css" rel="stylesheet">
 	<script src="https://ajax.googleapis.com/ajax/libs/jquery/1.11.0/jquery.min.js"></script>
 	<script src="http://ajax.aspnetcdn.com/ajax/jquery.validate/1.13.0/jquery.validate.min.js"></script>
 	<script src="//netdna.bootstrapcdn.com/bootstrap/3.1.1/js/bootstrap.min.js"></script>
@@ -237,7 +237,7 @@
 						.bindLabel("${fermata.gtfsId}");
 				} else {
 					// else it can be deleted, since it has no trips associated
-					popupContent +=	'<a class="btn btn-danger active" href="/_5t/eliminaFermata?id=${fermata.id}">Elimina</a>';
+					popupContent +=	'<a class="btn btn-danger active" href="eliminaFermata?id=${fermata.id}">Elimina</a>';
 					
 					marker = L.marker(["${fermata.lat}", "${fermata.lon}"], {draggable: true})
 						.bindPopup(popupContent, {minWidth: 300})
@@ -473,7 +473,7 @@
 	<div id="map" class="col-lg-8"></div>
 	<div class="col-lg-4">
 		<c:if test="${not empty lineaAttiva.gtfsId && not empty corsaAttiva.gtfsId}">
-			<a class="btn btn-default" href="/_5t/fermateCorse">Assegna fermate alla corsa ${corsaAttiva.gtfsId}</a>
+			<a class="btn btn-default" href="fermateCorse">Assegna fermate alla corsa ${corsaAttiva.gtfsId}</a>
 		</c:if>
 	</div>
 	

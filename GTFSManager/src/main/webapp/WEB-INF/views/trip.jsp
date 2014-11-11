@@ -71,13 +71,13 @@
 			$("#delete-trip").show();
 		});
 		$("#delete-trip-button").click(function() {
-			window.location.href = "/_5t/eliminaCorsa";
+			window.location.href = "eliminaCorsa";
 		});
 		
 		// clicking on a row, the correspondent trip is selected
 		$("#listaCorse").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaCorsa?id=" + tripId;
+			window.location.href = "selezionaCorsa?id=" + tripId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -207,8 +207,8 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
 		<li class="active">Corse</li>
 	</ol>
 	
@@ -263,15 +263,15 @@
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${corsa.calendar.id}">${corsa.calendar.gtfsId}</a></td>
+							<td><a href="selezionaCalendario?id=${corsa.calendar.id}">${corsa.calendar.gtfsId}</a></td>
 							<td>
 								${fn:length(corsa.frequencies)}
 								<c:choose>
 									<c:when test="${corsaAttiva.id == corsa.id}">
-										<a class="btn btn-default" href="/_5t/servizi">
+										<a class="btn btn-default" href="servizi">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/servizi">
+										<a class="btn btn-default disabled" href="servizi">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
@@ -284,10 +284,10 @@
 								${fn:length(corsa.stopTimes)}
 								<c:choose>
 									<c:when test="${corsaAttiva.id == corsa.id}">
-										<a class="btn btn-default" href="/_5t/fermateCorse">
+										<a class="btn btn-default" href="fermateCorse">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/fermateCorse">
+										<a class="btn btn-default disabled" href="fermateCorse">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
@@ -305,7 +305,7 @@
 		
 		<!-- Div with button to create trip and selected trip summary -->
 		<div class="col-lg-4">
-			<a id="creaCorsaButton" class="btn btn-primary" href="/_5t/creaCorsa">Crea una corsa</a>
+			<a id="creaCorsaButton" class="btn btn-primary" href="creaCorsa">Crea una corsa</a>
 			
 			<!-- Div with create trip form -->
 			<div id="creaCorsa">
@@ -377,7 +377,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea corsa" />
-							<a class="btn btn-default" href="/_5t/corse">Annulla</a>
+							<a class="btn btn-default" href="corse">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -422,11 +422,11 @@
 						%>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaCorsaButton" class="btn btn-primary" href="/_5t/modificaCorsa">Modifica</a>
+						<a id="modificaCorsaButton" class="btn btn-primary" href="modificaCorsa">Modifica</a>
 						<button id="eliminaCorsaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 					<div class="col-lg-12">
-						<form id="duplicaCorsaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsa">
+						<form id="duplicaCorsaForm" class="form-inline" role="form" method="post" action="duplicaCorsa">
 							<div class="form-group">
 								<label for="newGtfsId" class="required">Duplica con id</label>
 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" />
@@ -439,7 +439,7 @@
 			
 			<!-- Div with edit trip form -->
 			<div id="modificaCorsa">
-				<form:form id="modificaCorsaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsa">
+				<form:form id="modificaCorsaForm" commandName="trip" method="post" role="form" action="modificaCorsa">
 					<% Trip trip = (Trip) session.getAttribute("corsaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -568,7 +568,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica corsa" />
-							<a class="btn btn-default" href="/_5t/corse">Annulla</a>
+							<a class="btn btn-default" href="corse">Annulla</a>
 						</div>
 					</div>
 				</form:form>

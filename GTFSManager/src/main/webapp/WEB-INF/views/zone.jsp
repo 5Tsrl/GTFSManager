@@ -62,13 +62,13 @@
 				$("#delete-zone").show();
 		});
 		$("#delete-zone-button").click(function() {
-			window.location.href = "/_5t/eliminaZona";
+			window.location.href = "eliminaZona";
 		});
 		
 		// clicking on a row, the correspondent zone is selected
 		$("#listaZone").find("tbody").find("tr").click(function() {
 			var zoneId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaZona?id=" + zoneId;
+			window.location.href = "selezionaZona?id=" + zoneId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -219,7 +219,7 @@
 		
 		<!-- Div with button to create zone and selected zone summary -->
 		<div class="col-lg-6">
-			<a id="creaZonaButton" class="btn btn-primary" href="/_5t/creaZona">Crea una zona</a>
+			<a id="creaZonaButton" class="btn btn-primary" href="creaZona">Crea una zona</a>
 			
 			<!-- Div with create zone form -->
 			<div id="creaZona">
@@ -241,7 +241,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea zona" />
-							<a class="btn btn-default" href="/_5t/zone">Annulla</a>
+							<a class="btn btn-default" href="zone">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -259,7 +259,7 @@
 						<b>Nome:</b> ${zonaAttiva.name}
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaZonaButton" class="btn btn-primary" href="/_5t/modificaZona">Modifica</a>
+						<a id="modificaZonaButton" class="btn btn-primary" href="modificaZona">Modifica</a>
 						<button id="eliminaZonaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -267,7 +267,7 @@
 			
 			<!-- Div with edit zone form -->
 			<div id="modificaZona">
-				<form:form id="modificaZonaForm" commandName="zone" method="post" role="form" action="/_5t/modificaZona">
+				<form:form id="modificaZonaForm" commandName="zone" method="post" role="form" action="modificaZona">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
@@ -285,7 +285,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica zona" />
-							<a class="btn btn-default" href="/_5t/zone">Annulla</a>
+							<a class="btn btn-default" href="zone">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -330,7 +330,7 @@
 					<tbody>
 						<c:forEach var="tariffa" items="${listaTariffeOrigine}">
 							<tr>
-								<td><a href="/_5t/selezionaTariffa?id=${tariffa.id}">${tariffa.gtfsId}</a></td>
+								<td><a href="selezionaTariffa?id=${tariffa.id}">${tariffa.gtfsId}</a></td>
 							</tr>
 						</c:forEach>
 					</tbody>
@@ -349,7 +349,7 @@
 					<tbody>
 						<c:forEach var="tariffa" items="${listaTariffeDestinazione}">
 							<tr>
-								<td><a href="/_5t/selezionaTariffa?id=${tariffa.id}">${tariffa.gtfsId}</a></td>
+								<td><a href="selezionaTariffa?id=${tariffa.id}">${tariffa.gtfsId}</a></td>
 							</tr>
 						</c:forEach>
 					</tbody>

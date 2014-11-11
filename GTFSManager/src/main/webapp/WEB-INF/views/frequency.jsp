@@ -83,13 +83,13 @@
 			$("#delete-frequency").show();
 		});
 		$("#delete-frequency-button").click(function() {
-			window.location.href = "/_5t/eliminaServizio";
+			window.location.href = "eliminaServizio";
 		});
 		
 		// clicking on a row, the correspondent frequency is selected
 		$("#listaServizi").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaServizio?id=" + tripId;
+			window.location.href = "selezionaServizio?id=" + tripId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -206,9 +206,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/corse">Corsa: <b>${corsaAttiva.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="linee">Linea: <b>${lineaAttiva.gtfsId}</b></a></li>
+		<li><a href="corse">Corsa: <b>${corsaAttiva.gtfsId}</b></a></li>
 		<li class="active">Servizi</li>
 	</ol>
 	
@@ -248,7 +248,7 @@
 		
 		<!-- Div with button to create frequency and selected frequency summary -->
 		<div class="col-lg-6">
-			<a id="creaServizioButton" class="btn btn-primary" href="/_5t/creaServizio">Crea un servizio</a>
+			<a id="creaServizioButton" class="btn btn-primary" href="creaServizio">Crea un servizio</a>
 			
 			<!-- Div with create frequency form -->
 			<div id="creaServizio">
@@ -291,7 +291,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea servizio" />
-							<a class="btn btn-default" href="/_5t/servizi">Annulla</a>
+							<a class="btn btn-default" href="servizi">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -319,7 +319,7 @@
 						</c:choose>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaServizioButton" class="btn btn-primary" href="/_5t/modificaServizio">Modifica</a>
+						<a id="modificaServizioButton" class="btn btn-primary" href="modificaServizio">Modifica</a>
 						<button id="eliminaServizioButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -327,7 +327,7 @@
 			
 			<!-- Div with edit frequency form -->
 			<div id="modificaServizio">
-				<form:form name="modificaServizioForm" id="modificaServizioForm" commandName="frequency" method="post" role="form" action="/_5t/modificaServizio" onsubmit="return validateModificaServizioForm()">
+				<form:form name="modificaServizioForm" id="modificaServizioForm" commandName="frequency" method="post" role="form" action="modificaServizio" onsubmit="return validateModificaServizioForm()">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="start" class="required">Ora inizio</label>
@@ -374,7 +374,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica servizio" />
-							<a class="btn btn-default" href="/_5t/servizi">Annulla</a>
+							<a class="btn btn-default" href="servizi">Annulla</a>
 						</div>
 					</div>
 				</form:form>

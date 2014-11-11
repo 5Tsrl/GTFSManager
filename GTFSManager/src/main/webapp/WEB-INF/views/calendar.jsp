@@ -244,25 +244,25 @@
 				$("#delete-calendar").show();
 		});
 		$("#delete-calendar-button").click(function() {
-				window.location.href = "/_5t/eliminaCalendario";
+				window.location.href = "eliminaCalendario";
 		});
 		$("#eliminaEccezioneButton").click(function() {
 			$("#delete-calendar-date").show();
 		});
 		$("#delete-calendar-date-button").click(function() {
-			window.location.href = "/_5t/eliminaEccezione";
+			window.location.href = "eliminaEccezione";
 		});
 		
 		// clicking on a row, the correspondent calendar is selected
 		$("#listaCalendari").find("tbody").find("tr").click(function() {
 			var serviceId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaCalendario?id=" + serviceId;
+			window.location.href = "selezionaCalendario?id=" + serviceId;
 		});
 		
 		// clicking on a row, the correspondent calendar date is selected
 		$("#listaEccezioni").find("tbody").find("tr").click(function() {
 			var calendarDateId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaEccezione?id=" + calendarDateId;
+			window.location.href = "selezionaEccezione?id=" + calendarDateId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -512,7 +512,7 @@
 		
 		<!-- Div with button to create calendar and selected calendar summary -->
 		<div class="col-lg-6">
-			<a id="creaCalendarioButton" class="btn btn-primary" href="/_5t/creaCalendario">Crea un calendario</a>
+			<a id="creaCalendarioButton" class="btn btn-primary" href="creaCalendario">Crea un calendario</a>
 			
 			<!-- Div with create calendar form -->
 			<div id="creaCalendario">
@@ -567,7 +567,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea calendario" />
-							<a class="btn btn-default" href="/_5t/calendari">Annulla</a>
+							<a class="btn btn-default" href="calendari">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -599,7 +599,7 @@
 						<c:if test="${calendarioAttivo.sunday}">Dom</c:if>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaCalendarioButton" class="btn btn-primary" href="/_5t/modificaCalendario">Modifica</a>
+						<a id="modificaCalendarioButton" class="btn btn-primary" href="modificaCalendario">Modifica</a>
 						<button id="eliminaCalendarioButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -607,7 +607,7 @@
 			
 			<!-- Div with edit calendar form -->
 			<div id="modificaCalendario">
-				<form:form id="modificaCalendarioForm" commandName="calendar" method="post" role="form" action="/_5t/modificaCalendario">
+				<form:form id="modificaCalendarioForm" commandName="calendar" method="post" role="form" action="modificaCalendario">
 					<% Calendar calendar = (Calendar) session.getAttribute("calendarioAttivo"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -659,7 +659,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica calendario" />
-							<a class="btn btn-default" href="/_5t/calendari">Annulla</a>
+							<a class="btn btn-default" href="calendari">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -685,7 +685,7 @@
 					<tbody>
 						<c:forEach var="corsa" items="${listaCorse}">
 							<tr>
-								<td><a href="/_5t/selezionaCorsa?id=${corsa.id}">${corsa.gtfsId}</a></td>
+								<td><a href="selezionaCorsa?id=${corsa.id}">${corsa.gtfsId}</a></td>
 								<td>${corsa.tripShortName}</td>
 								<td>${corsa.tripHeadsign}</td>
 							</tr>
@@ -734,11 +734,11 @@
 			
 			<!-- Div with button to create calendar date and selected calendar date summary -->
 			<div class="col-lg-3">
-				<a id="creaEccezioneButton" class="btn btn-primary" href="/_5t/creaEccezione">Crea un'eccezione</a>
+				<a id="creaEccezioneButton" class="btn btn-primary" href="creaEccezione">Crea un'eccezione</a>
 			
 				<!-- Div with create calendar date form -->
 				<div id="creaEccezione">
-					<form:form id="creaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/creaEccezione" onsubmit="return validateCreaEccezioneForm()">
+					<form:form id="creaEccezioneForm" commandName="calendarDate" method="post" role="form" action="creaEccezione" onsubmit="return validateCreaEccezioneForm()">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="date" class="required">Data</label>
@@ -759,7 +759,7 @@
 						<div class="row">
 							<div class="form-group">
 								<input class="btn btn-success" type="submit" value="Crea eccezione" />
-								<a class="btn btn-default" href="/_5t/calendari">Annulla</a>
+								<a class="btn btn-default" href="calendari">Annulla</a>
 							</div>
 						</div>
 					</form:form>
@@ -781,7 +781,7 @@
 							</c:choose>
 						</div>
 						<div>
-							<a id="modificaEccezioneButton" class="btn btn-primary" href="/_5t/modificaEccezione">Modifica</a>
+							<a id="modificaEccezioneButton" class="btn btn-primary" href="modificaEccezione">Modifica</a>
 							<button id="eliminaEccezioneButton" type="button" class="btn btn-danger">Elimina</button>
 						</div>
 					</div>
@@ -789,7 +789,7 @@
 				
 				<!-- Div with edit calendar date form -->
 				<div id="modificaEccezione">
-					<form:form id="modificaEccezioneForm" commandName="calendarDate" method="post" role="form" action="/_5t/modificaEccezione" onsubmit="return validateModificaEccezioneForm()">
+					<form:form id="modificaEccezioneForm" commandName="calendarDate" method="post" role="form" action="modificaEccezione" onsubmit="return validateModificaEccezioneForm()">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="date" class="required">Data</label>
@@ -818,7 +818,7 @@
 						<div class="row">
 							<div class="form-group">
 								<input class="btn btn-success" type="submit" value="Modifica eccezione" />
-								<a class="btn btn-default" href="/_5t/calendari">Annulla</a>
+								<a class="btn btn-default" href="calendari">Annulla</a>
 							</div>
 						</div>
 					</form:form>

@@ -77,13 +77,13 @@
 			$("#delete-transfer").show();
 		});
 		$("#delete-transfer-button").click(function() {
-			window.location.href = "/_5t/eliminaTrasferimento";
+			window.location.href = "eliminaTrasferimento";
 		});
 		
 		// clicking on a row, the correspondent transfer is selected
 		$("#listaTrasferimenti").find("tbody").find("tr").click(function() {
 			var transferId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaTrasferimento?id=" + transferId;
+			window.location.href = "selezionaTrasferimento?id=" + transferId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -286,7 +286,7 @@
 		
 		<!-- Div with button to create transfer and selected transfer summary -->
 		<div class="col-lg-4">
-			<a id="creaTrasferimentoButton" class="btn btn-primary" href="/_5t/creaTrasferimento">Crea un trasferimento</a>
+			<a id="creaTrasferimentoButton" class="btn btn-primary" href="creaTrasferimento">Crea un trasferimento</a>
 			
 			<!-- Div with create transfer form -->
 			<div id="creaTrasferimento">
@@ -335,7 +335,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea trasferimento" />
-							<a class="btn btn-default" href="/_5t/trasferimenti">Annulla</a>
+							<a class="btn btn-default" href="trasferimenti">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -365,7 +365,7 @@
 						<b>Tempo minimo per il trasferimento:</b> ${trasferimentoAttivo.minTransferTime}
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaTrasferimentoButton" class="btn btn-primary" href="/_5t/modificaTrasferimento">Modifica</a>
+						<a id="modificaTrasferimentoButton" class="btn btn-primary" href="modificaTrasferimento">Modifica</a>
 						<button id="eliminaTrasferimentoButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -373,7 +373,7 @@
 			
 			<!-- Div with edit transfer form -->
 			<div id="modificaTrasferimento">
-				<form:form id="modificaTrasferimentoForm" commandName="transfer" method="post" role="form" action="/_5t/modificaTrasferimento" onsubmit="return validateModificaTrasferimentoForm()">
+				<form:form id="modificaTrasferimentoForm" commandName="transfer" method="post" role="form" action="modificaTrasferimento" onsubmit="return validateModificaTrasferimentoForm()">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="fromStopId" class="required">Dalla fermata</label>
@@ -454,7 +454,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica trasferimento" />
-							<a class="btn btn-default" href="/_5t/trasferimenti">Annulla</a>
+							<a class="btn btn-default" href="trasferimenti">Annulla</a>
 						</div>
 					</div>
 				</form:form>
