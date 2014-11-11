@@ -35,7 +35,7 @@ public class Trip implements Serializable{
 	private Integer id;
 	
 	@Column(name = "trip_gtfs_id")
-	@Size(min = 1, max = 50, message = "Il campo \"id\" non può essere vuoto")
+	@Size(min = 1, max = 50, message = "Il campo \"id\" non puÃ² essere vuoto")
 	private String gtfsId;
 	
 	@ManyToOne(fetch = FetchType.LAZY)
@@ -59,7 +59,7 @@ public class Trip implements Serializable{
 	@Max(1)
 	private Integer directionId;
 	
-	@JoinColumn(name = "block_id")
+	@Column(name = "block_id")
 	@Size(max = 50)
 	private String blockId;
 	

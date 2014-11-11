@@ -5,17 +5,19 @@
 <hibernate-configuration>
   <session-factory>
     <property name= "hibernate.connection.driver_class">org.postgresql.Driver</property>
-    <property name="hibernate.connection.url">jdbc:postgresql://supremo.5t.torino.it:5432/GTFSManager</property>
-<!--     <property name="hibernate.connection.url">jdbc:postgresql://localhost:5432/GTFSManager</property> -->
-    <property name="hibernate.default_schema">prova</property>
+    <!-- <property name="hibernate.connection.url">jdbc:postgresql://supremo.5t.torino.it:5432/gtfsManagerTripPattern</property> -->
+    <property name="hibernate.connection.url">jdbc:postgresql://supremo:5432/GTFSManager</property> 
+    <property name="hibernate.default_schema">feed_import</property>
     <property name="hibernate.connection.username">postgres</property>
     <property name="connection.password">postgres</property>
-    <property name="connection.pool_size">10</property>
+    <!-- <property name="connection.schemaname">feed_import</property> -->
+    <!-- <property name="connection.pool_size">10</property> -->
 	<property name="hibernate.current_session_context_class">thread</property>
     <property name="hibernate.dialect">org.hibernate.dialect.PostgreSQLDialect</property>
 	<property name="hibernate.format_sql">true</property> 
 	<property name="hibernate.show_sql">true</property> 
-    <property name="hbm2ddl.auto">validate</property>
+     <property name="hbm2ddl.auto">validate</property> 
+    <!-- <property name="hbm2ddl.auto">create</property>-->
 	
 	<mapping class="it.torino._5t.entity.Agency"/>
 	<mapping class="it.torino._5t.entity.Route"/>
