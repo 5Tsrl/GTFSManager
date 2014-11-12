@@ -72,13 +72,13 @@
 			$("#delete-tripPattern").show();
 		});
 		$("#delete-tripPattern-button").click(function() {
-			window.location.href = "/_5t/eliminaSchemaCorsa";
+			window.location.href = "eliminaSchemaCorsa";
 		});
 		
 		// clicking on a row, the correspondent tripPattern is selected
 		$("#listaSchemiCorse").find("tbody").find("tr").click(function() {
 			var tripPatternId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaSchemaCorsa?id=" + tripPatternId;
+			window.location.href = "selezionaSchemaCorsa?id=" + tripPatternId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -220,8 +220,8 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.shortName}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="linee">Linea: <b>${lineaAttiva.shortName}</b></a></li>
 		<li class="active">Schemi corse</li>
 	</ol>
 	
@@ -290,15 +290,15 @@
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${schemaCorsa.calendar.id}">${schemaCorsa.calendar.gtfsId}</a></td>
+							<td><a href="selezionaCalendario?id=${schemaCorsa.calendar.id}">${schemaCorsa.calendar.gtfsId}</a></td>
 							<td>
 								${fn:length(schemaCorsa.stopTimeRelatives)}
 								<c:choose>
 									<c:when test="${schemaCorsaAttivo.id == schemaCorsa.id}">
-										<a class="btn btn-default" href="/_5t/fermateSchemaCorsa">
+										<a class="btn btn-default" href="fermateSchemaCorsa">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/fermateSchemaCorsa">
+										<a class="btn btn-default disabled" href="fermateSchemaCorsa">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
@@ -313,15 +313,15 @@
 								<c:when test="${fn:length(schemaCorsa.stopTimeRelatives) > 0}">
 									<c:choose>
 										<c:when test="${schemaCorsaAttivo.id == schemaCorsa.id}">
-											<a class="btn btn-default" href="/_5t/corseSingole">
+											<a class="btn btn-default" href="corseSingole">
 										</c:when>
 										<c:otherwise>
-											<a class="btn btn-default disabled" href="/_5t/corseSingole">
+											<a class="btn btn-default disabled" href="corseSingole">
 										</c:otherwise>
 									</c:choose>
 								</c:when>
 								<c:otherwise>
-									<a class="btn btn-default disabled" href="/_5t/corseSingole">
+									<a class="btn btn-default disabled" href="corseSingole">
 								</c:otherwise>
 								</c:choose>
 								Inserisci/modifica</a>
@@ -332,15 +332,15 @@
 								<c:when test="${fn:length(schemaCorsa.stopTimeRelatives) > 0}">
 									<c:choose>
 										<c:when test="${schemaCorsaAttivo.id == schemaCorsa.id}">
-											<a class="btn btn-default" href="/_5t/corseAFrequenza">
+											<a class="btn btn-default" href="corseAFrequenza">
 										</c:when>
 										<c:otherwise>
-											<a class="btn btn-default disabled" href="/_5t/corseAFrequenza">
+											<a class="btn btn-default disabled" href="corseAFrequenza">
 										</c:otherwise>
 									</c:choose>
 								</c:when>
 								<c:otherwise>
-									<a class="btn btn-default disabled" href="/_5t/corseAFrequenza">
+									<a class="btn btn-default disabled" href="corseAFrequenza">
 								</c:otherwise>
 								</c:choose>
 								Inserisci/modifica</a>
@@ -354,7 +354,7 @@
 		
 		<!-- Div with button to create tripPattern and selected tripPattern summary -->
 		<div class="col-lg-4">
-			<a id="creaSchemaCorsaButton" class="btn btn-primary" href="/_5t/creaSchemaCorsa">Crea uno schema corsa</a>
+			<a id="creaSchemaCorsaButton" class="btn btn-primary" href="creaSchemaCorsa">Crea uno schema corsa</a>
 			
 			<!-- Div with create tripPattern form -->
 			<div id="creaSchemaCorsa">
@@ -426,7 +426,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea schema corsa" />
-							<a class="btn btn-default" href="/_5t/schemiCorse">Annulla</a>
+							<a class="btn btn-default" href="schemiCorse">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -463,11 +463,11 @@
 						<% out.write(bikesAllowed.get(tripPattern.getBikesAllowed())); %>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaSchemaCorsaButton" class="btn btn-primary" href="/_5t/modificaSchemaCorsa">Modifica</a>
+						<a id="modificaSchemaCorsaButton" class="btn btn-primary" href="modificaSchemaCorsa">Modifica</a>
 						<button id="eliminaSchemaCorsaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 					<div class="col-lg-12">
-						<form id="duplicaSchemaCorsaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaSchemaCorsa">
+						<form id="duplicaSchemaCorsaForm" class="form-inline" role="form" method="post" action="duplicaSchemaCorsa">
 							<div class="form-group">
 								<label for="newGtfsId" class="required">Duplica con id</label>
 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuovo schema corsa" maxlength="50" />
@@ -480,7 +480,7 @@
 			
 			<!-- Div with edit tripPattern form -->
 			<div id="modificaSchemaCorsa">
-				<form:form id="modificaSchemaCorsaForm" commandName="tripPattern" method="post" role="form" action="/_5t/modificaSchemaCorsa">
+				<form:form id="modificaSchemaCorsaForm" commandName="tripPattern" method="post" role="form" action="modificaSchemaCorsa">
 					<% TripPattern tripPattern = (TripPattern) session.getAttribute("schemaCorsaAttivo"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -593,7 +593,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica corsa" />
-							<a class="btn btn-default" href="/_5t/schemiCorse">Annulla</a>
+							<a class="btn btn-default" href="schemiCorse">Annulla</a>
 						</div>
 					</div>
 				</form:form>

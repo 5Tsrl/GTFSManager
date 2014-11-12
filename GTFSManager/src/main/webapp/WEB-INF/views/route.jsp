@@ -61,13 +61,13 @@
 			$("#delete-route").show();
 		});
 		$("#delete-route-button").click(function() {
-			window.location.href = "/_5t/eliminaLinea";
+			window.location.href = "eliminaLinea";
 		});
 		
 		// clicking on a row, the correspondent route is selected
 		$("#listaLinee").find("tbody").find("tr").click(function() {
 			var routeId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaLinea?id=" + routeId;
+			window.location.href = "selezionaLinea?id=" + routeId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -208,7 +208,7 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
 		<li class="active">Linee</li>
 	</ol>
 	
@@ -258,10 +258,10 @@
 								${fn:length(linea.tripPatterns)}
 								<c:choose>
 									<c:when test="${lineaAttiva.id == linea.id}">
-										<a class="btn btn-default" href="/_5t/schemiCorse">
+										<a class="btn btn-default" href="schemiCorse">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/schemiCorse">
+										<a class="btn btn-default disabled" href="schemiCorse">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
@@ -279,7 +279,7 @@
 		
 		<!-- Div with button to create route and selected route summary -->
 		<div class="col-lg-6">
-			<a id="creaLineaButton" class="btn btn-primary" href="/_5t/creaLinea">Crea una linea</a>
+			<a id="creaLineaButton" class="btn btn-primary" href="creaLinea">Crea una linea</a>
 			
 			<!-- Div with create route form -->
 			<div id="creaLinea">
@@ -357,7 +357,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea linea" />
-							<a class="btn btn-default" href="/_5t/linee">Annulla</a>
+							<a class="btn btn-default" href="linee">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -409,14 +409,15 @@
 								<b>Colore testo:</b> <p class="colored" style="background: ${lineaAttiva.textColor};"></p>
 							</c:otherwise>
 						</c:choose>
+					</div>
 					<div class="col-lg-8">
 						<b>Tariffe:</b>
 						<c:forEach var="tariffa" items="${listaTariffe}" varStatus="i">
-							<a href="/_5t/selezionaTariffa?id=${tariffa.fareAttribute.id}">${tariffa.fareAttribute.gtfsId}</a><c:if test="${!i.last}">,</c:if>
+							<a href="selezionaTariffa?id=${tariffa.fareAttribute.id}">${tariffa.fareAttribute.gtfsId}</a><c:if test="${!i.last}">,</c:if>
 						</c:forEach>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaLineaButton" class="btn btn-primary" href="/_5t/modificaLinea">Modifica</a>
+						<a id="modificaLineaButton" class="btn btn-primary" href="modificaLinea">Modifica</a>
 						<button id="eliminaLineaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -424,7 +425,7 @@
 			
 			<!-- Div with edit route form -->
 			<div id="modificaLinea">
-				<form:form id="modificaLineaForm" commandName="route" method="post" role="form" action="/_5t/modificaLinea">
+				<form:form id="modificaLineaForm" commandName="route" method="post" role="form" action="modificaLinea">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
@@ -501,7 +502,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica linea" />
-							<a class="btn btn-default" href="/_5t/linee">Annulla</a>
+							<a class="btn btn-default" href="linee">Annulla</a>
 						</div>
 					</div>
 				</form:form>

@@ -16,16 +16,16 @@
 	<nav class="navbar navbar-default" role="navigation">
 	  <div class="container-fluid">
 	    <div class="navbar-header">
-	      <a class="navbar-brand" href="/_5t/home">GTFS Manager</a>
+	      <a class="navbar-brand" href="home">GTFS Manager</a>
 	    </div>
 	  </div>
 	</nav>
 
-	<a href="/_5t/agenzie">Agenzie</a>
+	<a href="agenzie">Agenzie</a>
 
 	<div class="login_registration">
-	<p><a class="btn btn-primary" href="/_5t/login">Accedi</a><br>
-	oppure <a href="/_5t/registration">Registrati</a></p>
+	<p><a class="btn btn-primary" href="login">Accedi</a><br>
+	oppure <a href="registration">Registrati</a></p>
 	</div>
 </body>
 </html>

@@ -15,6 +15,7 @@ import javax.persistence.ManyToOne;
 import javax.persistence.OneToMany;
 import javax.persistence.SequenceGenerator;
 import javax.persistence.Table;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "shape")
@@ -35,6 +36,7 @@ public class Shape implements Serializable {
 	private Agency agency;
 	
 	@Column(name = "shape_encoded_polyline")
+	@Size(max=1000000)
 	private String encodedPolyline;
 	
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "shape")

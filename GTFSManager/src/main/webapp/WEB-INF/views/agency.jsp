@@ -72,7 +72,7 @@
 			$("#delete-agency").show();
 		});
 		$("#delete-agency-button").click(function() {
-			window.location.href = "/_5t/eliminaAgenzia";
+			window.location.href = "eliminaAgenzia";
 		});
 		
 		// when an agency is selected, all navigation bar links are enabled
@@ -83,7 +83,7 @@
 		// clicking on a row, the correspondent agency is selected
 		$("#listaAgenzie").find("tbody").find("tr").click(function() {
 			var agencyId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaAgenzia?id=" + agencyId;
+			window.location.href = "selezionaAgenzia?id=" + agencyId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -295,10 +295,10 @@
 								${fn:length(agenzia.routes)}
 								<c:choose>
 									<c:when test="${agenziaAttiva.id == agenzia.id}">
-										<a class="btn btn-default" href="/_5t/linee">
+										<a class="btn btn-default" href="linee">
 									</c:when>
 									<c:otherwise>
-										<a class="btn btn-default disabled" href="/_5t/linee">
+										<a class="btn btn-default disabled" href="linee">
 									</c:otherwise>
 								</c:choose>
 								<c:choose>
@@ -316,7 +316,7 @@
 		
 		<!-- Div with button to create agency and selected agency summary -->
 		<div class="col-lg-6">
-			<a id="creaAgenziaButton" class="btn btn-primary" href="/_5t/creaAgenzia">Crea un'agenzia</a>
+			<a id="creaAgenziaButton" class="btn btn-primary" href="creaAgenzia">Crea un'agenzia</a>
 			
 			<!-- Div with create agency form -->
 			<div id="creaAgenzia">
@@ -372,7 +372,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea agenzia" />
-							<a class="btn btn-default" href="/_5t/agenzie">Annulla</a>
+							<a class="btn btn-default" href="agenzie">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -405,7 +405,7 @@
 						<b>Sito web tariffe:</b> <a href="${agenziaAttiva.fareUrl}">${agenziaAttiva.fareUrl}</a>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaAgenziaButton" class="btn btn-primary" href="/_5t/modificaAgenzia">Modifica</a>
+						<a id="modificaAgenziaButton" class="btn btn-primary" href="modificaAgenzia">Modifica</a>
 						<button id="eliminaAgenziaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -413,7 +413,7 @@
 			
 			<!-- Div with edit agency form -->
 			<div id="modificaAgenzia">
-				<form:form id="modificaAgenziaForm" commandName="agency" method="post" role="form" action="/_5t/modificaAgenzia">
+				<form:form id="modificaAgenziaForm" commandName="agency" method="post" role="form" action="modificaAgenzia">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
@@ -465,7 +465,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica agenzia" />
-							<a class="btn btn-default" href="/_5t/agenzie">Annulla</a>
+							<a class="btn btn-default" href="agenzie">Annulla</a>
 						</div>
 					</div>
 				</form:form>

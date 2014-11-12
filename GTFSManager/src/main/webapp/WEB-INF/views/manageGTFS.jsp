@@ -81,7 +81,7 @@
 		});
 		$("#delete-gtfs-button").click(function() {
 			var GTFSSelected = GTFSTable.rows('.selected').data().length;
-			var url = "/_5t/eliminaGTFS?id=";
+			var url = "eliminaGTFS?id=";
 			$("#listaGTFS").find("tbody").find(".selected").each(function(index) {
 				if (index == GTFSSelected - 1)
 					url += $(this).find(".hidden").html();
@@ -185,7 +185,7 @@
 			<tbody>
 				<c:forEach var="gtfs" items="${listaGTFS}">
 					<tr>
-						<td><a href="/_5t/scaricaGTFS?id=${gtfs.id}">${gtfs.name}</a></td>
+						<td><a href="scaricaGTFS?id=${gtfs.id}">${gtfs.name}</a></td>
 						<td>${gtfs.version}</td>
 						<td><fmt:formatDate type="date" dateStyle="short" timeStyle="short" value="${gtfs.startDate}" /></td>
 						<td><fmt:formatDate type="date" dateStyle="short" timeStyle="short" value="${gtfs.endDate}" /></td>
@@ -204,7 +204,7 @@
 		</div>
 		
 		<div id="creaGTFS">
-			<form:form id="creaGTFSForm" commandName="feedInfo" method="post" role="form" action="/_5t/creaGTFS">
+			<form:form id="creaGTFSForm" commandName="feedInfo" method="post" role="form" action="creaGTFS">
 				<div class="row">
 					<div class="form-group col-lg-8">
 						<label for="publisherName" class="required">Pubblicato da</label>
@@ -266,7 +266,7 @@
 				<div class="row">
 					<div class="form-group col-lg-8">
 						<input class="btn btn-success" type="submit" value="Crea GTFS" />
-						<a class="btn btn-default" href="/_5t/GTFS">Annulla</a>
+						<a class="btn btn-default" href="GTFS">Annulla</a>
 					</div>
 				</div>
 			</form:form>

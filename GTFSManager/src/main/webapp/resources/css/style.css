@@ -51,3 +51,24 @@ label.required:after {
      content: "\003E";
      color: #ccc;
 }
+
+.marker-cluster-small {
+	background-color: rgba(166, 237, 255, 0.6);
+	}
+.marker-cluster-small div {
+	background-color: rgba(136, 207, 255, 0.6);
+	}
+
+.marker-cluster-medium {
+	background-color: rgba(106, 177, 255, 0.6);
+	}
+.marker-cluster-medium div {
+	background-color: rgba(76, 147, 255, 0.6);
+	}
+
+.marker-cluster-large {
+	background-color: rgba(46, 117, 255, 0.6);
+	}
+.marker-cluster-large div {
+	background-color: rgba(16, 87, 255, 0.6);
+	}

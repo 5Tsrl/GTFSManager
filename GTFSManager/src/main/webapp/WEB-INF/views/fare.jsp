@@ -88,13 +88,13 @@
 			$("#delete-fare").show();
 		});
 		$("#delete-fare-button").click(function() {
-			window.location.href = "/_5t/eliminaTariffa";
+			window.location.href = "eliminaTariffa";
 		});
 		
 		// clicking on a row, the correspondent fare is selected
 		$("#listaTariffe").find("tbody").find("tr").click(function() {
 			var fareAttributeId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaTariffa?id=" + fareAttributeId;
+			window.location.href = "selezionaTariffa?id=" + fareAttributeId;
 		});
 		
 		// check at form submit for creation of a route association that at least one route has been selected
@@ -272,7 +272,7 @@
 		});
 		$("#delete-fare-rule-button").click(function() {
 			var routeSelected = listaRegoleLineaTable.rows('.selected').data().length;
-			var url = "/_5t/eliminaRegolaLinea?id=";
+			var url = "eliminaRegolaLinea?id=";
 			$("#listaRegoleLinea").find("tbody").find(".selected").each(function(index) {
 				if (index == routeSelected - 1)
 					url += $(this).find(".hidden").html();
@@ -330,7 +330,7 @@
 		});
 		$("#delete-fare-rule-zone-button").click(function() {
 			var zoneSelected = listaRegoleZonaTable.rows('.selected').data().length;
-			var url = "/_5t/eliminaRegolaZona?id=";
+			var url = "eliminaRegolaZona?id=";
 			$("#listaRegoleZona").find("tbody").find(".selected").each(function(index) {
 				if (index == zoneSelected - 1)
 					url += $(this).find(".hidden").html();
@@ -388,7 +388,7 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
 	</ol>
 	
 	<p>Cliccare su una riga della tabella per selezionare la tariffa corrispondente.</p>
@@ -427,7 +427,7 @@
 		
 		<!-- Div with button to create fare and selected fare summary -->
 		<div class="col-lg-6">
-			<a id="creaTariffaButton" class="btn btn-primary" href="/_5t/creaTariffa">Crea una tariffa</a>
+			<a id="creaTariffaButton" class="btn btn-primary" href="creaTariffa">Crea una tariffa</a>
 			
 			<!-- Div with create fare form -->
 			<div id="creaTariffa">
@@ -485,7 +485,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea tariffa" />
-							<a class="btn btn-default" href="/_5t/tariffe">Annulla</a>
+							<a class="btn btn-default" href="tariffe">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -522,7 +522,7 @@
 						<b>Durata del trasferimento (min):</b> ${tariffaAttiva.transferDuration}
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaTariffaButton" class="btn btn-primary" href="/_5t/modificaTariffa">Modifica</a>
+						<a id="modificaTariffaButton" class="btn btn-primary" href="modificaTariffa">Modifica</a>
 						<button id="eliminaTariffaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 				</div>
@@ -530,7 +530,7 @@
 			
 			<!-- Div with edit fare form -->
 			<div id="modificaTariffa">
-				<form:form id="modificaTariffaForm" commandName="fareAttribute" method="post" role="form" action="/_5t/modificaTariffa">
+				<form:form id="modificaTariffaForm" commandName="fareAttribute" method="post" role="form" action="modificaTariffa">
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<label for="gtfsId" class="required">Id</label>
@@ -614,7 +614,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica tariffa" />
-							<a class="btn btn-default" href="/_5t/tariffe">Annulla</a>
+							<a class="btn btn-default" href="tariffe">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -641,7 +641,7 @@
 						<c:forEach var="regola" items="${listaRegoleLinea}">
 							<c:if test="${not empty regola.route}">
 								<tr>
-									<td><a href="/_5t/selezionaLinea?id=${regola.route.id}">${regola.route.shortName}</a></td>
+									<td><a href="selezionaLinea?id=${regola.route.id}">${regola.route.shortName}</a></td>
 									<td>${regola.route.shortName}</td>
 									<td class="hidden">${regola.id}</td>
 								</tr>
@@ -657,7 +657,7 @@
 				
 				<!-- Div with create fare rule form -->
 				<div id="creaRegolaLinea">
-					<form name="creaRegolaLineaForm" id="creaRegolaLineaForm" method="post" role="form" action="/_5t/creaRegolaLinea" onsubmit="return validateCreaRegolaLineaForm()">
+					<form name="creaRegolaLineaForm" id="creaRegolaLineaForm" method="post" role="form" action="creaRegolaLinea" onsubmit="return validateCreaRegolaLineaForm()">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="routeId" class="required">Linee</label>
@@ -671,7 +671,7 @@
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<input class="btn btn-success" type="submit" value="Associa" />
-								<a class="btn btn-default" href="/_5t/tariffe">Annulla</a>
+								<a class="btn btn-default" href="tariffe">Annulla</a>
 							</div>
 						</div>
 					</form>
@@ -707,8 +707,8 @@
 						<c:forEach var="regola" items="${listaRegoleZona}">
 							<c:if test="${not empty regola.origin && not empty regola.destination}">
 								<tr>
-									<td><a href="/_5t/selezionaZona?id=${regola.origin.id}">${regola.origin.gtfsId}</a></td>
-									<td><a href="/_5t/selezionaZona?id=${regola.destination.id}">${regola.destination.gtfsId}</a></td>
+									<td><a href="selezionaZona?id=${regola.origin.id}">${regola.origin.gtfsId}</a></td>
+									<td><a href="selezionaZona?id=${regola.destination.id}">${regola.destination.gtfsId}</a></td>
 									<td class="hidden">${regola.id}</td>
 								</tr>
 							</c:if>
@@ -723,7 +723,7 @@
 				
 				<!-- Div with create fare rule form -->
 				<div id="creaRegolaZona">
-					<form name="creaRegolaZonaForm" id="creaRegolaZonaForm" method="post" role="form" action="/_5t/creaRegolaZona">
+					<form name="creaRegolaZonaForm" id="creaRegolaZonaForm" method="post" role="form" action="creaRegolaZona">
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<label for="originId" class="required">Zona di origine</label>
@@ -749,7 +749,7 @@
 						<div class="row">
 							<div class="form-group col-lg-8">
 								<input class="btn btn-success" type="submit" value="Associa" />
-								<a class="btn btn-default" href="/_5t/tariffe">Annulla</a>
+								<a class="btn btn-default" href="tariffe">Annulla</a>
 							</div>
 						</div>
 					</form>

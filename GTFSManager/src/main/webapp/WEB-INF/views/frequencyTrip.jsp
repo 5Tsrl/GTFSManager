@@ -72,13 +72,13 @@
 			$("#delete-trip").show();
 		});
 		$("#delete-trip-button").click(function() {
-			window.location.href = "/_5t/eliminaCorsaAFrequenza";
+			window.location.href = "eliminaCorsaAFrequenza";
 		});
 		
 		// clicking on a row, the correspondent trip is selected
 		$("#listaCorseAFrequenza").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaCorsaAFrequenza?id=" + tripId;
+			window.location.href = "selezionaCorsaAFrequenza?id=" + tripId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -263,9 +263,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.shortName}</b></a></li>
-		<li><a href="/_5t/schemiCorse">Schema corsa: <b>${schemaCorsaAttivo.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="linee">Linea: <b>${lineaAttiva.shortName}</b></a></li>
+		<li><a href="schemiCorse">Schema corsa: <b>${schemaCorsaAttivo.gtfsId}</b></a></li>
 		<li class="active">Corse a frequenza</li>
 	</ol>
 	
@@ -322,7 +322,7 @@
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${corsaAFrequenza.calendar.id}">${corsaAFrequenza.calendar.gtfsId}</a></td>
+							<td><a href="selezionaCalendario?id=${corsaAFrequenza.calendar.id}">${corsaAFrequenza.calendar.gtfsId}</a></td>
 							<td>${corsaAFrequenza.startTime}</td>
 							<td>${corsaAFrequenza.endTime}</td>
 							<td>${corsaAFrequenza.headwaySecs}</td>
@@ -335,7 +335,7 @@
 		
 		<!-- Div with button to create tripPattern and selected tripPattern summary -->
 		<div class="col-lg-4">
-			<a id="creaCorsaAFrequenzaButton" class="btn btn-primary" href="/_5t/creaCorsaAFrequenza">Crea una corsa a frequenza</a>
+			<a id="creaCorsaAFrequenzaButton" class="btn btn-primary" href="creaCorsaAFrequenza">Crea una corsa a frequenza</a>
 			
 			<!-- Div with create tripPattern form -->
 			<div id="creaCorsaAFrequenza">
@@ -489,7 +489,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea corsa a frequenza" />
-							<a class="btn btn-default" href="/_5t/corseAFrequenza">Annulla</a>
+							<a class="btn btn-default" href="corseAFrequenza">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -579,11 +579,11 @@
 							%>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaCorsaAFrequenzaButton" class="btn btn-primary" href="/_5t/modificaCorsaAFrequenza">Modifica</a>
+						<a id="modificaCorsaAFrequenzaButton" class="btn btn-primary" href="modificaCorsaAFrequenza">Modifica</a>
 						<button id="eliminaCorsaAFrequenzaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 <!-- 					<div class="col-lg-12"> -->
-<%-- 						<form id="duplicaCorsaAFrequenzaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsaAFrequenza"> --%>
+<%-- 						<form id="duplicaCorsaAFrequenzaForm" class="form-inline" role="form" method="post" action="duplicaCorsaAFrequenza"> --%>
 <!-- 							<div class="form-group"> -->
 <!-- 								<label for="newGtfsId" class="required">Duplica con id</label> -->
 <!-- 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" /> -->
@@ -596,7 +596,7 @@
 			
 			<!-- Div with edit tripPattern form -->
 			<div id="modificaCorsaAFrequenza">
-				<form:form id="modificaCorsaAFrequenzaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsaAFrequenza">
+				<form:form id="modificaCorsaAFrequenzaForm" commandName="trip" method="post" role="form" action="modificaCorsaAFrequenza">
 					<% Trip trip = (Trip) session.getAttribute("corsaAFrequenzaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -754,7 +754,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica corsa" />
-							<a class="btn btn-default" href="/_5t/corseAFrequenza">Annulla</a>
+							<a class="btn btn-default" href="corseAFrequenza">Annulla</a>
 						</div>
 					</div>
 				</form:form>

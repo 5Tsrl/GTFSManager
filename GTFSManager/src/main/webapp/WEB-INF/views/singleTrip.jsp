@@ -72,13 +72,13 @@
 			$("#delete-trip").show();
 		});
 		$("#delete-trip-button").click(function() {
-			window.location.href = "/_5t/eliminaCorsaSingola";
+			window.location.href = "eliminaCorsaSingola";
 		});
 		
 		// clicking on a row, the correspondent trip is selected
 		$("#listaCorseSingole").find("tbody").find("tr").click(function() {
 			var tripId = $(this).find(".hidden").html();
-			window.location.href = "/_5t/selezionaCorsaSingola?id=" + tripId;
+			window.location.href = "selezionaCorsaSingola?id=" + tripId;
 		});
 		
 		// when alert are closed, they are hidden
@@ -219,9 +219,9 @@
 	<nav id="navigationBar" class="navbar navbar-default" role="navigation"></nav>
 	
 	<ol class="breadcrumb">
-		<li><a href="/_5t/agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
-		<li><a href="/_5t/linee">Linea: <b>${lineaAttiva.shortName}</b></a></li>
-		<li><a href="/_5t/schemiCorse">Schema corsa: <b>${schemaCorsaAttivo.gtfsId}</b></a></li>
+		<li><a href="agenzie">Agenzia: <b>${agenziaAttiva.gtfsId}</b></a></li>
+		<li><a href="linee">Linea: <b>${lineaAttiva.shortName}</b></a></li>
+		<li><a href="schemiCorse">Schema corsa: <b>${schemaCorsaAttivo.gtfsId}</b></a></li>
 		<li class="active">Corse singole</li>
 	</ol>
 	
@@ -276,7 +276,7 @@
 									<c:otherwise>Ritorno</c:otherwise>
 								</c:choose>
 							</td>
-							<td><a href="/_5t/selezionaCalendario?id=${corsaSingola.calendar.id}">${corsaSingola.calendar.gtfsId}</a></td>
+							<td><a href="selezionaCalendario?id=${corsaSingola.calendar.id}">${corsaSingola.calendar.gtfsId}</a></td>
 							<td>${corsaSingola.startTime}</td>
 							<td class="hidden">${corsaSingola.id}</td>
 						</tr>
@@ -287,7 +287,7 @@
 		
 		<!-- Div with button to create tripPattern and selected tripPattern summary -->
 		<div class="col-lg-4">
-			<a id="creaCorsaSingolaButton" class="btn btn-primary" href="/_5t/creaCorsaSingola">Crea una corsa singola</a>
+			<a id="creaCorsaSingolaButton" class="btn btn-primary" href="creaCorsaSingola">Crea una corsa singola</a>
 			
 			<!-- Div with create tripPattern form -->
 			<div id="creaCorsaSingola">
@@ -418,7 +418,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Crea corsa singola" />
-							<a class="btn btn-default" href="/_5t/corseSingole">Annulla</a>
+							<a class="btn btn-default" href="corseSingole">Annulla</a>
 						</div>
 					</div>
 				</form:form>
@@ -461,11 +461,11 @@
 						<% out.write(bikesAllowed.get(trip.getBikesAllowed())); %>
 					</div>
 					<div class="col-lg-12">
-						<a id="modificaCorsaSingolaButton" class="btn btn-primary" href="/_5t/modificaCorsaSingola">Modifica</a>
+						<a id="modificaCorsaSingolaButton" class="btn btn-primary" href="modificaCorsaSingola">Modifica</a>
 						<button id="eliminaCorsaSingolaButton" type="button" class="btn btn-danger">Elimina</button>
 					</div>
 <!-- 					<div class="col-lg-12"> -->
-<%-- 						<form id="duplicaCorsaSingolaForm" class="form-inline" role="form" method="post" action="/_5t/duplicaCorsaSingola"> --%>
+<%-- 						<form id="duplicaCorsaSingolaForm" class="form-inline" role="form" method="post" action="duplicaCorsaSingola"> --%>
 <!-- 							<div class="form-group"> -->
 <!-- 								<label for="newGtfsId" class="required">Duplica con id</label> -->
 <!-- 					    		<input name="newGtfsId" class="form-control" id="newGtfsId" placeholder="Id nuova corsa" maxlength="50" /> -->
@@ -478,7 +478,7 @@
 			
 			<!-- Div with edit tripPattern form -->
 			<div id="modificaCorsaSingola">
-				<form:form id="modificaCorsaSingolaForm" commandName="trip" method="post" role="form" action="/_5t/modificaCorsaSingola">
+				<form:form id="modificaCorsaSingolaForm" commandName="trip" method="post" role="form" action="modificaCorsaSingola">
 					<% Trip trip = (Trip) session.getAttribute("corsaSingolaAttiva"); %>
 					<div class="row">
 						<div class="form-group col-lg-8">
@@ -605,7 +605,7 @@
 					<div class="row">
 						<div class="form-group col-lg-8">
 							<input class="btn btn-success" type="submit" value="Modifica corsa" />
-							<a class="btn btn-default" href="/_5t/corseSingole">Annulla</a>
+							<a class="btn btn-default" href="corseSingole">Annulla</a>
 						</div>
 					</div>
 				</form:form>

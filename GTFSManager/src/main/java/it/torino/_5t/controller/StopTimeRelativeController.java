@@ -16,6 +16,7 @@ import it.torino._5t.entity.Route;
 import it.torino._5t.entity.Shape;
 import it.torino._5t.entity.Stop;
 import it.torino._5t.entity.StopTimeRelative;
+import it.torino._5t.entity.Trip;
 import it.torino._5t.entity.TripPattern;
 
 import org.slf4j.Logger;
@@ -312,6 +313,10 @@ public class StopTimeRelativeController {
 							// non è ancora stato associato nessuno shape alla corsa -> ne creo uno nuovo
 							shape.addTripPattern(tp);
 							a.addShape(shape);
+							// aggiungo lo shape anche a tutte le corse associate al trip pattern
+							for (Trip t: tp.getTrips()) {
+								t.setShape(shape);
+							}
 							logger.info("Shape creato per la corsa " + tp.getTripShortName());
 						} else {
 							// c'è già uno shape associato alla corsa
@@ -323,12 +328,20 @@ public class StopTimeRelativeController {
 										// c'è una sola corsa associata allo shape -> aggiorno lo shape
 										s.setEncodedPolyline(shape.getEncodedPolyline());
 										tp.setShape(s);
+										// aggiorno lo shape anche a tutte le corse associate al trip pattern
+										for (Trip t: tp.getTrips()) {
+											t.setShape(s);
+										}
 										logger.info("Shape aggiornato per la corsa " + tp.getTripShortName());
 									} else {
 										// c'è più di una corsa associata allo shape -> creo uno shape nuovo
 										s.getTripPatterns().remove(tripPattern);
 										shape.addTripPattern(tp);
 										a.addShape(shape);
+										// aggiungo lo shape anche a tutte le corse associate al trip pattern
+										for (Trip t: tp.getTrips()) {
+											t.setShape(s);
+										}
 										logger.info("Shape creato da shape precedente per la corsa " + tp.getTripShortName());
 									}
 									break;
@@ -348,6 +361,63 @@ public class StopTimeRelativeController {
 		}
 		
 		session.setAttribute("agenziaAttiva", a);
+		
+		return "redirect:fermateSchemaCorsa";
+	}
+	
+	// chiamata viene eliminato uno shape
+	@RequestMapping(value = "/eliminaShape", method = RequestMethod.GET)
+	public String deleteShape(RedirectAttributes redirectAttributes, HttpSession session) {
+		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+		if (agency == null) {
+			return "redirect:agenzie";
+		}
+		Agency a = agencyDAO.loadAgency(agency.getId());
+		
+		Route route = (Route) session.getAttribute("lineaAttiva");
+		if (route == null) {
+			return "redirect:linee";
+		}
+		
+		TripPattern tripPattern = (TripPattern) session.getAttribute("schemaCorsaAttivo");
+		if (tripPattern == null) {
+			return "redirect:schemiCorse";
+		}
+		
+		// cerco tra le linee dell'agenzia quella attiva
+		for (Route r: a.getRoutes()) {
+			if (r.getId().equals(route.getId())) {
+				// tra le corse della linea quella attiva e le rimuovo lo shape
+				for (TripPattern tp: r.getTripPatterns()) {
+					if (tp.equals(tripPattern)) {
+						// cerco tra gli shape dell'agenzia quello associato alla corsa attiva
+						for (Shape s: a.getShapes()) {
+							if (s.getId() == tp.getShape().getId()) {
+								if (s.getTripPatterns().size() == 1) {
+									// c'è un solo trip pattern associato allo shape, elimino lo shape
+									a.getShapes().remove(s);
+								} else {
+									// ci sono più trip pattern associati allo shape, rimuovo il trip pattern attivo dallo shape
+									s.getTripPatterns().remove(tp);
+								}
+								break;
+							}
+						}
+						tp.setShape(null);
+						// rimuovo lo shape anche da tutte le corse associate al trip pattern
+						for (Trip t: tp.getTrips()) {
+							t.setShape(null);
+						}
+						logger.info("Shape eliminato dallo schema corsa " + tp.getGtfsId());
+						session.setAttribute("schemaCorsaAttivo", tp);
+						session.setAttribute("lineaAttiva", r);
+						session.setAttribute("agenziaAttiva", a);
+						break;
+					}
+				}
+				break;
+			}
+		}
 		
 		return "redirect:fermateSchemaCorsa";
 	}
