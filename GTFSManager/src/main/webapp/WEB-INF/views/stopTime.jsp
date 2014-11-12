@@ -129,8 +129,7 @@
 		        marker: false
 		    },
 		    edit: {
-		        featureGroup: drawnItems,
-		        remove: false
+		        featureGroup: drawnItems
 		    }
 		});
 		map.addControl(drawControl);
@@ -401,6 +400,13 @@
 				$("#creaShapeForm").submit();
 		    });
 			
+		});
+		
+		map.on('draw:deleted', function (e) {
+			var layers = e.layers;
+		    layers.eachLayer(function (layer) {
+				window.location.href = "eliminaShape";
+		    });
 		});
 	});
 	
