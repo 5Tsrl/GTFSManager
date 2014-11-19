@@ -361,6 +361,59 @@ public class StopTimeController {
 		return "redirect:fermateCorse";
 	}
 	
+	// chiamata viene eliminato uno shape
+	@RequestMapping(value = "/eliminaShape", method = RequestMethod.GET)
+	public String deleteShape(RedirectAttributes redirectAttributes, HttpSession session) {
+		Agency agency = (Agency) session.getAttribute("agenziaAttiva");
+		if (agency == null) {
+			return "redirect:agenzie";
+		}
+		Agency a = agencyDAO.loadAgency(agency.getId());
+		
+		Route route = (Route) session.getAttribute("lineaAttiva");
+		if (route == null) {
+			return "redirect:linee";
+		}
+		
+		Trip trip = (Trip) session.getAttribute("corsaAttiva");
+		if (trip == null) {
+			return "redirect:corse";
+		}
+		
+		// cerco tra le linee dell'agenzia quella attiva
+		for (Route r: a.getRoutes()) {
+			if (r.getId().equals(route.getId())) {
+				// tra le corse della linea quella attiva e le rimuovo lo shape
+				for (Trip t: r.getTrips()) {
+					if (t.equals(trip)) {
+						// cerco tra gli shape dell'agenzia quello associato alla corsa attiva
+						for (Shape s: a.getShapes()) {
+							if (s.getId() == t.getShape().getId()) {
+								if (s.getTrips().size() == 1) {
+									// c'è un solo trip pattern associato allo shape, elimino lo shape
+									a.getShapes().remove(s);
+								} else {
+									// ci sono più trip pattern associati allo shape, rimuovo il trip pattern attivo dallo shape
+									s.getTrips().remove(t);
+								}
+								break;
+							}
+						}
+						t.setShape(null);
+						logger.info("Shape eliminato dallo schema corsa " + t.getGtfsId());
+						session.setAttribute("corsaAttiva", t);
+						session.setAttribute("lineaAttiva", r);
+						session.setAttribute("agenziaAttiva", a);
+						break;
+					}
+				}
+				break;
+			}
+		}
+		
+		return "redirect:fermateCorse";
+	}
+	
 	// chiamata quando clicco sul pulsante "Elimina"
 	@RequestMapping(value = "/eliminaFermataCorsa", method = RequestMethod.GET)
 	public String deleteRoute(RedirectAttributes redirectAttributes, @RequestParam("id") Integer id, HttpSession session) {
