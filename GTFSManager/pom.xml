@@ -142,7 +142,7 @@
 			<version>1.3.2</version>  
 		</dependency>
         
-		<!-- Test -->
+		<!-- Test
 		<dependency>
 			<groupId>junit</groupId>
 			<artifactId>junit</artifactId>
@@ -163,7 +163,7 @@
 			<groupId>org.springframework.boot</groupId>
 			<artifactId>spring-boot-starter-websocket</artifactId>
 			<version>1.0.0.RELEASE</version>
-		</dependency>
+		</dependency> -->
 	</dependencies>
     <build>
         <plugins>
