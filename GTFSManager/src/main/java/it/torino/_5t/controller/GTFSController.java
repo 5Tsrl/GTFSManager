@@ -861,6 +861,7 @@ public class GTFSController {
 		    }
 		    
 		    closeOutputStreams();
+		    zipFile.close();
 		    
 		    // for each entity there is a map to retrieve in a fast way the object in case of foreign references (in order to avoid too many access to the database)
 		    Map<String, Agency> agencies = new HashMap<String, Agency>();
